@@ -1,0 +1,6 @@
+[submodule "mdegraphlib"]
+	path = mdegraphlib
+	url = ./mdegraphlib
+[submodule "mdegraphlib-gql"]
+	path = mdegraphlib-gql
+	url = ./mdegraphlib-gql

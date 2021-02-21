@@ -1,0 +1,149 @@
+type Partner {
+   purchases : Purchase
+   phone : String
+   address : Address
+   email : String
+   worksAt : Department
+   bankAccount : BankingDetails
+   email : String
+   id : ID
+   id : ID
+   hiredAt : String
+   lastname : String
+   firstname : String
+   name : String
+}
+
+type ⊔Mutation,Mutation,Mutation {
+   updateDepartment : Department
+   createDepartment : Department
+   createPurchase : Purchase
+   createStore : Store
+   deleteEmployee : Partner
+   setBankingDetails : Partner
+   updateEmployee : Partner
+   addPurchaseItem : PurchaseItem
+   setAddress : Partner
+   deleteStore : Store
+   createEmployee : Partner
+   deleteDepartment : Department
+   deletePurchase : Purchase
+   updateCustomer : Partner
+   createCustomer : Partner
+   deleteCustomer : Partner
+}
+
+type ⊔Query,Query,Query {
+   customers : Partner
+   employees : Partner
+   employee : Partner
+   store : Store
+   stores : Store
+   purchases : Purchase
+   customer : Partner
+   departments : Department
+   department : Department
+   purchase : Purchase
+}
+
+type PurchaseItem {
+   purchaseId : ID
+   quantity : Int
+   productId : ID
+}
+
+type Address {
+   country : String
+   postalCode : String
+   postalCode : String
+   street : String
+   country : String
+   street : String
+   state : String
+   state : String
+   city : String
+   city : String
+}
+
+type Purchase {
+   items : PurchaseItem
+   id : ID
+   store : Store
+   date : String
+   customer : Partner
+}
+
+type Store {
+   address : Address
+   purchases : Purchase
+   id : ID
+   manager : ID
+}
+
+type PaymentDetails {
+   validUntil : String
+   bic : String
+   cardNumber : String
+   iban : String
+}
+
+type Invoice {
+   dueAt : String
+   total : Int
+   payedAt : String
+   id : ID
+   createdAt : String
+   client : Client
+}
+
+type Client {
+   name : String
+   id : ID
+   address : Address
+   paymentDetails : PaymentDetails
+   invoices : Invoice
+}
+
+type Address {
+   country : String
+   postalCode : String
+   postalCode : String
+   street : String
+   country : String
+   street : String
+   state : String
+   state : String
+   city : String
+   city : String
+}
+
+type Query {
+   clients : Client
+   invoice : Invoice
+   client : Client
+   invoices : Invoice
+}
+
+type Mutation {
+   createClient : Client
+   updateClient : Client
+   deleteClient : Client
+   updateInvoice : Invoice
+   createInvoice : Invoice
+   setAddress : Client
+   deleteInvoice : Invoice
+   setPaymentDetails : Client
+}
+
+type BankingDetails {
+   iban : String
+   bic : String
+}
+
+type Department {
+   name : String
+   id : ID
+   manager : Partner
+   workingAt : Partner
+}
+
