@@ -1,0 +1,4 @@
+rootProject.name = 'modelvm'
+include 'mdegraphlib'
+include 'mdegraphlib-gql'
+include 'corr-lang-core'
