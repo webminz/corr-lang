@@ -1,0 +1,8 @@
+.gradle
+build
+corr-lang-core/.idea
+corr-lang-editor
+examples
+mdegraphlib-mgmt
+old
+corr-lang-core/src/generated

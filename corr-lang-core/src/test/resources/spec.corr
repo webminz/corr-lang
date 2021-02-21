@@ -1,0 +1,26 @@
+endpoint Sales {
+    type server
+    at http://localhost:4011
+    technology GRAPH_QL
+}
+
+endpoint Invoices {
+    type server
+    at http://localhost:4012
+    technology GRAPH_QL
+}
+
+endpoint HR {
+    type server
+    at http://localhost:4013
+    technology GRAPH_QL
+}
+
+correspondence Fed (Sales,Invoices,HR) {
+
+   identify (Sales.Query,Sales.Query,HR.Query) as Query;
+   identify (Sales.Mutation,Sales.Mutation,HR.Mutation) as Mutation;
+
+   identify (Sales.Customer,Sales.Client,HR.Employee) as Partner;
+
+}

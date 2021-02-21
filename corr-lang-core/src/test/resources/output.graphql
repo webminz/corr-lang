@@ -1,0 +1,143 @@
+type Partner {
+   hiredAt : String
+   id : ID
+   lastname : String
+   bankAccount : BankingDetails
+   firstname : String
+   purchases : Purchase
+   email : String
+   phone : String
+   email : String
+   worksAt : Department
+   id : ID
+   address : Address
+   name : String
+}
+
+type Mutation {
+   updateInvoice : Invoice
+   updateClient : Client
+   updateCustomer : Partner
+   createEmployee : Partner
+   updateDepartment : Department
+   deleteStore : Store
+   createPurchase : Purchase
+   updateEmployee : Partner
+   deleteClient : Client
+   deleteInvoice : Invoice
+   addPurchaseItem : PurchaseItem
+   deleteDepartment : Department
+   createDepartment : Department
+   createStore : Store
+   setBankingDetails : Partner
+   setPaymentDetails : Client
+   deletePurchase : Purchase
+   deleteCustomer : Partner
+   deleteEmployee : Partner
+   createCustomer : Partner
+   createClient : Client
+   setAddress : Client
+   createInvoice : Invoice
+   setAddress : Partner
+}
+
+type Query {
+   customer : Partner
+   clients : Client
+   invoice : Invoice
+   employees : Partner
+   employee : Partner
+   departments : Department
+   client : Client
+   purchases : Purchase
+   store : Store
+   stores : Store
+   invoices : Invoice
+   purchase : Purchase
+   customers : Partner
+   department : Department
+}
+
+type PurchaseItem {
+   purchaseId : ID
+   quantity : Int
+   productId : ID
+}
+
+type Address {
+   street : String
+   country : String
+   postalCode : String
+   city : String
+   city : String
+   state : String
+   postalCode : String
+   street : String
+   state : String
+   country : String
+}
+
+type Purchase {
+   date : String
+   store : Store
+   customer : Partner
+   id : ID
+   items : PurchaseItem
+}
+
+type Store {
+   address : Address
+   id : ID
+   purchases : Purchase
+   manager : ID
+}
+
+type PaymentDetails {
+   bic : String
+   iban : String
+   cardNumber : String
+   validUntil : String
+}
+
+type Invoice {
+   dueAt : String
+   id : ID
+   total : Int
+   client : Client
+   payedAt : String
+   createdAt : String
+}
+
+type Client {
+   address : Address
+   invoices : Invoice
+   name : String
+   paymentDetails : PaymentDetails
+   id : ID
+}
+
+type Address {
+   street : String
+   country : String
+   postalCode : String
+   city : String
+   city : String
+   state : String
+   postalCode : String
+   street : String
+   state : String
+   country : String
+}
+
+type BankingDetails {
+   bic : String
+   iban : String
+}
+
+type Department {
+   name : String
+   manager : Partner
+   id : ID
+   workingAt : Partner
+}
+

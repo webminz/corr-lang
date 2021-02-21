@@ -1,0 +1,60 @@
+plugins {
+    id 'antlr'
+    id "application"
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ['-package', 'no.hvl.past.corrlang.parser']
+    outputDirectory = new File("src/generated/no/hvl/past/corrlang/parser")
+}
+
+dependencies {
+    implementation project(':mdegraphlib')
+    implementation project(':mdegraphlib-gql')
+    compile 'org.antlr:antlr4-runtime:4.8'
+    antlr "org.antlr:antlr4:4.8"
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
+    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+    testCompile project(':mdegraphlib').sourceSets.test.output
+}
+
+
+ext {
+    javaMainClass = "no.hvl.past.corrlang.runner.Run"
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+
+compileJava.dependsOn generateGrammarSource
+
+sourceSets {
+    main {
+        java.srcDir 'src/main/java'
+        java.srcDir 'src/generated'
+        resources.srcDir 'src/main/resources'
+    }
+    test {
+        java.srcDir 'src/test/integration'
+        java.srcDir 'src/test/java'
+        resources.srcDir 'src/test/resources'
+    }
+}
+
+clean {
+    delete 'src/generated'
+}
+
+run {
+    args = ["GOAL:INFO", "--config:/Users/past/Documents/dev/modelvm/corr-lang-core/execution/corrlang.conf"]
+}
+
+shadowJar {
+    archiveBaseName.set('corrlang')
+    archiveClassifier.set('')
+    archiveVersion.set('')
+}

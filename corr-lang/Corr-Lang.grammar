@@ -1,0 +1,31 @@
+Corr-Lang
+
+
+FileContents ::= <CorrSpec>* |<Import>*
+
+CorrSpec ::= 'correspondence' <identifier> ('instantiates' <CorrSpecRef>)? '{' <CorrSpecElement> '}'
+
+CorrSpecElement ::= <Endpoint> | <Commonality> | <ConsistencyRule>
+
+Endpoint ::= 'endpoint' ('server' | 'batch' | 'file') ('at' <URI>)? 'language' (ECORE|GQL|JAVA|XML|OPENAPI|PROTOCOLBUFFERS|TSINTERFACE)
+
+Commonality ::= ('relate' | 'sync' | 'identify')  // commonality type
+				<ElementRef>+  // related elements
+				('as' <Identifier)?  // name
+				('with' '{' <CommonalityRelation>* '}')? // sub relations !! Do they have to be hierarchical ?!
+				('by' '{' <Match> '}')?  // automatic matching procedure
+				('check' '{' <ConsistencyRule>|<ConsistencyRuleRef> '}' )? // inter-model constraint
+
+CommonalityRelation ::= <Commonality>
+
+Match ::= <Key> | <MatchRule>
+
+Key ::= 'key' (ElementRef)+ // !! composite and alternative keys
+
+MatchRule ::= 'rule' '{' (EVL_BODY|OCL_BODY) '}'
+
+ConsistencyRule ::= 'rule' <Identifier> ('severity' (ERROR|PROBLEM|WARNING|CRITIQUE|INFO|<String>))? '{' (EVL_BODY|OCL_BODY) '}'
+
+Import ::= 'import' 
+			('external')? // For importing EVL or OCL procedures
+			<URI>;

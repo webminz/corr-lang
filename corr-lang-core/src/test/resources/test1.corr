@@ -1,0 +1,62 @@
+
+endpoint Sales {
+    type server
+    at http://localhost:4011
+    technology GRAPH_QL
+}
+
+endpoint Invoices {
+    type server
+    at http://localhost:4012
+    technology GRAPH_QL
+}
+
+endpoint HR {
+    type server
+    at http://localhost:4013
+    technology GRAPH_QL
+}
+
+correspondence Fed (Sales,Invoices,HR) {
+
+   identify (Sales.Query,Sales.Query,HR.Query) as Query;
+   identify (Sales.Mutation,Sales.Mutation,HR.Mutation) as Mutation;
+
+   identify (Sales.Customer,Sales.Client,HR.Employee) as Partner;
+
+}
+
+endpoint Second {
+    type file
+    at file:///home/user/Documents/example/one.xmi
+    technology ECORE
+    schema file:///home/user/Documents/example/one.ecore
+}
+
+
+correspondence OO2RDM {
+    relate (OO.ClassDiagram, RDBM.Schema) with {
+        sync (OO.ClassDiagram.classes , RDBM.Schema.tables) as entities with {
+            identify (OO.ClassDiagram.classes.Column ,RDBM.Schema.tables.column);
+        };
+    };
+}
+
+correspondence C (First,Second) {
+
+    relate (First . A , Second . B) as C0 check AllCapitals;
+
+    relate (First . C , Second . D) as C1 with {
+        sync (First . C . id , Second . D . identifier);
+    } when Second . C . name == First . C . firstname ++ First . C . lastname;
+
+    identify (First . A . owner , Second . B . src) when First . A . owner . C <~> Second . D . src . D;
+
+}
+
+rule AllCapitals {
+    using OCL """
+       context A inv allCaps:
+          self.name->toUpper() = self.name
+    """
+}
