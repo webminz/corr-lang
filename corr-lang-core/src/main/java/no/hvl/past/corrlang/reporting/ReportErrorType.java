@@ -8,5 +8,7 @@ public enum ReportErrorType {
 
     PLUGIN,
 
-    OTHER
+    OTHER,
+
+    GOAL
 }

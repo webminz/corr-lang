@@ -1,10 +1,10 @@
 package no.hvl.past.corrlang.domainmodel;
 
-import no.hvl.past.corrlang.referencing.URLReference;
 import no.hvl.past.graph.Sketch;
-import no.hvl.past.names.Name;
+import no.hvl.past.systems.Sys;
 import no.hvl.past.techspace.TechSpace;
 import no.hvl.past.techspace.TechSpaceAdapter;
+import org.checkerframework.checker.nullness.Opt;
 
 import java.util.Optional;
 
@@ -15,7 +15,7 @@ public abstract class Endpoint extends CorrLangElement {
     private String technology;
     private TechSpace techSpace;
     private TechSpaceAdapter<? extends TechSpace> techSpaceAdapter;
-    private Sketch schema;
+    private Sys system;
 
 
     Endpoint(String name) {
@@ -62,13 +62,6 @@ public abstract class Endpoint extends CorrLangElement {
         this.techSpaceAdapter = adapter;
     }
 
-    public void setSchema(Sketch schema) {
-        this.schema = schema;
-    }
-
-    public Optional<Sketch> getFormalSchemaRepresentation()  {
-        return Optional.ofNullable(schema);
-    }
 
     public void setTechSpace(TechSpace techSpace) {
         this.techSpace = techSpace;
@@ -76,5 +69,13 @@ public abstract class Endpoint extends CorrLangElement {
 
     public Optional<TechSpace> getTechSpace() {
         return Optional.of(techSpace);
+    }
+
+    public void setSystem(Sys system) {
+        this.system = system;
+    }
+
+    public Optional<Sys> getSystem() {
+        return Optional.of(system);
     }
 }

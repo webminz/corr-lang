@@ -1,13 +1,24 @@
 package no.hvl.past.corrlang.domainmodel;
 
+import no.hvl.past.graph.Graph;
 import no.hvl.past.graph.elements.Triple;
+import no.hvl.past.keys.AttributeBasedKey;
+import no.hvl.past.keys.Key;
+import no.hvl.past.names.Name;
+import no.hvl.past.systems.Sys;
 
-public class ElementRef implements Key.KeyLiteralArgument {
+import java.util.Optional;
+
+/**
+ * Element refs are used to refer to elements in another schema.
+ */
+public class ElementRef extends CorrLangElement implements ElementCondition.IdentificationArgument, ElementCondition.RelationRulePart {
 
     private String endpointName;
     private String name;
     private String ownerName;
     private String targetName;
+
     private Endpoint endpoint;
     private Triple element;
 
@@ -56,6 +67,11 @@ public class ElementRef implements Key.KeyLiteralArgument {
         this.name = name;
     }
 
+    @Override
+    public void accept(SyntaxVisitor visitor) throws Throwable {
+        visitor.handle(this);
+    }
+
     public String getOwnerName() {
         return ownerName;
     }
@@ -72,8 +88,8 @@ public class ElementRef implements Key.KeyLiteralArgument {
         this.targetName = targetName;
     }
 
-    public Triple getElement() {
-        return element;
+    public Optional<Triple> getElement() {
+        return Optional.ofNullable(element);
     }
 
     public void setElement(Triple element) {
@@ -112,5 +128,25 @@ public class ElementRef implements Key.KeyLiteralArgument {
             result = result ^ this.ownerName.hashCode();
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return endpointName + "." + (ownerName != null ? ownerName + "." : "") + name + (targetName != null ? "." + targetName : "") ;
+    }
+
+    @Override
+    public Key toKey(Name targetType, Graph carrier) {
+        return new AttributeBasedKey(carrier, this.element, targetType);
+    }
+
+    public Optional<Triple> lookup(Sys system) {
+        if (targetName != null) {
+            return system.lookup(this.ownerName, this.name, this.targetName);
+        } else if (ownerName != null) {
+            return system.lookup(this.ownerName, this.name);
+        } else {
+            return system.lookup(this.name);
+        }
     }
 }

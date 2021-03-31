@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 plugins {
     id 'antlr'
     id "application"
@@ -13,6 +16,7 @@ generateGrammarSource {
 dependencies {
     implementation project(':mdegraphlib')
     implementation project(':mdegraphlib-gql')
+    implementation 'org.springframework:spring-context:5.3.3'
     compile 'org.antlr:antlr4-runtime:4.8'
     antlr "org.antlr:antlr4:4.8"
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
@@ -30,6 +34,8 @@ application {
 }
 
 
+
+
 compileJava.dependsOn generateGrammarSource
 
 sourceSets {
@@ -45,12 +51,34 @@ sourceSets {
     }
 }
 
+task updateVersionInfo {
+    def gitBranch = "Unknown branch"
+    try {
+        def workingDir = new File("${project.projectDir}")
+        def result = 'git rev-parse HEAD'.execute(null, workingDir)
+        result.waitFor()
+        if (result.exitValue() == 0) {
+            gitBranch = result.text.trim()
+        }
+    } catch (e) {
+    }
+    Properties props = new Properties()
+    File propsFile = new File("${project.projectDir}/src/main/resources/BUILD.properties")
+    props.load(propsFile.newDataInputStream())
+    def version = props.get("VERSION")
+    def buildNo = 1 + Integer.parseInt(props.getProperty("BUILD", "0"))
+    props.setProperty("BUILD", buildNo.toString())
+    props.setProperty("COMMIT",gitBranch)
+    props.setProperty("DATE", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+    props.store(propsFile.newDataOutputStream(),"")
+}
+
 clean {
     delete 'src/generated'
 }
 
 run {
-    args = ["GOAL:INFO", "--config:/Users/past/Documents/dev/modelvm/corr-lang-core/execution/corrlang.conf"]
+    args = ["GOAL:CHECK", "--config:/Users/past/Documents/dev/modelvm/corr-lang-core/execution/corrlang.conf"]
 }
 
 shadowJar {

@@ -1,21 +1,29 @@
 package no.hvl.past.corrlang.domainmodel;
 
 import no.hvl.past.graph.*;
-import no.hvl.past.names.Name;
+import no.hvl.past.keys.Key;
+import no.hvl.past.systems.ComprSys;
 
 import java.util.*;
 
 public class CorrSpec extends CorrLangElement {
 
+    // Parsed
     private String typedOverName;
-    private CorrSpec typedOver;
     private List<String> endpointsList;
     private Collection<Commonality> commonalities;
-    private Map<String, Endpoint> endpointRefs;
 
+    // Linked
+    private Map<String, Endpoint> endpointRefs;
+    private CorrSpec typedOver;
+
+    // Interpreted
+    // TODO all summarizes in a comprehensive system
     private Star formalRepresentation;
     private Map<String, GraphMorphism> schemaTypeEmbeddings;
     private Sketch comprehensiveSchema;
+    private Set<Key> formalKeys;
+    private ComprSys comprSys;
 
 
     public CorrSpec(String name) {
@@ -24,23 +32,16 @@ public class CorrSpec extends CorrLangElement {
         this.endpointsList = new ArrayList<>();
         this.endpointRefs = new LinkedHashMap<>();
         this.schemaTypeEmbeddings = new LinkedHashMap<>();
+        this.formalKeys = new HashSet<>();
     }
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(SyntaxVisitor visitor) throws Throwable {
         visitor.handle(this);
     }
 
     public void setTypedOverName(String typedOverName) {
         this.typedOverName = typedOverName;
-    }
-
-    public String getTypedOverName() {
-        return typedOverName;
-    }
-
-    public CorrSpec getTypedOver() {
-        return typedOver;
     }
 
     public void addEndpoint(String name) {
@@ -51,12 +52,25 @@ public class CorrSpec extends CorrLangElement {
         return endpointsList;
     }
 
+    public void addCommonality(Commonality commonality) {
+        this.commonalities.add(commonality);
+    }
+
     public Collection<Commonality> getCommonalities() {
         return commonalities;
     }
 
-    public void addCommonality(Commonality commonality) {
-        this.commonalities.add(commonality);
+    public Optional<Commonality> getCommonalityWithName(String name) {
+        return commonalities.stream().filter(comm -> comm.getName().equals(name)).findFirst();
+    }
+
+
+    public String getTypedOverName() {
+        return typedOverName;
+    }
+
+    public CorrSpec getTypedOver() {
+        return typedOver;
     }
 
     public void addEndpointRef(String name, Endpoint endpoint) {
@@ -83,15 +97,47 @@ public class CorrSpec extends CorrLangElement {
         this.comprehensiveSchema = comprehensiveSchema;
     }
 
-    public Star getFormalRepresentation() {
-        return formalRepresentation;
+    public Optional<Star> getFormalRepresentation() {
+        return Optional.ofNullable(formalRepresentation);
     }
 
     public Map<String, GraphMorphism> getSchemaTypeEmbeddings() {
         return schemaTypeEmbeddings;
     }
 
-    public Sketch getComprehensiveSchema() {
-        return comprehensiveSchema;
+    public Optional<Sketch> getComprehensiveSchema() {
+        return Optional.ofNullable(comprehensiveSchema);
+    }
+
+    public void addFormalKey(Key key) {
+        this.formalKeys.add(key);
+    }
+
+    public Set<Key> getFormalKeys() {
+        return this.formalKeys;
+    }
+
+    public Collection<Commonality> allTransitiveCommonalities() {
+        List<Commonality> all = new ArrayList<>();
+        for (Commonality commonality : commonalities) {
+            addCommsTransitively(commonality,all);
+        }
+        return all;
+    }
+
+
+    private static void addCommsTransitively(Commonality commonality, List<Commonality> result) {
+        result.add(commonality);
+        for (Commonality sub : commonality.getSubCommonalities()) {
+            addCommsTransitively(sub, result);
+        }
+    }
+
+    public void setComprSys(ComprSys comprSys) {
+        this.comprSys = comprSys;
+    }
+
+    public ComprSys getComprSys() {
+        return comprSys;
     }
 }

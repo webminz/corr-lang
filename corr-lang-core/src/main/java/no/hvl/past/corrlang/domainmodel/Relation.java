@@ -1,12 +1,23 @@
 package no.hvl.past.corrlang.domainmodel;
 
 public class Relation extends Commonality {
-    public Relation(String name) {
-        super(name);
+
+    public Relation() {
+        super();
     }
 
     @Override
-    public void accept(Visitor visitor) {
+    public boolean isIdentity() {
+        return false;
+    }
+
+    @Override
+    public boolean isSynchronizeElements() {
+        return false;
+    }
+
+    @Override
+    public void accept(SyntaxVisitor visitor) throws Throwable {
         visitor.handle(this);
 
     }

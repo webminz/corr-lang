@@ -1,19 +1,24 @@
 package no.hvl.past.corrlang.domainmodel;
 
+/**
+ * Super type of all CorrLang language elements.
+ * By default every language element should have a name
+ * and information about its origin (file,from line number/column, to line number/column).
+ */
 public abstract class CorrLangElement {
 
-    private String name;
+    private String name = "";
     private String file = "unavailable";
     private int startTokenLine = -1;
     private int startTokenColumn = -1;
     private int stopTokenLine = -1;
     private int getStopTokenColumn = -1;
 
+    CorrLangElement() {}
+
     CorrLangElement(String name) {
         this.name = name;
     }
-
-    public abstract void accept(Visitor visitor);
 
     public String getName() {
         return name;
@@ -23,6 +28,7 @@ public abstract class CorrLangElement {
         this.name = name;
     }
 
+    public abstract void accept(SyntaxVisitor visitor) throws Throwable;
 
     public String getFile() {
         return file;
@@ -32,35 +38,19 @@ public abstract class CorrLangElement {
         this.file = file;
     }
 
-    public int getStartTokenLine() {
-        return startTokenLine;
-    }
-
     public void setStartTokenLine(int startTokenLine) {
         this.startTokenLine = startTokenLine;
-    }
-
-    public int getStartTokenColumn() {
-        return startTokenColumn;
     }
 
     public void setStartTokenColumn(int startTokenColumn) {
         this.startTokenColumn = startTokenColumn;
     }
 
-    public int getStopTokenLine() {
-        return stopTokenLine;
-    }
-
     public void setStopTokenLine(int stopTokenLine) {
         this.stopTokenLine = stopTokenLine;
     }
 
-    public int getGetStopTokenColumn() {
-        return getStopTokenColumn;
-    }
-
-    public void setGetStopTokenColumn(int getStopTokenColumn) {
+    public void setStopTokenColumn(int getStopTokenColumn) {
         this.getStopTokenColumn = getStopTokenColumn;
     }
 
@@ -86,6 +76,7 @@ public abstract class CorrLangElement {
                 }
             }
         }
+        result.append(")");
         return result.toString();
     }
 }

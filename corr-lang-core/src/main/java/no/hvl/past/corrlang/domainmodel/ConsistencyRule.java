@@ -2,25 +2,23 @@ package no.hvl.past.corrlang.domainmodel;
 
 import no.hvl.past.graph.Diagram;
 
+import java.util.Optional;
+
 public class ConsistencyRule extends CorrLangElement {
 
-    public enum ConsistencyRuleLanguage {
-        OCL,
-        EVL
-    }
-
-    private ConsistencyRuleLanguage language;
+    private String language;
     private String body;
+    private Diagram formalRepresentation;
 
     public ConsistencyRule(String name) {
         super(name);
     }
 
-    public ConsistencyRuleLanguage getLanguage() {
+    public String getLanguage() {
         return language;
     }
 
-    public void setLanguage(ConsistencyRuleLanguage language) {
+    public void setLanguage(String language) {
         this.language = language;
     }
 
@@ -32,14 +30,19 @@ public class ConsistencyRule extends CorrLangElement {
         this.body = body;
     }
 
+    public void setFormalRepresentation(Diagram diagram) {
+        this.formalRepresentation = diagram;
+    }
+
+    public Optional<Diagram> formalRepresentation() {
+        return Optional.ofNullable(formalRepresentation);
+    }
+
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(SyntaxVisitor visitor) throws Throwable {
         visitor.handle(this);
     }
 
-    public Diagram formalRepresentation() {
-        // TODO
-        return null;
-    }
+
 
 }

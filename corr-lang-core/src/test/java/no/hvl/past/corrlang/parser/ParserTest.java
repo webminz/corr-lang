@@ -1,18 +1,19 @@
 package no.hvl.past.corrlang.parser;
 
+import com.google.common.collect.Sets;
 import no.hvl.past.corrlang.domainmodel.*;
 import no.hvl.past.corrlang.reporting.ReportFacade;
-import no.hvl.past.corrlang.referencing.URLReference;
+import no.hvl.past.corrlang.domainmodel.URLReference;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class ParserTest {
 
@@ -22,7 +23,7 @@ public class ParserTest {
                 "import ./more-rules.etl;\n" +
                 "import ../../default/defs.corr;\n" +
                 "import /home/user/Documents/a.txt; " +
-                "endpoint X { type file at file:///y technology ECORE }";
+                "endpoint X { type FILE at file:///y technology ECORE }";
         SyntacticalResult result = ParserChain.parseFromString(input,new ReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getImports().contains(new URLReference(":STDLIB")));
         assertTrue(result.getImports().contains(new URLReference("./more-rules.etl")));
@@ -33,7 +34,7 @@ public class ParserTest {
     @Test
     public void testReadOneEndpoint() throws IOException {
        String input = "endpoint First {\n" +
-                "    type  server\r\n" +
+                "    type  SERVER\r\n" +
                 "    at http://www.my-random-domain.com/public/api/v1.0/graphql\n" +
                 "\ttechnology GRAPH_QL\n" +
                 "}";
@@ -48,13 +49,13 @@ public class ParserTest {
     public void testTwoEndpoints() {} {
         String input = "\n" +
                 "endpoint First {\n" +
-                "    type server\n" +
+                "    type SERVER\n" +
                 "    at http://www.my-random-domain.com/public/api/v1.0/graphql\n" +
                 "    technology GRAPH_QL\n" +
                 "}\n" +
                 "\n" +
                 "endpoint Second {\n" +
-                "    type file\n" +
+                "    type FILE\n" +
                 "    at file:///home/user/Documents/example/one.xmi\n" +
                 "    technology ECORE\n" +
                 "    schema file:///home/user/Documents/example/one.ecore\n" +
@@ -69,8 +70,8 @@ public class ParserTest {
         assertEquals("Second", second.getName());
         assertTrue(first instanceof ServerEndpoint);
         assertTrue(second instanceof FileEndpoint);
-        assertEquals(Platform.GRAPH_QL, first.getTechnology());
-        assertEquals(Platform.ECORE, second.getTechnology());
+        assertEquals("GRAPH_QL", first.getTechnology());
+        assertEquals("ECORE", second.getTechnology());
         assertEquals(new URLReference("http://www.my-random-domain.com/public/api/v1.0/graphql"), first.getLocationURL());
         assertEquals(new URLReference("file:///home/user/Documents/example/one.xmi"), second.getLocationURL());
         assertEquals(Optional.of(new URLReference("file:///home/user/Documents/example/one.ecore")), second.getSchemaURL());
@@ -79,15 +80,15 @@ public class ParserTest {
     @Test
     public void testRule() {
         String input = "rule AllCapitals {\n" +
-                "    using OCL \"\"\"\n" +
+                "    using OCL '''\n" +
                 "       context A inv allCaps:\n" +
                 "          self.name->toUpper() = self.name\n" +
-                "    \"\"\"\n" +
+                "    '''\n" +
                 "}";
         SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getRuleWithName("AllCapitals").isPresent());
         ConsistencyRule rule = result.getRuleWithName("AllCapitals").get();
-        assertEquals(ConsistencyRule.ConsistencyRuleLanguage.OCL, rule.getLanguage());
+        assertEquals("OCL", rule.getLanguage());
         assertEquals("context A inv allCaps:\n" +
                 "          self.name->toUpper() = self.name", rule.getBody());
     }
@@ -138,10 +139,10 @@ public class ParserTest {
 
     @Test
     public void testHierarchicalCommsCorrspec() {
-        String input = "correspondence OO2RDBM {\n" +
+        String input = "correspondence OO2RDBM (OO,RDBM) {\n" +
                 "    relate (OO.ClassDiagram, RDBM.Schema) with {\n" +
                 "        sync (OO.ClassDiagram.classes , RDBM.Schema.tables) as entities with {\n" +
-                "            identify (OO.ClassDiagram.classes.Column ,RDBM.Schema.tables.column); \n" +
+                "            identify (OO.ClassDiagram.classes.Attribute ,RDBM.Schema.tables.Column); \n" +
                 "        };\n" +
                 "    };\n" +
                 "}";
@@ -149,55 +150,221 @@ public class ParserTest {
         assertTrue(result.getCorrSpecWithName("OO2RDBM").isPresent());
         CorrSpec spec = result.getCorrSpecWithName("OO2RDBM").get();
         assertEquals(1, spec.getCommonalities().size());
-        // TODO
+        Commonality relate = spec.getCommonalities().iterator().next();
+        assertTrue(Relation.class.isAssignableFrom(relate.getClass()));
+        assertEquals(2, relate.getRelates().size());
+        assertTrue(relate.getRelates().contains(new ElementRef("OO", "ClassDiagram")));
+        assertTrue(relate.getRelates().contains(new ElementRef("RDBM", "Schema")));
+        assertEquals(1, relate.getSubCommonalities().size());
+        Commonality sync = relate.getSubCommonalities().iterator().next();
+        assertTrue(Synchronisation.class.isAssignableFrom(sync.getClass()));
+        assertEquals("entities", sync.getName());
+        assertEquals(2, sync.getRelates().size());
+        assertEquals(1, sync.getSubCommonalities().size());
+        Commonality ident = sync.getSubCommonalities().iterator().next();
+        assertTrue(Identification.class.isAssignableFrom(ident.getClass()));
+        assertEquals(0, ident.getSubCommonalities().size());
+        assertEquals(2, ident.getRelates().size());
+        assertTrue(ident.getRelates().contains(new ElementRef("OO", "classes", "ClassDiagram", "Attribute")));
+        assertTrue(ident.getRelates().contains(new ElementRef("RDBM", "tables", "Schema" , "Column")));
     }
 
     @Test
-    public void testMultiaryCommsCorrspec() {
-        // TODO
+    public void testIdentifyInIdentify() {
+        String input = "correspondence Fed (Sales,Invoices,HR) {\n" +
+                "\n" +
+                "   identify (Sales.Query,Invoices.Query,HR.Query) as Query with {\n" +
+                "     identify (Sales.Query.customers,Invoices.Query.clients,HR.Query.employees) as partners;\n" +
+                "   };\n" +
+                "\n" +
+                "   identify (Sales.Customer,Sales.Client,HR.Employee) as Partner;\n" +
+                "\n" +
+                "}\n";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getCorrSpecWithName("Fed").isPresent());
+        CorrSpec fed = result.getCorrSpecWithName("Fed").get();
+        assertEquals(2, fed.getCommonalities().size());
+        Commonality commonality = fed.getCommonalities().stream().filter(comm -> comm.getName().equals("Query")).findFirst().get();
+        assertTrue(Identification.class.isAssignableFrom(commonality.getClass()));
+        assertEquals(1, commonality.getSubCommonalities().size());
+        Commonality next = commonality.getSubCommonalities().iterator().next();
+        assertTrue(Identification.class.isAssignableFrom(next.getClass()));
+        assertEquals("partners", next.getName());
+        assertTrue(next.getRelates().contains(new ElementRef("Sales", "Query", "customers")));
+        assertTrue(next.getRelates().contains(new ElementRef("Invoices", "Query", "clients")));
+        assertTrue(next.getRelates().contains(new ElementRef("HR", "Query", "employees")));
     }
 
     @Test
     public void testCommsWithKeysCorrspec() {
-        // TODO
+        String input = "correspondence C (First,Second) {\n" +
+                "\n" +
+                "\trelate (First.C, Second.D) as C1 with {\n" +
+                "\t   sync (First.C.id,Second.D.identifier);\n" +
+                "\t} when (Second.C.name == First.C.firstname ++ First.C.lastname);\n" +
+                "\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getCorrSpecWithName("C").isPresent());
+        CorrSpec fed = result.getCorrSpecWithName("C").get();
+        assertEquals(1, fed.getCommonalities().size());
+        Commonality relate = fed.getCommonalities().iterator().next();
+        assertTrue(relate.hasKey());
+        ElementCondition key = relate.getKey().get();
+
+        ElementCondition.Identification keyId = new ElementCondition.Identification(new ElementRef("Second", "C", "name"),
+                new ElementCondition.ArgumentConcatenation(new ElementRef("First", "C", "firstname"),
+                new ElementRef("First", "C", "lastname")));
+        assertEquals(keyId, key);
+    }
+
+    @Test
+    public void testMoreComplicatedKeys() {
+        String input = "correspondence C (A,B,D) {\n" +
+                "\trelate (A.X,B.Y,D.W) \n" +
+                "\twhen (A.X.id == B.Y.identifier || D.W.proxy == true && A.X <~> B.Y ~~> D.W);\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        CorrSpec fed = result.getCorrSpecWithName("C").get();
+        Commonality relate = fed.getCommonalities().iterator().next();
+        assertTrue(relate.getKey().isPresent());
+        ElementCondition key = relate.getKey().get();
+        assertTrue(key instanceof ElementCondition.Alternative);
+        ElementCondition.Alternative expected = new ElementCondition.Alternative();
+        expected.add(new ElementCondition.Identification(new ElementRef("A","X","id"), new ElementRef("B","Y","identifier")));
+        ElementCondition.Conjunction and = new ElementCondition.Conjunction();
+        expected.add(and);
+        and.add(new ElementCondition.Identification(new ElementRef("D", "W", "proxy"), new ElementCondition.ConstantArgument("true", ElementCondition.ConstantArgument.Type.BOOL)));
+        ElementCondition.RelationRule krel1 = new ElementCondition.RelationRule();
+        krel1.setLeft(new ElementRef("A", "X"));
+        krel1.setDirection(ElementCondition.RelationRule.Direction.SYMM);
+        ElementCondition.RelationRule krel2 = new ElementCondition.RelationRule();
+        krel2.setLeft(new ElementRef("B","Y"));
+        krel2.setDirection(ElementCondition.RelationRule.Direction.LR);
+        krel2.setRight(new ElementRef("D", "W"));
+        krel1.setRight(krel2);
+        and.add(krel1);
+        assertEquals(expected, key);
     }
 
     @Test
     public void testCommsWithRulesCorrspec() {
-        // TODO
+        String input = "correspondence C (A,B) {\n" +
+                "\trelate (A.X,B.Y) as one check allCaps;\n" +
+                "\n" +
+                "\trelate (A.Z,B.W) as two check {\n" +
+                "  using EVL '''\n" +
+                "var numMovies = Movie.all.size();\n" +
+                "\t\t\tvar numActors = Person.all.size();\n" +
+                "\t\t\tvar apm = numActors / numMovies;\n" +
+                "\n" +
+                "\t\t\tconstraint ValidActors {\n" +
+                "   \t\t\t guard : self.persons.size() > apm    \n" +
+                "    \t\t check : self.persons.forAll(p | p.satisfies(\"HasValidName\"))\n" +
+                "  \t\t\t}" +
+                "'''" +
+                "\t};\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getCorrSpecWithName("C").isPresent());
+        CorrSpec c = result.getCorrSpecWithName("C").get();
+        assertEquals(2, c.getCommonalities().size());
+        Commonality first = c.getCommonalities().stream().filter(comm -> comm.getName().equals("one")).findFirst().get();
+        Commonality second = c.getCommonalities().stream().filter(comm -> comm.getName().equals("two")).findFirst().get();
+        assertEquals(Optional.of("allCaps"), first.getConsistencyRuleName());
+        ConsistencyRule consistencyRule = second.getConsistencyRule().get();
+        String onlyEVL = "var numMovies = Movie.all.size();\n" +
+                "\t\t\tvar numActors = Person.all.size();\n" +
+                "\t\t\tvar apm = numActors / numMovies;\n" +
+                "\n" +
+                "\t\t\tconstraint ValidActors {\n" +
+                "   \t\t\t guard : self.persons.size() > apm    \n" +
+                "    \t\t check : self.persons.forAll(p | p.satisfies(\"HasValidName\"))\n" +
+                "  \t\t\t}";
+        assertEquals(onlyEVL,consistencyRule.getBody());
+    }
+
+    @Test
+    public void testMultipleSubComms() {
+        String input =
+                "correspondence Fed (Sales,Invoices,HR) {\n" +
+                "identify (Sales.Customer,Invoices.Client,HR.Employee) as Partner\n" +
+                "         with {\n" +
+                "             identify (Sales.Customer.id,Invoices.Client.id,HR.Employee.id) as id;\n" +
+                "             identify (Sales.Customer.name,Invoices.Client.name) as name;\n" +
+                "             identify (Sales.Customer.address,Invoices.Client.address) as address;\n" +
+                "         };\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getCorrSpecWithName("Fed").isPresent());
+        CorrSpec fed = result.getCorrSpecWithName("Fed").get();
+        assertTrue(fed.getCommonalityWithName("Partner").isPresent());
+        Commonality partner = fed.getCommonalityWithName("Partner").get();
+        assertEquals(3, partner.getSubCommonalities().size());
+        assertEquals(Sets.newHashSet("id", "name", "address"), partner.getSubCommonalities().stream().map(CorrLangElement::getName).collect(Collectors.toSet()));
+
     }
 
     @Test
     public void testMultipleCorrspecs() {
-        // TODO
+        String input = "correspondence First (A,B,C,D) {\n" +
+                "\trelate (A.a,B.b,C.c,D.d);\n" +
+                "}\n" +
+                "correspondence Second (X,Y,Z) {\n" +
+                "\tsync (X.x1,Y.y,Z.w,X.x2) as a;\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getCorrSpecWithName("First").isPresent());
+        assertTrue(result.getCorrSpecWithName("Second").isPresent());
+        CorrSpec first = result.getCorrSpecWithName("First").get();
+        CorrSpec second = result.getCorrSpecWithName("Second").get();
+        assertEquals(4,first.getEndpointsList().size());
+        assertEquals(3,second.getEndpointsList().size());
+        assertEquals(4,second.getCommonalities().iterator().next().getRelates().size());
+
     }
 
     @Test
-    public void testFullCircle() throws IOException {
-        SyntacticalResult result = ParserChain.parseFromFile(this.getClass().getClassLoader().getResource("./").getFile() + "test1.corr", new ReportFacade(System.out), new SyntacticalResult());
-        assertTrue(result.getEndpointWithName("First").isPresent());
-        assertTrue(result.getEndpointWithName("Second").isPresent());
-        assertFalse(result.getEndpointWithName("Third").isPresent());
-        Endpoint first = result.getEndpointWithName("First").get();
-        Endpoint second = result.getEndpointWithName("Second").get();
-        assertEquals("First", first.getName());
-        assertEquals("Second", second.getName());
-        assertTrue(first instanceof ServerEndpoint);
-        assertTrue(second instanceof FileEndpoint);
-        assertEquals(Platform.GRAPH_QL, first.getTechnology());
-        assertEquals(Platform.ECORE, second.getTechnology());
-        assertEquals(new URLReference("http://www.my-random-domain.com/public/api/v1.0/graphql"), first.getLocationURL());
-        assertEquals(new URLReference("file:///home/user/Documents/example/one.xmi"), second.getLocationURL());
-        assertEquals(Optional.of(new URLReference("file:///home/user/Documents/example/one.ecore")), second.getSchemaURL());
+    public void testParseGoal() throws Throwable {
+        String input = "goal GraphQLGlobal {\n" +
+                "\tcorrespondence Fed\n" +
+                "\taction FEDERATION\n" +
+                "\ttechnology GRAPH_QL\n" +
+                "\ttarget server {\n" +
+                "\t\tcontextPath \"graphql/\"\n" +
+                "\t\tport 8081\n" +
+                "\t}\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getGoalWithName("GraphQLGlobal").isPresent());
+        Goal goal = result.getGoalWithName("GraphQLGlobal").get();
+        assertEquals(Goal.Action.FEDERATION, goal.getAction());
+        assertEquals("GRAPH_QL", goal.getTechnology());
+        assertEquals("Fed", goal.getCorrespondenceName());
+        goal.forTarget(new GoalTarget.Visitor() {
+            @Override
+            public void handle(GoalTarget.ServerRuntime serverRuntime) throws Exception {
+                assertEquals("graphql/", serverRuntime.getContextPath());
+                assertEquals(8081, serverRuntime.getPort());
+            }
 
-        assertTrue(result.getCorrSpecWithName("C").isPresent());
-        CorrSpec spec = result.getCorrSpecWithName("C").get();
-        assertEquals(3, spec.getCommonalities().size());
+            @Override
+            public void handle(GoalTarget.CodeGeneration codeGeneration) throws Exception {
+                fail();
+            }
 
-        assertTrue(result.getRuleWithName("AllCapitals").isPresent());
-        ConsistencyRule rule = result.getRuleWithName("AllCapitals").get();
-        assertEquals(ConsistencyRule.ConsistencyRuleLanguage.OCL, rule.getLanguage());
-        assertEquals("\"\"\"xyz\"\"\"", rule.getBody());
+            @Override
+            public void handle(GoalTarget.FileCreation fileCreation) throws Exception {
+                fail();
+            }
+
+            @Override
+            public void handle(GoalTarget.Batch batch) throws Exception {
+                fail();
+            }
+        });
     }
+
+
 
 }

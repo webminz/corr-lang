@@ -1,0 +1,165 @@
+type Query {
+   customer(customer : ID!) : Partner
+   partners : [Partner]
+   purchase(purchase : ID!) : Purchase
+   purchases : [Purchase]
+   store(store : ID!) : Store
+   stores : [Store]
+   client(client : ID!) : Partner
+   invoice(invoice : ID!) : Invoice
+   invoices : [Invoice]
+   employee(employee : ID!) : Partner
+   departments : [Department]
+   department(department : ID!) : Department
+}
+
+type Mutation {
+   createCustomer(name : String!, email : String) : Partner!
+   updateCustomer(customer : ID!
+      name : String
+      email : String) : Partner
+   setAddress_Sales(customer : ID!
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      country : String) : Partner
+   deleteCustomer(customer : ID!) : Partner
+   createPurchase(customer : ID!
+      date : String!
+      store : ID!) : Purchase
+   addPurchaseItem(purchase : ID!
+      product : ID!
+      quantity : Int) : PurchaseItem
+   deletePurchase(purchase : ID!) : Purchase
+   createStore(manager : ID
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      country : String) : Store
+   deleteStore(store : ID!) : Store
+   createClient(name : String) : Partner
+   setAddress_Invoices(client : ID!
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      Country : String) : Partner
+   setPaymentDetails(client : ID!
+      iban : String
+      bic : String
+      cardNumber : String
+      validUntil : String) : Partner
+   updateClient(client : ID!, name : String) : Partner
+   deleteClient(client : ID!) : Partner
+   createInvoice(client : ID!
+      createdAt : String
+      dueAt : String
+      payedAt : String
+      total : Int) : Invoice
+   updateInvoice(invoice : ID!
+      client : ID!
+      createdAt : String
+      dueAt : String
+      payedAt : String
+      total : Int) : Invoice
+   deleteInvoice(invoice : ID!) : Invoice
+   createEmployee(department : ID
+      firstname : String
+      lastname : String
+      hiredAt : String
+      email : String
+      phone : String) : Partner
+   setBankingDetails(employee : ID!
+      iban : String
+      bic : String) : Partner
+   updateEmployee(employee : ID!
+      department : ID
+      firstname : String
+      lastname : String
+      hiredAt : String
+      email : String
+      phone : String) : Partner
+   deleteEmployee(employee : ID!) : Partner
+   createDepartment(name : String, manager : ID) : Department
+   updateDepartment(department : ID!
+      name : String
+      manager : ID) : Department
+   deleteDepartment(department : ID!) : Department
+}
+
+type Address {
+   postalCode : String
+   state : String
+   street : String
+   country : String
+   city : String
+}
+
+type BankingDetails {
+   iban : String
+   bic : String
+}
+
+type Department {
+   workingAt : [Partner]
+   manager : Partner
+   id : ID!
+   name : String
+}
+
+type Invoice {
+   id : ID!
+   total : Int
+   createdAt : String
+   payedAt : String
+   client : Partner!
+   dueAt : String
+}
+
+type Partner {
+   invoices : [Invoice]
+   phone : String
+   firstname : String
+   address : Address
+   worksAt : Department
+   customer_email : String
+   paymentDetails : PaymentDetails
+   employee_email : String
+   name : String
+   bankAccount : BankingDetails
+   id : ID!
+   purchases : [Purchase]
+   hiredAt : String
+   lastname : String
+}
+
+type PaymentDetails {
+   bic : String
+   validUntil : String
+   iban : String
+   cardNumber : String
+}
+
+type Purchase {
+   items : [PurchaseItem]
+   store : Store!
+   customer : Partner!
+   date : String
+   id : ID!
+}
+
+type PurchaseItem {
+   productId : ID!
+   quantity : Int
+   purchaseId : ID!
+}
+
+type Store {
+   address : Address
+   id : ID!
+   manager : ID!
+   purchases : [Purchase]
+}
+

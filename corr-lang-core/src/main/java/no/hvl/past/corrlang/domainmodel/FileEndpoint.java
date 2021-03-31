@@ -7,7 +7,7 @@ public class FileEndpoint extends Endpoint {
     }
 
     @Override
-    public void accept(Visitor visitor) {
+    public void accept(SyntaxVisitor visitor) throws Throwable {
         visitor.handle(this);
     }
 }

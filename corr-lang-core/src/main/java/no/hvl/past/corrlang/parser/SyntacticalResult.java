@@ -1,9 +1,7 @@
 package no.hvl.past.corrlang.parser;
 
-import no.hvl.past.corrlang.domainmodel.ConsistencyRule;
-import no.hvl.past.corrlang.domainmodel.CorrSpec;
-import no.hvl.past.corrlang.domainmodel.Endpoint;
-import no.hvl.past.corrlang.referencing.URLReference;
+import no.hvl.past.corrlang.domainmodel.*;
+import org.checkerframework.checker.nullness.Opt;
 
 import java.util.*;
 
@@ -13,12 +11,18 @@ public class SyntacticalResult {
     private final Map<String, Endpoint> endpoints;
     private final Map<String, CorrSpec> specs;
     private final Map<String, ConsistencyRule> rules;
+    private final Map<String, Goal> goals;
 
     public SyntacticalResult() {
         this.imports = new ArrayList<>();
-        this.endpoints = new HashMap<>();
-        this.specs = new HashMap<>();
-        this.rules = new HashMap<>();
+        this.endpoints = new LinkedHashMap<>();
+        this.specs = new LinkedHashMap<>();
+        this.rules = new LinkedHashMap<>();
+        this.goals = new LinkedHashMap<>();
+    }
+
+    public Collection<Goal> allGoals() {
+        return goals.values();
     }
 
     public Collection<Endpoint> allEndpoints() {
@@ -43,7 +47,6 @@ public class SyntacticalResult {
         } else {
             return Optional.of(this.endpoints.get(name));
         }
-
     }
 
     public void addCorrspec(CorrSpec currentSpec) {
@@ -56,8 +59,6 @@ public class SyntacticalResult {
         } else {
             return Optional.empty();
         }
-
-
     }
 
     public void addRule(ConsistencyRule currentConsistencyRule) {
@@ -67,6 +68,18 @@ public class SyntacticalResult {
     public Optional<ConsistencyRule> getRuleWithName(String name) {
         if (this.rules.containsKey(name)) {
             return Optional.of(this.rules.get(name));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public void addGoal(Goal goal) {
+        this.goals.put(goal.getName(), goal);
+    }
+
+    public Optional<Goal> getGoalWithName(String name) {
+        if (this.goals.containsKey(name)) {
+            return Optional.of(this.goals.get(name));
         } else {
             return Optional.empty();
         }

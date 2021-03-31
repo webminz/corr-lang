@@ -1,12 +1,14 @@
 package no.hvl.past.corrlang.runner;
 
-import no.hvl.past.corrlang.domainmodel.traverser.TraverserFacade;
-import no.hvl.past.corrlang.goals.GoalFacade;
+import no.hvl.past.corrlang.execution.AbstractExecutor;
+import no.hvl.past.corrlang.execution.ExecutionFacade;
+import no.hvl.past.corrlang.execution.goals.AbstractGoal;
 import no.hvl.past.corrlang.parser.ParserChain;
 import no.hvl.past.corrlang.parser.SyntacticalResult;
 import no.hvl.past.di.DependencyInjectionContainer;
 import no.hvl.past.di.PropertyHolder;
 import no.hvl.past.corrlang.reporting.ReportFacade;
+import no.hvl.past.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,24 +22,20 @@ public class Run {
 
 
     private static final String ARGUMENT_PREFIX = "--";
-    private static final String GOAL_ARGUMENT = "--goal:";
-    private static final String TECH_ARGUMENT = "--technology:";
-    private static final String OUTOUT_ARGUMENT = "--out:";
 
-    private final List<File> corrSpecs;
-    private final Map<String, String> arguments;
-    private final List<String> goalNames;
+    private final List<String> corrSpecs;
+    private final String goal;
+    private Map<String, String> arguments;
     private final ReportFacade reportFacade;
     private DependencyInjectionContainer container;
-    private TraverserFacade traverserFacade;
-    private GoalFacade goalFacade;
+    private ExecutionFacade executor;
     private SyntacticalResult syntacticalResult;
 
 
-    private Run(List<File> corrSpecs, Map<String, String> arguments, List<String> goalNames) {
+    private Run(List<String> corrSpecs, Map<String, String> arguments, String goal) {
         this.corrSpecs = corrSpecs;
+        this.goal = goal;
         this.arguments = arguments;
-        this.goalNames = goalNames;
         this.reportFacade = new ReportFacade(System.out);
     }
 
@@ -45,7 +43,6 @@ public class Run {
         try {
             createDIContainer();
             printLogoAndSysInfo();
-            executeSystemGoals();
             parseCorrSpecFiles();
             executeLanguageGoals();
         } catch (Throwable throwable) {
@@ -53,53 +50,30 @@ public class Run {
         }
     }
 
+
+
     private void executeLanguageGoals() {
-        for (String current : goalNames) {
-            if (current.contains(":")) {
-                String goal = current.substring(0, current.indexOf(':'));
-                String arg = current.substring(current.indexOf(':') + 1);
-                if (goalFacade.isKnownGoal(goal)) {
-                    goalFacade.runGoal(goal,arg,this.container,reportFacade,syntacticalResult,traverserFacade);
-                } else {
-                    reportFacade.reportError("Goal '" + goal + "' is not known");
-                }
-            } else {
-                if (goalFacade.isKnownGoal(current)) {
-                    goalFacade.runGoal(current,null,this.container,reportFacade,syntacticalResult,traverserFacade);
-                } else {
-                    reportFacade.reportError("Goal '" + current + "' is not known");
-                }
-            }
+        try {
+            AbstractGoal.runGoal(container, executor, syntacticalResult, goal);
+        } catch (Throwable throwable) {
+            reportFacade.reportError(throwable);
+            System.exit(99);
         }
     }
 
     private void parseCorrSpecFiles() throws IOException {
         this.syntacticalResult = new SyntacticalResult();
-        for (File corrSpecFile : corrSpecs) {
-            this.syntacticalResult = ParserChain.parseFromFile(corrSpecFile, reportFacade, this.syntacticalResult);
+        FileSystemUtils fsUtils = this.container.getFSUtils();
+        for (String corrSpecFile : corrSpecs) {
+            File file = fsUtils.file(corrSpecFile);
+            if (!file.exists()) {
+                reportFacade.reportError("File '" + file.getAbsolutePath() + "' does not exist! It will be ignored!");
+            }
+            this.syntacticalResult = ParserChain.parseFromFile(file, reportFacade, this.syntacticalResult);
         }
-        this.traverserFacade = new TraverserFacade(reportFacade, this.container.getPluginRegistry(), this.container.getUniverse());
     }
 
-    private void executeSystemGoals() {
-        Iterator<String> i = this.goalNames.iterator();
-        while (i.hasNext()) {
-            String current = i.next();
-            if (current.contains(":")) {
-                String goal = current.substring(0, current.indexOf(':'));
-                String arg = current.substring(current.indexOf(':') + 1);
-                if (goalFacade.isSystemGoal(goal)) {
-                    i.remove();
-                    goalFacade.runGoal(goal,arg,this.container,this.reportFacade,null,null);
-                }
-            } else {
-                if (goalFacade.isSystemGoal(current)) {
-                    i.remove();
-                    goalFacade.runGoal(current, null, this.container, this.reportFacade, null, null);
-                }
-            }
-        }
-    }
+
 
     private void createDIContainer() throws IOException {
         if (arguments.containsKey(PropertyHolder.CONFIG_FILE)) {
@@ -109,7 +83,7 @@ public class Run {
         } else {
             this.container = DependencyInjectionContainer.create();
         }
-        this.goalFacade = new GoalFacade();
+        this.executor = new ExecutionFacade(container);
     }
 
     private void printLogoAndSysInfo() {
@@ -122,12 +96,17 @@ public class Run {
 
 
     public static void main(String[] args) {
-        final List<File> corrSpecs = new ArrayList<>();
+        final List<String> corrSpecs = new ArrayList<>();
         final Map<String, String> arguments = new LinkedHashMap<>();
-        final List<String> goalNames = new ArrayList<>();
+        String goal = null;
         for (String arg : args) {
-            if (arg.startsWith("g:") || arg.startsWith("GOAL:")) {
-                goalNames.add(arg.substring(arg.indexOf(':') + 1));
+            if (arg.startsWith("\"")) {
+                if (goal != null) {
+                    System.err.println("ERROR: Cannot execute more than one goal!");
+                    System.exit(99);
+                } else {
+                    goal = arg.substring(1, arg.length() - 1);
+                }
             } else if (arg.startsWith("-")) {
                 String rest = arg;
                 while (rest.startsWith("-")) {
@@ -144,13 +123,13 @@ public class Run {
                     arguments.put(rest, "");
                 }
             } else {
-                File file = new File(arg);
-                if (file.exists()) {
-                    corrSpecs.add(file);
-                }
+                corrSpecs.add(arg);
             }
         }
-        Run run = new Run(corrSpecs, arguments, goalNames);
+        if (goal == null) {
+            goal = "HELP";
+        }
+        Run run = new Run(corrSpecs, arguments, goal);
         run.run();
     }
 }

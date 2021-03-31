@@ -35,8 +35,16 @@ public class ReportFacade {
         out.println("[" +errorType.name() + "_ERROR]: " + cause.getMessage());
     }
 
+    public void reportError(ReportErrorType errorType, String message) {
+        out.println("[" +errorType.name() + "_ERROR]: " + message);
+    }
+    public void reportError(ReportErrorType errorType, String key, String message) {
+        out.println("[" + errorType.name() + "_ERROR]: " + key + ": " + message);
+    }
+
     public void reportError(ReportErrorType errorType, Throwable cause, CorrLangElement langElement) {
         out.println("[" +errorType.name() + "_ERROR]: " + cause.getMessage() + " at element "+ langElement.reportElement());
+
     }
 
 
