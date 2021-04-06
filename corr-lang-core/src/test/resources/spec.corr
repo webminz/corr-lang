@@ -18,6 +18,11 @@ endpoint HR {
 
 correspondence Fed (Sales,Invoices,HR) {
 
+   identify (Sales.Mutation.createCustomer,Invoices.Mutation.createClient) as Mutation.createC
+      with {
+            identify (Sales.Mutation.createCustomer.name,Invoices.Mutation.createClient.name) as name;
+      };
+
    identify (Sales.Query.customers,Invoices.Query.clients,HR.Query.employees) as Query.partners;
    identify (Sales.Customer,Invoices.Client,HR.Employee) as Partner
          with {

@@ -100,12 +100,12 @@ public class Run {
         final Map<String, String> arguments = new LinkedHashMap<>();
         String goal = null;
         for (String arg : args) {
-            if (arg.startsWith("\"")) {
+            if (arg.startsWith("g:")) {
                 if (goal != null) {
                     System.err.println("ERROR: Cannot execute more than one goal!");
                     System.exit(99);
                 } else {
-                    goal = arg.substring(1, arg.length() - 1);
+                    goal = arg.substring(2);
                 }
             } else if (arg.startsWith("-")) {
                 String rest = arg;

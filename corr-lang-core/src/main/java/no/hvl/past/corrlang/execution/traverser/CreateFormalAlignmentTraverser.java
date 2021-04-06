@@ -83,7 +83,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
             List<GraphBuilders> morphismBuilders,
             Set<Name> ids) {
         Name srcName = Name.identifier(commonality.getParent().get().getName());
-        Name lblName = Name.identifier(commonality.getName());
+        Name lblName = Name.identifier(commonality.getName()).prefixWith(srcName);
         Name trgName = Name.identifier(commonality.getTarget().get().getName());
         apexBuilder.edge(srcName, lblName, trgName);
         for (ElementRef ref : commonality.getRelates()) {
