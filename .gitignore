@@ -16,5 +16,4 @@ corr-lang-core/src/generated
 *.tar.gz
 *.rar
 hs_err_pid*
-BUILD.properties
 corr-lang-core/execution
