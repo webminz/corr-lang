@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tables:Table xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:tables="http://www.hvl.no/pcs955/mt/table" name="Exam Results">
+  <columnGroups>
+    <columns title="Student No"/>
+  </columnGroups>
+  <columnGroups caption="Exercise 1">
+    <columns title="1.1" type="NUMERIC"/>
+    <columns title="1.2" type="NUMERIC"/>
+  </columnGroups>
+  <columnGroups caption="Exercise 2">
+    <columns title="2.1" type="NUMERIC"/>
+    <columns title="2.2." type="NUMERIC"/>
+    <columns title="2.3" type="NUMERIC"/>
+  </columnGroups>
+  <columnGroups caption="Result">
+    <columns title="Grade"/>
+  </columnGroups>
+  <rows>
+    <cells value="7114612" column="//@columnGroups.0/@columns.0"/>
+    <cells value="1.0" column="//@columnGroups.1/@columns.0"/>
+    <cells value="1.2" column="//@columnGroups.1/@columns.1"/>
+    <cells value="9.0" column="//@columnGroups.2/@columns.0"/>
+    <cells value="15.5" column="//@columnGroups.2/@columns.1"/>
+    <cells value="3.0" column="//@columnGroups.2/@columns.2"/>
+    <cells value="B" column="//@columnGroups.3/@columns.0"/>
+  </rows>
+  <rows>
+    <cells value="7117812" column="//@columnGroups.0/@columns.0"/>
+    <cells value="1.0" column="//@columnGroups.1/@columns.0"/>
+    <cells value="2.0" column="//@columnGroups.1/@columns.1"/>
+    <cells value="10.0" column="//@columnGroups.2/@columns.0"/>
+    <cells value="20.0" column="//@columnGroups.2/@columns.1"/>
+    <cells value="3.0" column="//@columnGroups.2/@columns.2"/>
+    <cells value="A" column="//@columnGroups.3/@columns.0"/>
+  </rows>
+  <rows>
+    <cells value="7110723" column="//@columnGroups.0/@columns.0"/>
+    <cells value="0.5" column="//@columnGroups.1/@columns.0"/>
+    <cells value="0.0" column="//@columnGroups.1/@columns.1"/>
+    <cells value="0.0" column="//@columnGroups.2/@columns.0"/>
+    <cells value="2.5" column="//@columnGroups.2/@columns.1"/>
+    <cells value="1.0" column="//@columnGroups.2/@columns.2"/>
+    <cells value="F" column="//@columnGroups.3/@columns.0"/>
+  </rows>
+</tables:Table>

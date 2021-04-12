@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<flow:Flowchart xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flow="http://www.hvl.no/pcs955/mt/flowchart" start="//@nodes.0" end="//@nodes.6">
+  <nodes xsi:type="flow:Event" text="Start"/>
+  <nodes xsi:type="flow:Assignment" text="i := 1"/>
+  <nodes xsi:type="flow:Decision" text="i &lt;= 10"/>
+  <nodes xsi:type="flow:Output" text="i"/>
+  <nodes xsi:type="flow:Input" text="x"/>
+  <nodes xsi:type="flow:Assignment" text="i := i + x"/>
+  <nodes xsi:type="flow:Event" text="End"/>
+  <transitions src="//@nodes.0" trg="//@nodes.1"/>
+  <transitions src="//@nodes.1" trg="//@nodes.4"/>
+  <transitions src="//@nodes.4" trg="//@nodes.5"/>
+  <transitions src="//@nodes.5" trg="//@nodes.2"/>
+  <transitions src="//@nodes.2" trg="//@nodes.3" lbl="false"/>
+  <transitions src="//@nodes.3" trg="//@nodes.6"/>
+  <transitions src="//@nodes.2" trg="//@nodes.1" lbl="true"/>
+</flow:Flowchart>

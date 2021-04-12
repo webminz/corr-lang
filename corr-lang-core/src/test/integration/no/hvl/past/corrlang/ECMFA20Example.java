@@ -60,4 +60,17 @@ public class ECMFA20Example extends TestBase {
     }
 
 
+    @Test
+    public void testKarlErikDemo() throws Throwable {
+        DependencyInjectionContainer diContainer = DependencyInjectionContainer.create(System.getProperty("user.dir") + "/execution");
+        diContainer.setUpLogging();
+        ReportFacade reportFacade = new ReportFacade(System.out);
+        ExecutionFacade executor = new ExecutionFacade(diContainer);
+        SyntacticalResult result = new SyntacticalResult();
+        result = ParserChain.parseFromFile(getResourceFolderItem("karlErikDemo.corrlang"), reportFacade, result);
+        AbstractGoal.runGoal(diContainer,executor,result,"GQLFederation");
+
+    }
+
+
 }

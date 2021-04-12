@@ -78,7 +78,7 @@ clean {
 }
 
 run {
-    args = ["GOAL:CHECK", "--config:/Users/past/Documents/dev/modelvm/corr-lang-core/execution/corrlang.conf"]
+    args = ["/Users/past/Desktop/Demo/def.corrlang", "\"GQLFile\""]
 }
 
 shadowJar {
