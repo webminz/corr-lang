@@ -23,6 +23,8 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
     compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
     testCompile project(':mdegraphlib').sourceSets.test.output
+    implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
+
 }
 
 
@@ -103,7 +105,7 @@ task buildCorrlang {
     dependsOn(copyResult)
     doLast {
         File releaseDirectory = new File("${project.projectDir}/release")
-        println("CorrLang successfully built: file:///${releaseDirectory.getAbsolutePath()}/corrlang.jar ")
+        println("CorrLang successfully built: file://${releaseDirectory.getAbsolutePath()}/corrlang.jar ")
     }
 }
 

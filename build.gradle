@@ -19,4 +19,10 @@ allprojects {
 
 }
 
+task buildCorrlang {
+	group = "corrlang"
+	description = "Builds the whole project and produces an executable Jarfile"
+	dependsOn(":corr-lang-core:buildCorrlang")
+}
+
 
