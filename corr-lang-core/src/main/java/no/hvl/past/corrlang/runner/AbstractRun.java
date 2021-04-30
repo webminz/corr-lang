@@ -83,7 +83,9 @@ public class AbstractRun {
                 reportFacade.reportInfo("DEVELOPER-BUILD: created from git branch <" + buildProps.getProperty("COMMIT") + "> at " + buildProps.getProperty("BUILD_DATE"));
             }
         }
-        reportFacade.reportError("WORKDIR: " + diContainer.getPropertyHolder().getBaseDir().getAbsolutePath());
+        reportFacade.reportInfo("WORKDIR: " + diContainer.getPropertyHolder().getBaseDir().getAbsolutePath());
+        reportFacade.reportInfo("JAVA: " + System.getProperty("java.runtime.version"));
+
     }
 
 

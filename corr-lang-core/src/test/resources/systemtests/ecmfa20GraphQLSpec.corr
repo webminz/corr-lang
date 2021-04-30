@@ -27,7 +27,7 @@ correspondence Fed (Sales,Invoices,HR) {
              identify (Sales.Customer.name,Invoices.Client.name) as name;
              identify (Sales.Customer.address,Invoices.Client.address) as address;
          }
-         when (Sales.Customer.id == Invoices.Client.id || Sales.Customer.name == HR.Employee.firstname ++ " " ++ HR.Employee.lastname);
+         when (Sales.Customer.id == Invoices.Client.id || Sales.Customer.name == HR.Employee.firstname ++ " " ++ HR.Employee.lastname );
 
    identify (Sales.Address,Invoices.Address) as Address
         with {
@@ -45,7 +45,7 @@ goal GQLFederation {
     action FEDERATION
 	technology GRAPH_QL
 	target SERVER {
-		contextPath "graphql/"
+		contextPath graphql/
 		port 8081
 	}
 }

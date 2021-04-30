@@ -13,7 +13,7 @@ public class Identification extends Commonality {
 
     @Override
     public boolean isSynchronizeElements() {
-        return true;
+        return false;
     }
 
     @Override

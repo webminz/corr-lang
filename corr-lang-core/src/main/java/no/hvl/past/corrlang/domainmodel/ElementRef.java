@@ -143,7 +143,8 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
         if (this.pathExpression.size() == 3) {
             Optional<Triple> lookup = system.lookup(this.pathExpression.get(1), this.pathExpression.get(2));
             if (lookup.isPresent()) {
-                system.lookup(this.pathExpression.get(1));
+                return lookup;
+                //system.lookup(this.pathExpression.get(1));
             }
         }
         boolean foundStart = false;

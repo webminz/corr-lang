@@ -17,3 +17,4 @@ corr-lang-core/src/generated
 *.rar
 hs_err_pid*
 corr-lang-core/execution
+BUILD.INFO

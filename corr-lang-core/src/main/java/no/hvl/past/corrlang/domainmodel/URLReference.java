@@ -34,7 +34,10 @@ public class URLReference {
 
             if (url.startsWith("classpath:")) {
                this.fullyResolvedUrl = "file://" +  base.file(url).getAbsolutePath();
+            } else {
+                this.fullyResolvedUrl = url;
             }
+
         }
     }
 
