@@ -124,35 +124,34 @@ public class FormalAlignmentTest {
         assertEquals(4, formalKeys.size());
 
         AttributeBasedKey k1 = new AttributeBasedKey(
-                fed.getComprehensiveSchema().get().carrier(),
-                Triple.edge(
-                Name.identifier("Customer"), Name.identifier("id"), Name.identifier("Integer"
-                )), Name.identifier("Partner"));
+                sales.getSystem().get(),
+                Triple.edge(Name.identifier("Customer"), Name.identifier("id"), Name.identifier("Integer")),
+                Name.identifier("Partner"));
         assertTrue(formalKeys.contains(k1));
         AttributeBasedKey k2 = new AttributeBasedKey(
-                fed.getComprehensiveSchema().get().carrier(),
-                Triple.edge(
-                        Name.identifier("Client"), Name.identifier("id"), Name.identifier("Integer"
-                        )), Name.identifier("Partner"));
+                invoices.getSystem().get(),
+                Triple.edge(Name.identifier("Client"), Name.identifier("id"), Name.identifier("Integer")),
+                Name.identifier("Partner"));
         assertTrue(formalKeys.contains(k2));
         AttributeBasedKey k3 = new AttributeBasedKey(
-                fed.getComprehensiveSchema().get().carrier(),
-                Triple.edge(
-                        Name.identifier("Customer"), Name.identifier("fullName"), Name.identifier("String"
-                        )), Name.identifier("Partner"));
+                sales.getSystem().get(),
+                Triple.edge(Name.identifier("Customer"), Name.identifier("fullName"), Name.identifier("String")),
+                Name.identifier("Partner"));
         assertTrue(formalKeys.contains(k3));
-        ConcatenatedKey concatenatedKey = new ConcatenatedKey(fed.getComprehensiveSchema().get().carrier(), Name.identifier("Partner"), Arrays.asList(
-                new AttributeBasedKey(
-                        fed.getComprehensiveSchema().get().carrier(),
-                        Triple.edge(
-                                Name.identifier("Employee"), Name.identifier("firstname"), Name.identifier("String"
-                                )), Name.identifier("Partner")),
-                new ConstantKey(fed.getComprehensiveSchema().get().carrier(),Name.value(" "), Name.identifier("Partner")),
-                new AttributeBasedKey(
-                        fed.getComprehensiveSchema().get().carrier(),
-                        Triple.edge(
-                                Name.identifier("Employee"), Name.identifier("lastname"), Name.identifier("String"
-                                )), Name.identifier("Partner"))
+        ConcatenatedKey concatenatedKey = new ConcatenatedKey(
+                Name.identifier("Partner"),
+                Name.identifier("Employee"),
+                hr.getSystem().get(),
+                Arrays.asList(
+                        new AttributeBasedKey(
+                                hr.getSystem().get(),
+                                Triple.edge(Name.identifier("Employee"), Name.identifier("firstname"), Name.identifier("String")),
+                                Name.identifier("Partner")),
+                        new ConstantKey(Name.value(" "), Name.identifier("Partner")),
+                        new AttributeBasedKey(
+                                hr.getSystem().get(),
+                                Triple.edge(Name.identifier("Employee"), Name.identifier("lastname"), Name.identifier("String")),
+                                Name.identifier("Partner"))
         ));
         assertTrue(formalKeys.contains(concatenatedKey));
     }

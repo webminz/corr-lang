@@ -5,6 +5,8 @@ import no.hvl.past.keys.ConcatenatedKey;
 import no.hvl.past.keys.ConstantKey;
 import no.hvl.past.keys.Key;
 import no.hvl.past.names.Name;
+import no.hvl.past.systems.Sys;
+import no.hvl.past.util.Holder;
 
 import java.util.*;
 
@@ -16,7 +18,7 @@ public abstract class ElementCondition extends CorrLangElement {
 
     public abstract boolean isPureKey();
 
-    public abstract Set<Key> asKeys(Name targetType, Graph carrier);
+    public abstract Set<Key> asKeys(Name targetType);
 
     /**
      * Key Alternatives allow elements to be identified by two or more keys.
@@ -71,11 +73,11 @@ public abstract class ElementCondition extends CorrLangElement {
         }
 
         @Override
-        public Set<Key> asKeys(Name targetType,Graph carrier) {
+        public Set<Key> asKeys(Name targetType) {
             Set<Key> result = new HashSet<>();
             for (AlternativeOption option : this.arguments) {
                 if (option.isPureKey()) {
-                    result.addAll(option.asKeys(targetType, carrier));
+                    result.addAll(option.asKeys(targetType));
                 }
             }
             return result;
@@ -139,9 +141,9 @@ public abstract class ElementCondition extends CorrLangElement {
         }
 
         @Override
-        public Set<Key> asKeys(Name targetType, Graph carrier) {
+        public Set<Key> asKeys(Name targetType) {
             if (this.literals.size() == 1) {
-                return this.literals.get(0).asKeys(targetType, carrier);
+                return this.literals.get(0).asKeys(targetType);
             }
             // TODO implement correctly
             return new HashSet<>();
@@ -220,21 +222,24 @@ public abstract class ElementCondition extends CorrLangElement {
         }
 
         @Override
-        public Set<Key> asKeys(Name targetType, Graph carrier) {
+        public Set<Key> asKeys(Name targetType) {
             Set<Key> result = new HashSet<>();
             for (IdentificationArgument arg : this.arguments) {
-                result.add(arg.toKey(targetType, carrier));
+                result.add(arg.toKey(targetType));
             }
             return result;
         }
     }
 
+
     public interface IdentificationArgument {
-        Key toKey(Name targetType, Graph carrier);
+
+        Key toKey(Name targetType);
 
         void accept(SyntaxVisitor visitor) throws Throwable;
     }
 
+    // TODO need some syntax checks here: all keys must start at the
     public static class ArgumentConcatenation implements IdentificationArgument {
 
         private final List<IdentificationArgument> parts;
@@ -276,12 +281,28 @@ public abstract class ElementCondition extends CorrLangElement {
         }
 
         @Override
-        public Key toKey(Name targetType, Graph carrier) {
+        public Key toKey(Name targetType) {
             List<Key> subs = new ArrayList<>();
+            Holder<Name> originalSource = new Holder<>();
+            Holder<Sys> originalSystem = new Holder<>();
             for (IdentificationArgument arg : this.parts) {
-                subs.add(arg.toKey(targetType, carrier));
+                Key e = arg.toKey(targetType);
+                subs.add(e);
+                if (!e.sourceType().equals(targetType)) {
+                    originalSource.set(e.sourceType());
+                }
+                if (e.sourceSystem() != null) {
+                    originalSystem.set(e.sourceSystem());
+                }
             }
-            return new ConcatenatedKey(carrier, targetType, subs);
+            for (Key sub : subs) {
+                if (sub instanceof ConstantKey) {
+                    ConstantKey ck = (ConstantKey) sub;
+                    ck.setSourceElement(originalSource.unsafeGet());
+                    ck.setOriginalSystem(originalSystem.unsafeGet());
+                }
+            }
+            return new ConcatenatedKey(targetType, originalSource.unsafeGet(), originalSystem.unsafeGet(), subs);
         }
 
         @Override
@@ -295,7 +316,7 @@ public abstract class ElementCondition extends CorrLangElement {
     public static class ConstantArgument implements IdentificationArgument {
 
         @Override
-        public Key toKey(Name targetType, Graph carrier) {
+        public Key toKey(Name targetType) {
             Name val;
             switch (type) {
                 case INT:
@@ -315,7 +336,7 @@ public abstract class ElementCondition extends CorrLangElement {
                     val = Name.value(this.value);
                     break;
             }
-            return new ConstantKey(carrier, val, targetType);
+            return new ConstantKey(val, targetType);
         }
 
         @Override
@@ -373,7 +394,7 @@ public abstract class ElementCondition extends CorrLangElement {
         }
 
         @Override
-        public Set<Key> asKeys(Name targetType, Graph carrier) {
+        public Set<Key> asKeys(Name targetType) {
             return Collections.emptySet(); // rules cannot become keys
         }
 

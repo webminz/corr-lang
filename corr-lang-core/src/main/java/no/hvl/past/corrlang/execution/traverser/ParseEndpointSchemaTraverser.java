@@ -1,5 +1,6 @@
 package no.hvl.past.corrlang.execution.traverser;
 
+import com.google.common.collect.Sets;
 import no.hvl.past.corrlang.domainmodel.Endpoint;
 import no.hvl.past.corrlang.domainmodel.FileEndpoint;
 import no.hvl.past.corrlang.domainmodel.ServerEndpoint;
@@ -34,7 +35,7 @@ public class ParseEndpointSchemaTraverser extends AbstractTraverser {
 
     @Override
     public Set<Class<? extends AbstractExecutor>> dependsOn() {
-        return Collections.singleton(LoadTechSpaceTraverser.class);
+        return Sets.newHashSet(LoadTechSpaceTraverser.class, RetrieveUrls.class);
     }
 
 }

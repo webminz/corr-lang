@@ -21,7 +21,7 @@ public class LinkEndpointsTraverser extends AbstractTraverser {
 
     @Override
     public Set<Class<? extends AbstractExecutor>> dependsOn() {
-        return Collections.emptySet();
+        return Collections.singleton(DesugarAliases.class);
     }
 
 

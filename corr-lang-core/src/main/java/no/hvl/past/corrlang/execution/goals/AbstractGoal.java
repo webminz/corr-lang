@@ -2,16 +2,19 @@ package no.hvl.past.corrlang.execution.goals;
 
 import no.hvl.past.corrlang.domainmodel.Goal;
 import no.hvl.past.corrlang.domainmodel.GoalTarget;
+import no.hvl.past.corrlang.domainmodel.URLReference;
 import no.hvl.past.corrlang.execution.AbstractExecutor;
 import no.hvl.past.corrlang.execution.ExecutionFacade;
 import no.hvl.past.corrlang.parser.SyntacticalResult;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
+import no.hvl.past.util.Holder;
 
+import java.io.File;
+import java.net.URI;
 import java.util.Optional;
 
 public abstract class AbstractGoal extends AbstractExecutor {
-
 
     public AbstractGoal(String goalName) {
         super(goalName);
@@ -27,7 +30,12 @@ public abstract class AbstractGoal extends AbstractExecutor {
 
     public abstract boolean isFileGoal();
 
-    public static void runGoal(DependencyInjectionContainer diContainer, ExecutionFacade executor, SyntacticalResult syntaxResult, String goal) throws Throwable {
+    public static Holder<Object> runGoal(
+            DependencyInjectionContainer diContainer,
+            ExecutionFacade executor,
+            SyntacticalResult syntaxResult,
+            String goal) throws Throwable {
+        Holder<Object> holder = new Holder<>();
         if (goal.equals(InfoGoal.GOAL_NAME)) {
             executor.execute(diContainer.getBean(InfoGoal.class), syntaxResult);
         } else if (goal.equals(HelpGoal.NAME)) {
@@ -59,14 +67,16 @@ public abstract class AbstractGoal extends AbstractExecutor {
                     public void handle(GoalTarget.FileCreation fileCreation) throws Exception {
                         FileGoal file = diContainer.getBean(FileGoal.class);
                         file.setGoalName(goal);
-                        file.setFile(diContainer.getFSUtils().file(fileCreation.getLocation()), fileCreation.isOverwrite());
+                        URLReference location = fileCreation.getLocation();
+                        location.retrieve(diContainer.getFSUtils());
+                        file.setFile(new File(new URI(location.getUrl())), fileCreation.isOverwrite());
                         executor.execute(file, syntaxResult);
                     }
 
                     @Override
                     public void handle(GoalTarget.Batch batch) throws Exception {
                         BatchGoal batchGoal = diContainer.getBean(BatchGoal.class);
-                        // TODO set  params
+                        batchGoal.setResult(holder);
                         batchGoal.setGoalName(goal);
                         executor.execute(batchGoal, syntaxResult);
                     }
@@ -75,8 +85,7 @@ public abstract class AbstractGoal extends AbstractExecutor {
                 throw new GoalException("Goal with name '" + goalWithName + "' does not exist");
             }
         }
-
-
+        return holder;
     }
 
 }

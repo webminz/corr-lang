@@ -36,7 +36,7 @@ public class LinkElementsTraverser extends AbstractTraverser {
             if (lookup.isPresent()) {
                 ref.setElement(lookup.get());
             } else {
-                throw new LanguageException(ref, ReportErrorType.SEMANTICS, "The element '" + ref.getName() + "' does not exist in " + ref.getEndpointName());
+                throw new LanguageException(ref, ReportErrorType.SEMANTICS, "The element '" + ref.toString()+ "' does not exist in " + ref.getEndpointName());
             }
         }
     }

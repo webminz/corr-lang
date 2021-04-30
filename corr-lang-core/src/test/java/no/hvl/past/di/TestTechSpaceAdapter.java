@@ -6,6 +6,7 @@ import no.hvl.past.graph.trees.QueryHandler;
 import no.hvl.past.names.Name;
 import no.hvl.past.plugin.UnsupportedFeatureException;
 import no.hvl.past.server.WebserviceRequestHandler;
+import no.hvl.past.systems.Data;
 import no.hvl.past.systems.Sys;
 import no.hvl.past.techspace.TechSpace;
 import no.hvl.past.techspace.TechSpaceAdapter;
@@ -422,7 +423,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     }
 
     @Override
-    public GraphMorphism readInstance(Sys system, InputStream inputStream) throws TechSpaceException, UnsupportedFeatureException {
+    public Data readInstance(Sys system, InputStream inputStream) throws TechSpaceException, UnsupportedFeatureException {
         return null;
     }
 

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Persons:PersonRegister xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Persons="Persons.ecore" xmi:id="_Meq0MKHAEeuOecDQxDHZAg">
+  <persons xsi:type="Persons:Male" xmi:id="_NRLPMKHAEeuOecDQxDHZAg" name="Hubert Hubermann"/>
+  <persons xsi:type="Persons:Female" xmi:id="_QqQq4KHAEeuOecDQxDHZAg" name="Hertha Hubermann"/>
+</Persons:PersonRegister>

@@ -16,6 +16,7 @@ generateGrammarSource {
 dependencies {
     implementation project(':mdegraphlib')
     implementation project(':mdegraphlib-gql')
+    implementation project(':mdegraphlib-emf')
     implementation 'org.springframework:spring-context:5.3.3'
     compile 'org.antlr:antlr4-runtime:4.8'
     antlr "org.antlr:antlr4:4.8"
@@ -26,7 +27,7 @@ dependencies {
 
 
 ext {
-    javaMainClass = "no.hvl.past.corrlang.runner.Run"
+    javaMainClass = "no.hvl.past.corrlang.runner.ConsoleRun"
 }
 
 application {
@@ -52,6 +53,8 @@ sourceSets {
 }
 
 task updateVersionInfo {
+    group = "corrlang"
+    def isRelease = findProperty('release') ?: 'false'
     def gitBranch = "Unknown branch"
     try {
         def workingDir = new File("${project.projectDir}")
@@ -61,17 +64,49 @@ task updateVersionInfo {
             gitBranch = result.text.trim()
         }
     } catch (e) {
+        e.printStackTrace()
     }
     Properties props = new Properties()
-    File propsFile = new File("${project.projectDir}/src/main/resources/BUILD.properties")
-    props.load(propsFile.newDataInputStream())
-    def version = props.get("VERSION")
-    def buildNo = 1 + Integer.parseInt(props.getProperty("BUILD", "0"))
-    props.setProperty("BUILD", buildNo.toString())
+    File propsFile = new File("${project.projectDir}/src/main/resources/BUILD.INFO")
+    if (propsFile.exists()) {
+        props.load(propsFile.newDataInputStream())
+    }
+    def buildNo = 1 + Integer.parseInt(props.getProperty("BUILD_NO", "0"))
+    props.setProperty("BUILD_NO", buildNo.toString())
     props.setProperty("COMMIT",gitBranch)
-    props.setProperty("DATE", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
-    props.store(propsFile.newDataOutputStream(),"")
+    props.setProperty("BUILD_DATE", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+    if (Boolean.parseBoolean(isRelease)) {
+        props.setProperty("BUILD_TYPE", "RELEASE")
+    } else {
+        props.setProperty("BUILD_TYPE", "DEVELOPER")
+    }
+    props.store(propsFile.newDataOutputStream(),null)
 }
+
+task copyResult(type: Copy) {
+    group = "corrlang"
+    from("${project.projectDir}/build/libs") {
+        include '**/*.jar'
+    }
+    into("${project.projectDir}/release")
+}
+
+
+shadowJar.mustRunAfter updateVersionInfo
+copyResult.mustRunAfter shadowJar
+
+task buildCorrlang {
+    group = "corrlang"
+    dependsOn(clean)
+    dependsOn(updateVersionInfo)
+    dependsOn(shadowJar)
+    dependsOn(copyResult)
+    doLast {
+        File releaseDirectory = new File("${project.projectDir}/release")
+        println("CorrLang successfully built: file:///${releaseDirectory.getAbsolutePath()}/corrlang.jar ")
+    }
+}
+
 
 clean {
     delete 'src/generated'

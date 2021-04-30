@@ -1,10 +1,14 @@
 package no.hvl.past.corrlang.domainmodel;
 
+import no.hvl.past.util.FileSystemUtils;
+
 import java.io.File;
+import java.io.IOException;
 
 public class URLReference {
 
     private final String url;
+    private String fullyResolvedUrl;
     private boolean isRetrieved;
     private boolean isLocal;
     private boolean isWeb;
@@ -16,22 +20,21 @@ public class URLReference {
     }
 
     public String getUrl() {
-        return url;
+        return fullyResolvedUrl;
     }
 
-    // TODO move this into FileSystemUtils
-    public void retrieve(File base) {
-        if (url.startsWith(".")) {
-            // TODO retrieve relative
-        } else if (url.startsWith("file:///") || url.startsWith("file://localhost/") || url.startsWith("file://127.0.0.1/")) {
-            isLocal = true;
-            // TODO retrieve absolute
-        } else if (url.startsWith("file://")) {
-            // TODO remote file
-        } else if (url.startsWith("http")) {
-            // TODO web resource
-        } else if (url.startsWith("platform")) {
-            // TODO eclipse resource
+    public void retrieve(FileSystemUtils base) throws IOException {
+        if (!url.contains(":")) {
+            if (url.startsWith("/")) {
+                this.fullyResolvedUrl = "file://" + url;
+            } else {
+                this.fullyResolvedUrl = "file://" + base.file(url).getAbsolutePath();
+            }
+        } else {
+
+            if (url.startsWith("classpath:")) {
+               this.fullyResolvedUrl = "file://" +  base.file(url).getAbsolutePath();
+            }
         }
     }
 

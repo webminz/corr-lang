@@ -4,6 +4,7 @@ import no.hvl.past.TestBase;
 import no.hvl.past.corrlang.domainmodel.CorrSpec;
 import no.hvl.past.corrlang.execution.ExecutionFacade;
 import no.hvl.past.corrlang.execution.goals.AbstractGoal;
+import no.hvl.past.corrlang.reporting.PrintStreamReportFacade;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.corrlang.parser.ParserChain;
 import no.hvl.past.corrlang.parser.SyntacticalResult;
@@ -11,7 +12,6 @@ import no.hvl.past.di.DependencyInjectionContainer;
 import no.hvl.past.keys.Key;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,16 +24,14 @@ import static junit.framework.TestCase.assertNotNull;
  */
 public class ECMFA20Example extends TestBase {
 
-    private String SALES_URL = "http://localhost:4011";
-    private String INVOICES_URL = "http://localhost:4011";
-    private String EMPLOYEES_URL = "http://localhost:4011";
-    private String CORRSPEC_FILE = "spec.corr";
+    private static final String CORRSPEC_FILE = "systemtests/ecmfa20GraphQLSpec.corr";
+    private static final String CORRSPEC_EMPTY_FILE = "systemtests/ecmfa20GraphQLSpecEmpty.corr";
 
     @Test
     public void testWriteFile() throws Throwable {
         DependencyInjectionContainer diContainer = DependencyInjectionContainer.create(System.getProperty("user.dir") + "/execution");
         diContainer.setUpLogging();
-        ReportFacade reportFacade = new ReportFacade(System.out);
+        ReportFacade reportFacade = new PrintStreamReportFacade(System.out);
         ExecutionFacade executor = new ExecutionFacade(diContainer);
         SyntacticalResult result = new SyntacticalResult();
         result = ParserChain.parseFromFile(getResourceFolderItem(CORRSPEC_FILE), reportFacade, result);
@@ -50,7 +48,7 @@ public class ECMFA20Example extends TestBase {
         DependencyInjectionContainer diContainer = DependencyInjectionContainer.create(System.getProperty("user.dir") + "/execution");
      //   diContainer.getPropertyHolder().getPropertyAndSetDefaultIfNecessary("log.level", "DEBUG");
         diContainer.setUpLogging();
-        ReportFacade reportFacade = new ReportFacade(System.out);
+        ReportFacade reportFacade = new PrintStreamReportFacade(System.out);
         ExecutionFacade executor = new ExecutionFacade(diContainer);
         SyntacticalResult result = new SyntacticalResult();
         result = ParserChain.parseFromFile(getResourceFolderItem(CORRSPEC_FILE), reportFacade, result);
@@ -61,15 +59,28 @@ public class ECMFA20Example extends TestBase {
 
 
     @Test
-    public void testKarlErikDemo() throws Throwable {
+    public void testPlottingEmpty() throws Throwable {
         DependencyInjectionContainer diContainer = DependencyInjectionContainer.create(System.getProperty("user.dir") + "/execution");
         diContainer.setUpLogging();
-        ReportFacade reportFacade = new ReportFacade(System.out);
+        ReportFacade reportFacade = new PrintStreamReportFacade(System.out);
         ExecutionFacade executor = new ExecutionFacade(diContainer);
         SyntacticalResult result = new SyntacticalResult();
-        result = ParserChain.parseFromFile(getResourceFolderItem("karlErikDemo.corrlang"), reportFacade, result);
-        AbstractGoal.runGoal(diContainer,executor,result,"GQLFederation");
+        result = ParserChain.parseFromFile(getResourceFolderItem(CORRSPEC_EMPTY_FILE), reportFacade, result);
+        AbstractGoal.runGoal(diContainer,executor,result,"GQLPlot");
 
+    }
+
+
+
+    @Test
+    public void testPlottingFull() throws Throwable {
+        DependencyInjectionContainer diContainer = DependencyInjectionContainer.create(System.getProperty("user.dir") + "/execution");
+        diContainer.setUpLogging();
+        ReportFacade reportFacade = new PrintStreamReportFacade(System.out);
+        ExecutionFacade executor = new ExecutionFacade(diContainer);
+        SyntacticalResult result = new SyntacticalResult();
+        result = ParserChain.parseFromFile(getResourceFolderItem(CORRSPEC_FILE), reportFacade, result);
+        AbstractGoal.runGoal(diContainer,executor,result,"GQLPlot");
     }
 
 

@@ -1,54 +1,42 @@
 package no.hvl.past.corrlang.domainmodel;
 
+import no.hvl.past.graph.Element;
 import no.hvl.past.graph.Graph;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.keys.AttributeBasedKey;
 import no.hvl.past.keys.Key;
 import no.hvl.past.names.Name;
 import no.hvl.past.systems.Sys;
+import no.hvl.past.util.StringUtils;
 
-import java.util.Optional;
+import java.lang.reflect.Array;
+import java.util.*;
 
 /**
  * Element refs are used to refer to elements in another schema.
  */
 public class ElementRef extends CorrLangElement implements ElementCondition.IdentificationArgument, ElementCondition.RelationRulePart {
 
-    private String endpointName;
-    private String name;
-    private String ownerName;
-    private String targetName;
+    private List<String> pathExpression = new ArrayList<>();
+    private String alias = null;
 
     private Endpoint endpoint;
     private Triple element;
+    private List<Triple> elementPath = new ArrayList<>();
 
     public ElementRef() {
     }
 
-    public ElementRef(String endpointName, String name) {
-        this.endpointName = endpointName;
-        this.name = name;
-    }
-
-    public ElementRef(String endpointName, String ownerName, String name) {
-        this.endpointName = endpointName;
-        this.name = name;
-        this.ownerName = ownerName;
-    }
-
-    public ElementRef(String endpointName, String name, String ownerName, String targetName) {
-        this.endpointName = endpointName;
-        this.name = name;
-        this.ownerName = ownerName;
-        this.targetName = targetName;
+    public ElementRef(String... path) {
+        this.pathExpression.addAll(Arrays.asList(path));
     }
 
     public String getEndpointName() {
-        return endpointName;
+        return pathExpression.get(0);
     }
 
     public void setEndpointName(String endpointName) {
-        this.endpointName = endpointName;
+        this.pathExpression.set(0, endpointName);
     }
 
     public Endpoint getEndpoint() {
@@ -60,11 +48,19 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     }
 
     public String getName() {
-        return name;
+        return pathExpression.get(pathExpression.size()-1);
     }
 
     public void setName(String name) {
-        this.name = name;
+        this.pathExpression.set(pathExpression.size() -1,name);
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public List<String> getPathExpression() {
+        return pathExpression;
     }
 
     @Override
@@ -73,20 +69,13 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     }
 
     public String getOwnerName() {
-        return ownerName;
+        return pathExpression.get(1);
     }
 
     public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
+        this.pathExpression.set(1,ownerName);
     }
 
-    public String getTargetName() {
-        return targetName;
-    }
-
-    public void setTargetName(String targetName) {
-        this.targetName = targetName;
-    }
 
     public Optional<Triple> getElement() {
         return Optional.ofNullable(element);
@@ -97,56 +86,98 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof ElementRef) {
-            ElementRef other = (ElementRef) obj;
-            if (this.endpointName.equals(other.endpointName)) {
-                if (this.name.equals(other.name)) {
-                    if (targetName != null) {
-                        return this.targetName.equals(other.targetName) && this.ownerName.equals(other.ownerName);
-                    } else {
-                        if (this.ownerName != null) {
-                            return this.ownerName.equals(other.ownerName);
-                        } else {
-                            return other.ownerName == null;
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ElementRef that = (ElementRef) o;
+        return pathExpression.equals(that.pathExpression);
     }
 
     @Override
     public int hashCode() {
-        int result = this.endpointName.hashCode();
-        result = result ^ this.name.hashCode();
-        if (this.targetName != null) {
-            result = result ^ this.targetName.hashCode();
-        }
-        if (this.ownerName != null) {
-            result = result ^ this.ownerName.hashCode();
-        }
-        return result;
+        return Objects.hash(pathExpression);
     }
 
     @Override
     public String toString() {
-        return endpointName + "." + (ownerName != null ? ownerName + "." : "") + name + (targetName != null ? "." + targetName : "") ;
+        return StringUtils.fuseList(this.pathExpression.stream(), ".");
     }
 
     @Override
-    public Key toKey(Name targetType, Graph carrier) {
-        return new AttributeBasedKey(carrier, this.element, targetType);
+    public Key toKey(Name targetType) {
+        if (isPath()) {
+            List<Triple> path = new ArrayList<>();
+            path.add(element);
+            path.addAll(elementPath);
+            return new AttributeBasedKey(endpoint.getSystem().get(), targetType, path);
+        } else {
+            Optional<Triple> lookup = getEndpoint().getSystem().get().lookup(this.pathExpression.get(1));
+            if (!lookup.get().getLabel().equals(this.element.getSource())) {
+                List<Triple> path = new ArrayList<>();
+                path.add(lookup.get());
+                path.add(element);
+                return new AttributeBasedKey(endpoint.getSystem().get(), targetType, path);
+            } else {
+                return new AttributeBasedKey(endpoint.getSystem().get(), this.element, targetType);
+            }
+        }
+    }
+
+    public void desugarAlias(Map<String, ElementRef> knownAliases) {
+        if (knownAliases.containsKey(pathExpression.get(0))) {
+            String alias = pathExpression.get(0);
+            pathExpression.remove(0);
+            ElementRef elementRef = knownAliases.get(alias);
+            this.pathExpression.addAll(0, elementRef.getPathExpression());
+        }
+    }
+
+    public boolean isPath() {
+        return !this.elementPath.isEmpty();
     }
 
     public Optional<Triple> lookup(Sys system) {
-        if (targetName != null) {
-            return system.lookup(this.ownerName, this.name, this.targetName);
-        } else if (ownerName != null) {
-            return system.lookup(this.ownerName, this.name);
-        } else {
-            return system.lookup(this.name);
+        if (this.pathExpression.size() == 2) {
+            return system.lookup(this.pathExpression.get(1));
         }
+        if (this.pathExpression.size() == 3) {
+            Optional<Triple> lookup = system.lookup(this.pathExpression.get(1), this.pathExpression.get(2));
+            if (lookup.isPresent()) {
+                system.lookup(this.pathExpression.get(1));
+            }
+        }
+        boolean foundStart = false;
+        int idx = 1;
+        Optional<Triple> lookup = Optional.empty();
+        while (!foundStart) {
+            String[] lookupPath = new String[idx];
+            for (int i = 0; i < idx; i++) {
+                lookupPath[i] = pathExpression.get(i + 1);
+            }
+            lookup = system.lookup(lookupPath);
+            if (lookup.isPresent()) {
+                foundStart = true;
+            }
+            idx++;
+            if (idx == this.pathExpression.size()) {
+                return Optional.empty();
+            }
+        }
+        Name start = lookup.get().getTarget();
+        while (idx < this.pathExpression.size()) {
+            Optional<Triple> triple = system.lookup(system.displayName(start), pathExpression.get(idx));
+            if (triple.isPresent()) {
+                start = triple.get().getTarget();
+                elementPath.add(triple.get());
+                idx++;
+            } else {
+                idx = this.pathExpression.size();
+            }
+        }
+        return lookup;
+    }
+
+    public void setAlias(String text) {
+        this.alias = text;
     }
 }

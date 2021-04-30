@@ -2,12 +2,13 @@ package no.hvl.past.corrlang.parser;
 
 import com.google.common.collect.Sets;
 import no.hvl.past.corrlang.domainmodel.*;
-import no.hvl.past.corrlang.reporting.ReportFacade;
+import no.hvl.past.corrlang.reporting.PrintStreamReportFacade;
 import no.hvl.past.corrlang.domainmodel.URLReference;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,13 +19,13 @@ import static org.junit.Assert.*;
 public class ParserTest {
 
     @Test
-    public void testImportsWithURLs() {
+    public void testImportsWithURLs() throws ParseException {
         String input = "import :STDLIB;\n" +
                 "import ./more-rules.etl;\n" +
                 "import ../../default/defs.corr;\n" +
                 "import /home/user/Documents/a.txt; " +
                 "endpoint X { type FILE at file:///y technology ECORE }";
-        SyntacticalResult result = ParserChain.parseFromString(input,new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input,new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getImports().contains(new URLReference(":STDLIB")));
         assertTrue(result.getImports().contains(new URLReference("./more-rules.etl")));
         assertTrue(result.getImports().contains(new URLReference("../../default/defs.corr")));
@@ -32,13 +33,13 @@ public class ParserTest {
     }
 
     @Test
-    public void testReadOneEndpoint() throws IOException {
+    public void testReadOneEndpoint() throws IOException, ParseException {
        String input = "endpoint First {\n" +
                 "    type  SERVER\r\n" +
                 "    at http://www.my-random-domain.com/public/api/v1.0/graphql\n" +
                 "\ttechnology GRAPH_QL\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getEndpointWithName("First").isPresent());
         Endpoint first = result.getEndpointWithName("First").get();
         assertEquals("First", first.getName());
@@ -46,7 +47,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testTwoEndpoints() {} {
+    public void testTwoEndpoints() throws ParseException {
         String input = "\n" +
                 "endpoint First {\n" +
                 "    type SERVER\n" +
@@ -60,7 +61,7 @@ public class ParserTest {
                 "    technology ECORE\n" +
                 "    schema file:///home/user/Documents/example/one.ecore\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getEndpointWithName("First").isPresent());
         assertTrue(result.getEndpointWithName("Second").isPresent());
         assertFalse(result.getEndpointWithName("Third").isPresent());
@@ -78,14 +79,14 @@ public class ParserTest {
     }
 
     @Test
-    public void testRule() {
+    public void testRule() throws ParseException {
         String input = "rule AllCapitals {\n" +
                 "    using OCL '''\n" +
                 "       context A inv allCaps:\n" +
                 "          self.name->toUpper() = self.name\n" +
                 "    '''\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getRuleWithName("AllCapitals").isPresent());
         ConsistencyRule rule = result.getRuleWithName("AllCapitals").get();
         assertEquals("OCL", rule.getLanguage());
@@ -94,9 +95,9 @@ public class ParserTest {
     }
 
     @Test
-    public void testEmptyCorrspec() {
+    public void testEmptyCorrspec() throws ParseException {
         String input = "correspondence C (A, B) { }";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("C").isPresent());
         CorrSpec spec = result.getCorrSpecWithName("C").get();
         assertEquals(2, spec.getEndpointsList().size());
@@ -106,13 +107,13 @@ public class ParserTest {
     }
 
     @Test
-    public void testSimpleCommsCorrspec() {
+    public void testSimpleCommsCorrspec() throws ParseException {
         String input = "correspondence OO2RDBM (OO,RDBM) {\n" +
                 "    relate (OO.ClassDiagram , RDBM.Schema);\n" +
                 "    sync (OO.Class , RDBM.Table);\n" +
                 "    identify (OO.Attribute,RDBM.Column);\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("OO2RDBM").isPresent());
         CorrSpec spec = result.getCorrSpecWithName("OO2RDBM").get();
         assertEquals(3, spec.getCommonalities().size());
@@ -138,7 +139,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testHierarchicalCommsCorrspec() {
+    public void testHierarchicalCommsCorrspec() throws ParseException {
         String input = "correspondence OO2RDBM (OO,RDBM) {\n" +
                 "    relate (OO.ClassDiagram, RDBM.Schema) with {\n" +
                 "        sync (OO.ClassDiagram.classes , RDBM.Schema.tables) as entities with {\n" +
@@ -146,7 +147,7 @@ public class ParserTest {
                 "        };\n" +
                 "    };\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("OO2RDBM").isPresent());
         CorrSpec spec = result.getCorrSpecWithName("OO2RDBM").get();
         assertEquals(1, spec.getCommonalities().size());
@@ -165,12 +166,12 @@ public class ParserTest {
         assertTrue(Identification.class.isAssignableFrom(ident.getClass()));
         assertEquals(0, ident.getSubCommonalities().size());
         assertEquals(2, ident.getRelates().size());
-        assertTrue(ident.getRelates().contains(new ElementRef("OO", "classes", "ClassDiagram", "Attribute")));
-        assertTrue(ident.getRelates().contains(new ElementRef("RDBM", "tables", "Schema" , "Column")));
+        assertTrue(ident.getRelates().contains(new ElementRef("OO", "ClassDiagram", "classes", "Attribute")));
+        assertTrue(ident.getRelates().contains(new ElementRef("RDBM", "Schema", "tables" , "Column")));
     }
 
     @Test
-    public void testIdentifyInIdentify() {
+    public void testIdentifyInIdentify() throws ParseException {
         String input = "correspondence Fed (Sales,Invoices,HR) {\n" +
                 "\n" +
                 "   identify (Sales.Query,Invoices.Query,HR.Query) as Query with {\n" +
@@ -180,7 +181,7 @@ public class ParserTest {
                 "   identify (Sales.Customer,Sales.Client,HR.Employee) as Partner;\n" +
                 "\n" +
                 "}\n";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("Fed").isPresent());
         CorrSpec fed = result.getCorrSpecWithName("Fed").get();
         assertEquals(2, fed.getCommonalities().size());
@@ -196,15 +197,15 @@ public class ParserTest {
     }
 
     @Test
-    public void testCommsWithKeysCorrspec() {
+    public void testCommsWithKeysCorrspec() throws ParseException {
         String input = "correspondence C (First,Second) {\n" +
                 "\n" +
                 "\trelate (First.C, Second.D) as C1 with {\n" +
                 "\t   sync (First.C.id,Second.D.identifier);\n" +
-                "\t} when (Second.C.name == First.C.firstname ++ First.C.lastname);\n" +
+                "\t} when (Second.C.name == First.C.firstname ++ First.C.lastname );\n" +
                 "\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("C").isPresent());
         CorrSpec fed = result.getCorrSpecWithName("C").get();
         assertEquals(1, fed.getCommonalities().size());
@@ -219,12 +220,12 @@ public class ParserTest {
     }
 
     @Test
-    public void testMoreComplicatedKeys() {
+    public void testMoreComplicatedKeys() throws ParseException {
         String input = "correspondence C (A,B,D) {\n" +
                 "\trelate (A.X,B.Y,D.W) \n" +
                 "\twhen (A.X.id == B.Y.identifier || D.W.proxy == true && A.X <~> B.Y ~~> D.W);\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         CorrSpec fed = result.getCorrSpecWithName("C").get();
         Commonality relate = fed.getCommonalities().iterator().next();
         assertTrue(relate.getKey().isPresent());
@@ -248,7 +249,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testCommsWithRulesCorrspec() {
+    public void testCommsWithRulesCorrspec() throws ParseException {
         String input = "correspondence C (A,B) {\n" +
                 "\trelate (A.X,B.Y) as one check allCaps;\n" +
                 "\n" +
@@ -265,7 +266,7 @@ public class ParserTest {
                 "'''" +
                 "\t};\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("C").isPresent());
         CorrSpec c = result.getCorrSpecWithName("C").get();
         assertEquals(2, c.getCommonalities().size());
@@ -285,7 +286,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testMultipleSubComms() {
+    public void testMultipleSubComms() throws ParseException {
         String input =
                 "correspondence Fed (Sales,Invoices,HR) {\n" +
                 "identify (Sales.Customer,Invoices.Client,HR.Employee) as Partner\n" +
@@ -295,7 +296,7 @@ public class ParserTest {
                 "             identify (Sales.Customer.address,Invoices.Client.address) as address;\n" +
                 "         };\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("Fed").isPresent());
         CorrSpec fed = result.getCorrSpecWithName("Fed").get();
         assertTrue(fed.getCommonalityWithName("Partner").isPresent());
@@ -306,14 +307,14 @@ public class ParserTest {
     }
 
     @Test
-    public void testMultipleCorrspecs() {
+    public void testMultipleCorrspecs() throws ParseException {
         String input = "correspondence First (A,B,C,D) {\n" +
                 "\trelate (A.a,B.b,C.c,D.d);\n" +
                 "}\n" +
                 "correspondence Second (X,Y,Z) {\n" +
                 "\tsync (X.x1,Y.y,Z.w,X.x2) as a;\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getCorrSpecWithName("First").isPresent());
         assertTrue(result.getCorrSpecWithName("Second").isPresent());
         CorrSpec first = result.getCorrSpecWithName("First").get();
@@ -330,12 +331,12 @@ public class ParserTest {
                 "\tcorrespondence Fed\n" +
                 "\taction FEDERATION\n" +
                 "\ttechnology GRAPH_QL\n" +
-                "\ttarget server {\n" +
-                "\t\tcontextPath \"graphql/\"\n" +
+                "\ttarget SERVER {\n" +
+                "\t\tcontextPath graphql/\n" +
                 "\t\tport 8081\n" +
                 "\t}\n" +
                 "}";
-        SyntacticalResult result = ParserChain.parseFromString(input, new ReportFacade(System.out), new SyntacticalResult());
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
         assertTrue(result.getGoalWithName("GraphQLGlobal").isPresent());
         Goal goal = result.getGoalWithName("GraphQLGlobal").get();
         assertEquals(Goal.Action.FEDERATION, goal.getAction());
@@ -363,6 +364,106 @@ public class ParserTest {
                 fail();
             }
         });
+    }
+
+    @Test
+    public void testParsePNGGoal() throws ParseException {
+        String input = "goal GQLPlot {\n" +
+                "    correspondence Fed\n" +
+                "    action SCHEMA\n" +
+                "\ttechnology PNG\n" +
+                "\ttarget FILE {\n" +
+                "\t\tat ./visualisation.png\n" +
+                "\t}\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
+        assertTrue(result.getGoalWithName("GQLPlot").isPresent());
+        Goal goal = result.getGoalWithName("GQLPlot").get();
+        assertEquals(Goal.Action.SCHEMA, goal.getAction());
+        assertEquals("PNG", goal.getTechnology());
+
+    }
+
+
+    @Test
+    public void testSyntaxError() {
+        String input = "correspondence C (A,B {\n" +
+                "\trelate A.x, B.y as z\n" +
+                "}";
+        try {
+            SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
+            fail();
+        } catch (ParseException p) {
+            assertEquals(3, p.getRecognitionExceptions().size());
+            assertEquals("Location: line: 1 column: 22 details: extraneous input '{' expecting {',', ')'}", p.getRecognitionExceptions().get(0));
+
+        }
+    }
+
+    @Test
+    public void testWithAlternativeKeys() throws ParseException {
+        String input = "correspondence C (A,B) {\n" +
+                "\t\n" +
+                "\trelate (A.X,B.Y) \n" +
+                "\twhen (A.x.id == B.Y.key ++ \"suffix\" || A.x.id == B.Y.identifier ++ \"suffix\" );\n" +
+                "}";
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
+        Commonality c = result.getCorrSpecWithName("C").get().getCommonalities().iterator().next();
+        assertTrue(c.getKey().isPresent());
+
+        ElementCondition.Alternative alternative = new ElementCondition.Alternative();
+        ElementCondition.Identification lhs = new ElementCondition.Identification(
+                new ElementRef("A", "x", "id"),
+                new ElementCondition.ArgumentConcatenation(
+                        new ElementRef("B", "Y", "key"),
+                        new ElementCondition.ConstantArgument("suffix", ElementCondition.ConstantArgument.Type.STRING)));
+        ElementCondition.Identification rhs = new ElementCondition.Identification(
+                new ElementRef("A", "x", "id"),
+                new ElementCondition.ArgumentConcatenation(
+                        new ElementRef("B", "Y", "identifier"),
+                        new ElementCondition.ConstantArgument("suffix", ElementCondition.ConstantArgument.Type.STRING)));
+        alternative.add(lhs);
+        alternative.add(rhs);
+        assertEquals(alternative, c.getKey().get());
+    }
+
+    @Test
+    public void testFamPersonsKey() throws ParseException {
+        String input = "correspondence Families2Persons (Families,Persons) {\n" +
+                "\t\n" +
+                "\n" +
+                "sync (Families.FamilyMember as fm , Persons.Male as m) as syncMale \n" +
+                "      when (fm.name ++ \" \" ++ fm.fatherInverse.name == m.name ||  fm.name  ++ \" \" ++ fm.sonsInverse.name == m.name );\n" +
+                "\n" +
+                "sync (Families.FamilyMember as fm, Persons.Female as f) as syncFemale\n" +
+                "\t  when (fm.name ++ \" \" ++  fm.motherInverse.name == f.name ||  fm.name  ++ \" \" ++ fm.daughtersInverse.name == f.name );\n" +
+                "\n" +
+                "}\n";
+
+        ElementCondition.Alternative alternative = new ElementCondition.Alternative();
+        ElementCondition.Identification lhs = new ElementCondition.Identification(
+                new ElementCondition.ArgumentConcatenation(
+                        new ElementRef("fm", "name"),
+                        new ElementCondition.ConstantArgument(" ", ElementCondition.ConstantArgument.Type.STRING),
+                        new ElementRef("fm", "fatherInverse", "name")
+                ),
+                new ElementRef("m", "name"));
+        ElementCondition.Identification rhs = new ElementCondition.Identification(
+                new ElementCondition.ArgumentConcatenation(
+                        new ElementRef("fm", "name"),
+                        new ElementCondition.ConstantArgument(" ", ElementCondition.ConstantArgument.Type.STRING),
+                        new ElementRef("fm", "sonsInverse", "name")
+                ),
+                new ElementRef("m", "name"));
+        alternative.add(lhs);
+        alternative.add(rhs);
+        SyntacticalResult result = ParserChain.parseFromString(input, new PrintStreamReportFacade(System.out), new SyntacticalResult());
+        Collection<Commonality> coms = result.getCorrSpecWithName("Families2Persons").get().getCommonalities();
+        Commonality suncMale = coms.iterator().next();
+
+        assertEquals(alternative, suncMale.getKey().get());
+
+
     }
 
 

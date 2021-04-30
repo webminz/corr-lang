@@ -22,21 +22,24 @@ import java.util.stream.Collectors;
 public class CreateFormalAlignmentTraverser extends AbstractTraverser {
 
 
-    private static final Name GLOBAL_STRING_NAME = Name.identifier("String");
-    private static final Name GLOBAL_INT_NAME = Name.identifier("Integer");
-    private static final Name GLOBAL_FLOAT_NAME = Name.identifier("Float");
-    private static final Name GLOBAL_BOOL_NAME = Name.identifier("Bool");
-
     @Autowired
     private  MetaRegistry registry;
     @Autowired
     private Universe universe;
     private Multimap<Triple, Name> participations;
 
+    private ComprSys.Builder builder;
+
+
+    public void setUniverse(Universe universe) {
+        this.universe = universe;
+    }
+
     public CreateFormalAlignmentTraverser() {
         super("CreateFormalAlignment");
         this.participations = ArrayListMultimap.create();
     }
+
 
     @Override
     public Set<Class<? extends AbstractExecutor>> dependsOn() {
@@ -46,71 +49,55 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
     @Override
     public void handle(CorrSpec corrSpec) throws GraphError {
         // Init result vars
-        List<Sketch> components = new ArrayList<>();
-        List<GraphBuilders> morphismBuilders = new ArrayList<>();
-        Set<Name> ids = new HashSet<>();
+        buildKeys(corrSpec);
 
-        GraphBuilders apexBuilder = makeBuilders(corrSpec, components, morphismBuilders);
+        this.builder = new ComprSys.Builder(Name.identifier(corrSpec.getName()), universe);
+
+        for (String ep : corrSpec.getEndpointsList()) {
+            this.builder.addSystem(corrSpec.getEndpointRefs().get(ep).getSystem().get());
+        }
 
         for (Commonality commonality : corrSpec.allTransitiveCommonalities()) {
-            addCommonality(corrSpec, commonality, apexBuilder, components, morphismBuilders, ids);
+            addCommonality(commonality);
         }
 
-        buildFormalConstructs(corrSpec, components, morphismBuilders, ids, apexBuilder);
+        for (Key k : corrSpec.getFormalKeys()) {
+            this.builder.key(k);
+        }
 
-
+        corrSpec.setComprSys(this.builder.build());
     }
 
-    private void addCommonality(
-            CorrSpec corrSpec,
-            Commonality commonality,
-            GraphBuilders apexBuilder,
-            List<Sketch> components,
-            List<GraphBuilders> morphismBuilders,
-            Set<Name> ids) {
+    private void addCommonality(Commonality commonality) {
         if (commonality.isNodeCorrespondence()) {
-            handleNode(apexBuilder, commonality,corrSpec,components,morphismBuilders,ids);
+            handleNode(commonality);
         } else if (commonality.isEdgeCorrespondence()) {
-            handleEdge(apexBuilder, commonality, corrSpec, components, morphismBuilders, ids);
+            handleEdge(commonality);
         }
     }
 
-    private void handleEdge(
-            GraphBuilders apexBuilder,
-            Commonality commonality,
-            CorrSpec corrSpec,
-            List<Sketch> components,
-            List<GraphBuilders> morphismBuilders,
-            Set<Name> ids) {
+    private void handleEdge(Commonality commonality) {
         Name srcName = Name.identifier(commonality.getParent().get().getName());
         Name lblName = Name.identifier(commonality.getName()).prefixWith(srcName);
         Name trgName = Name.identifier(commonality.getTarget().get().getName());
-        apexBuilder.edge(srcName, lblName, trgName);
-        for (ElementRef ref : commonality.getRelates()) {
-            int index = corrSpec.getEndpointsList().indexOf(ref.getEndpointName());
-            morphismBuilders.get(index).map(
-                   lblName, ref.getElement().get().getLabel());
-        }
+        this.builder.edgeCommonality(srcName, lblName, trgName, commonality.getRelates().stream().map(
+                com -> ComprSys.qname(com.getEndpoint().getSystem().get(),com.getElement().get().getLabel())
+        ).collect(Collectors.toList()));
         if (commonality.isIdentity()) {
-            ids.add(lblName);
+            this.builder.identification(lblName);
         }
     }
 
-    public void handleNode(
-            GraphBuilders apexBuilder,
-            Commonality commonality,
-            CorrSpec corrSpec,
-            List<Sketch> components,
-            List<GraphBuilders> morphismBuilders,
-            Set<Name> ids) {
+    public void handleNode(Commonality commonality) {
         Name commWitnsName = Name.identifier(commonality.getName());
-        apexBuilder.node(commWitnsName);
-        for (ElementRef ref : commonality.getRelates()) {
-            int index = corrSpec.getEndpointsList().indexOf(ref.getEndpointName());
-            morphismBuilders.get(index).map(commWitnsName, ref.getElement().get().getLabel());
-        }
+        this.builder.nodeCommonality(commWitnsName, commonality.getRelates().stream()
+                .map(com -> ComprSys.qname(com.getEndpoint().getSystem().get(), com.getElement().get().getLabel()))
+                .collect(Collectors.toList()));
         if (commonality.isIdentity()) {
-            ids.add(commWitnsName);
+            this.builder.identification(commWitnsName);
+        }
+        if (commonality.isSynchronizeElements()) {
+            this.builder.synchronisation(commWitnsName);
         }
     }
 
@@ -118,7 +105,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
     private void buildKeys(CorrSpec corrSpec) {
         for (Commonality commonality : corrSpec.getCommonalities()) {
             if (commonality.isNodeCorrespondence() && commonality.getKey().isPresent()) {
-                for (Key k : commonality.getKey().get().asKeys(Name.identifier(commonality.getName()), corrSpec.getComprehensiveSchema().get().carrier())) {
+                for (Key k : commonality.getKey().get().asKeys(Name.identifier(commonality.getName()))) {
                     corrSpec.addFormalKey(k);
                 }
             }
@@ -126,61 +113,10 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
 
     }
 
-    // TODO may be moved to a different traverser
-    private void buildFormalConstructs(CorrSpec corrSpec, List<Sketch> components, List<GraphBuilders> morphismBuilders, Set<Name> ids, GraphBuilders apexBuilder) throws GraphError {
-        Sketch apex = apexBuilder.graph(Name.identifier(corrSpec.getName() + "_0").absolute()).sketch(Name.identifier(corrSpec.getName() + "_0")).getResult(Sketch.class);
-        List<GraphMorphism> projections = new ArrayList<>();
-        for (GraphBuilders builders : morphismBuilders) {
-            builders.domain(apex.carrier());
-            builders.codomain(components.get(morphismBuilders.indexOf(builders)).carrier());
-            builders.morphism("Projection_" + morphismBuilders.indexOf(builders));
-            projections.add(builders.getResult(GraphMorphism.class));
-        }
-
-        Star result = new StarImpl(Name.identifier(corrSpec.getName()), apex, components, projections, ids);
-        corrSpec.setFormalRepresentation(result);
-        getLogger().debug("Formal representation of alignment for " + corrSpec.getName() + " is set");
-
-        Pair<Sketch, List<GraphMorphism>> sketchListPair = result.comprehensiveSystem();
-        getLogger().debug("Comprehensive system is calculated");
-
-        corrSpec.setComprehensveSchema(sketchListPair.getFirst());
-
-        Map<Sys, GraphMorphism> embeddings = new LinkedHashMap<>();
-
-        ListIterator<String> listIterator = corrSpec.getEndpointsList().listIterator();
-        while (listIterator.hasNext()) {
-            String endpoint = listIterator.next();
-            int i = listIterator.nextIndex();
-            GraphMorphism embMorph = sketchListPair.getRight().get(i);
-            corrSpec.getSchemaTypeEmbeddings().put(endpoint, embMorph);
-            embeddings.put(corrSpec.getEndpointRefs().get(endpoint).getSystem().get(), embMorph);
-        }
 
 
-        buildKeys(corrSpec);
 
 
-        ComprSys cs = new ComprSys.Impl("http://127.0.0.1",
-                corrSpec.getComprehensiveSchema().get(),
-                new HashMap<>(),
-                embeddings,
-                ids,
-                corrSpec.getFormalKeys());
-        corrSpec.setComprSys(cs);
-    }
-
-
-    @NotNull
-    private GraphBuilders makeBuilders(CorrSpec corrSpec, List<Sketch> components, List<GraphBuilders> morphismBuilders) {
-        GraphBuilders apexBuilder = new GraphBuilders(universe, false, true);
-        for (String endpoint : corrSpec.getEndpointsList()) {
-            Endpoint endpointObject = corrSpec.getEndpointRefs().get(endpoint);
-            components.add(endpointObject.getSystem().get().schema());
-            morphismBuilders.add(new GraphBuilders(universe, false, false));
-        }
-        return apexBuilder;
-    }
 
 
 

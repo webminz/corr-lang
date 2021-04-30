@@ -45,13 +45,13 @@ public abstract class GoalTarget {
     }
 
     public static class CodeGeneration extends GoalTarget {
-        private String location;
+        private URLReference location;
         private String technology;
         private String artefactId = "app";
         private String groupId = "com.example";
         private String version = "1.0";
 
-        public String getLocation() {
+        public URLReference getLocation() {
             return location;
         }
 
@@ -64,7 +64,7 @@ public abstract class GoalTarget {
         }
 
         public void setLocation(String location) {
-            this.location = location;
+            this.location = new URLReference(location);
         }
 
         public String getArtefactId() {
@@ -98,15 +98,15 @@ public abstract class GoalTarget {
     }
 
     public static class FileCreation extends GoalTarget {
-        private String location;
+        private URLReference location;
         private boolean overwrite = true;
 
-        public String getLocation() {
+        public URLReference getLocation() {
             return location;
         }
 
         public void setLocation(String location) {
-            this.location = location;
+            this.location = new URLReference(location);
         }
 
         public boolean isOverwrite() {

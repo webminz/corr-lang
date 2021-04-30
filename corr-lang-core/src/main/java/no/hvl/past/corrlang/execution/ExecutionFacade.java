@@ -1,6 +1,7 @@
 package no.hvl.past.corrlang.execution;
 
 import no.hvl.past.corrlang.parser.SyntacticalResult;
+import no.hvl.past.corrlang.reporting.PrintStreamReportFacade;
 import no.hvl.past.corrlang.reporting.ReportErrorType;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
@@ -20,7 +21,7 @@ public class ExecutionFacade {
             (DependencyInjectionContainer diContainer) {
         this.alreadyExecuted = new HashMap<>();
         this.diContainer = diContainer;
-        this.reportFacade = diContainer.getBean("defaultReportFacade", ReportFacade.class);
+        this.reportFacade = diContainer.getBean("defaultReportFacade", PrintStreamReportFacade.class);
     }
 
     public boolean isKnownTarget(String target) {

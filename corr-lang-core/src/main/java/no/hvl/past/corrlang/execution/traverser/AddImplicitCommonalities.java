@@ -10,6 +10,7 @@ import no.hvl.past.corrlang.domainmodel.Identification;
 import no.hvl.past.corrlang.execution.AbstractExecutor;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
+import no.hvl.past.systems.ComprSys;
 import no.hvl.past.techspace.TechSpace;
 import no.hvl.past.techspace.TechSpaceDirective;
 
@@ -70,7 +71,9 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                         ref.setEndpoint(endpoint);
                     }
                 }
-                ohterIds.add(toAdd);
+                if (toAdd != null) {
+                    ohterIds.add(toAdd);
+                }
             });
         }
 
@@ -101,7 +104,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                     if (endpoint.getSystem().get().schema().carrier().mentions(baseTypeName)) {
                         if (stringId == null) {
                             stringId = new Identification();
-                            stringId.setName("STRING_TYPE_IMPLICIT_IDENTITY");
+                            stringId.setName(ComprSys.GLOBAL_STRING_NAME.printRaw());
                         }
                         ElementRef ref = new ElementRef(ep, baseTypeName.print(PrintingStrategy.IGNORE_PREFIX));
                         ref.setElement(endpoint.getSystem().get().schema().carrier().get(baseTypeName).get());
@@ -123,7 +126,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                         if (endpoint.getSystem().get().schema().carrier().mentions(baseTypeName)) {
                             if (intId == null) {
                                 intId = new Identification();
-                                intId.setName("INTEGER_NUMBER_TYPE_IMPLICIT_IDENTITY");
+                                intId.setName(ComprSys.GLOBAL_INT_NAME.printRaw());
                             }
                             ElementRef ref = new ElementRef(ep, baseTypeName.print(PrintingStrategy.IGNORE_PREFIX));
                             ref.setEndpoint(endpoint);
@@ -146,7 +149,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                         if (endpoint.getSystem().get().schema().carrier().mentions(baseTypeName)) {
                             if (floatId == null) {
                                 floatId = new Identification();
-                                floatId.setName("FLOATING_POINT_NUMBER_TYPE_IMPLICIT_IDENTITY");
+                                floatId.setName(ComprSys.GLOBAL_FLOAT_NAME.printRaw());
                             }
                             ElementRef ref = new ElementRef(ep, baseTypeName.print(PrintingStrategy.IGNORE_PREFIX));
                             ref.setEndpoint(endpoint);
@@ -169,7 +172,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                         if (endpoint.getSystem().get().schema().carrier().mentions(baseTypeName)) {
                             if (booldId == null) {
                                 booldId = new Identification();
-                                booldId.setName("BOOLEAN_TYPE_IMPLICIT_IDENTITY");
+                                booldId.setName(ComprSys.GLOBAL_BOOL_NAME.printRaw());
                             }
                             ElementRef ref = new ElementRef(ep, baseTypeName.print(PrintingStrategy.IGNORE_PREFIX));
                             ref.setEndpoint(endpoint);

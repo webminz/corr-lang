@@ -9,6 +9,16 @@ import javax.annotation.PostConstruct;
 public class TraverserConfiguration {
 
     @Bean
+    public RetrieveUrls retrieveUrls() {
+        return new RetrieveUrls();
+    }
+
+    @Bean
+    public DesugarAliases desugarAliases() {
+        return new DesugarAliases();
+    }
+
+    @Bean
     public IdentifyTechSpaceTraverser identifyTechSpaces() {
         return new IdentifyTechSpaceTraverser();
     }

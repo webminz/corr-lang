@@ -14,6 +14,7 @@ import no.hvl.past.techspace.TechSpaceException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -58,7 +59,7 @@ public abstract class LanguageGoal extends AbstractGoal {
 
     protected abstract void executeSynchronize(CorrSpec correspondence, TechSpaceAdapter<? extends TechSpace> techSpace);
 
-    protected abstract void executeVerify(CorrSpec correspondence, TechSpaceAdapter<? extends TechSpace> techSpace);
+    protected abstract void executeVerify(CorrSpec correspondence, TechSpaceAdapter<? extends TechSpace> techSpace) throws UnsupportedFeatureException, TechSpaceException, IOException, URISyntaxException;
 
     protected abstract void executeSchema(CorrSpec correspondence, TechSpaceAdapter<? extends TechSpace> techSpace) throws TechSpaceException, UnsupportedFeatureException, IOException;
 

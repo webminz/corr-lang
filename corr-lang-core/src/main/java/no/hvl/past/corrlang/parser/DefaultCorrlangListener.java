@@ -174,35 +174,30 @@ public class DefaultCorrlangListener extends CorrlangBaseListener {
 
     @Override
     public void enterElmentRef(CorrlangParser.ElmentRefContext ctx) {
-        this.currentElementRef = new ElementRef();
+        String qualified = ctx.getText();
+        String[] split = qualified.split("\\.");
+        this.currentElementRef = new ElementRef(split);
         this.currentElementRef.setFile(fileName);
         this.currentElementRef.setStartTokenLine(ctx.start.getLine());
         this.currentElementRef.setStartTokenColumn(ctx.start.getCharPositionInLine());
-        String qualified = ctx.getText();
-        String[] split = qualified.split("\\.");
-        if (split.length >= 4) {// all
-            this.currentElementRef.setEndpointName(split[0]);
-            this.currentElementRef.setOwnerName(split[1]);
-            this.currentElementRef.setName(split[2]);
-            this.currentElementRef.setTargetName(split[3]);
-        } else if (split.length == 3) { //edge
-            this.currentElementRef.setEndpointName(split[0]);
-            this.currentElementRef.setOwnerName(split[1]);
-            this.currentElementRef.setName(split[2]);
-        } else if (split.length == 2) { //node
-            this.currentElementRef.setEndpointName(split[0]);
-            this.currentElementRef.setName(split[1]);
-        } else if (split.length == 1) { // unqualified
-            this.currentElementRef.setName(split[0]);
+    }
+
+    @Override
+    public void enterElmentRefAlias(CorrlangParser.ElmentRefAliasContext ctx) {
+        this.currentElementRef.setAlias(ctx.getText());
+    }
+
+    @Override
+    public void exitElmentRefDef(CorrlangParser.ElmentRefDefContext ctx) {
+        if (!buildingKeys) {
+            this.currentCommonality.addRelatedElement(this.currentElementRef);
+            this.currentElementRef = null;
         }
     }
 
     @Override
     public void exitElmentRef(CorrlangParser.ElmentRefContext ctx) {
-        if (!buildingKeys) {
-            this.currentCommonality.addRelatedElement(this.currentElementRef);
-            this.currentElementRef = null;
-        } else {
+        if (buildingKeys) {
             if (this.keyIdentification != null || this.keyConcatenation != null) {
                 if (this.keyConcatenation != null) {
                     this.keyConcatenation.add(this.currentElementRef);
@@ -300,30 +295,24 @@ public class DefaultCorrlangListener extends CorrlangBaseListener {
     }
 
     @Override
-    public void enterKeyIdArgumentSuffix(CorrlangParser.KeyIdArgumentSuffixContext ctx) {
-        if (this.keyConcatenation == null) {
-            this.keyConcatenation = new ElementCondition.ArgumentConcatenation();
-            int last = this.keyIdentification.getArguments().size() -1;
-            this.keyConcatenation.add(this.keyIdentification.getArguments().get(last));
-            this.keyIdentification.getArguments().remove(last);
-        }
+    public void enterKeyIdArgument(CorrlangParser.KeyIdArgumentContext ctx) {
+        this.keyConcatenation = new ElementCondition.ArgumentConcatenation();
     }
+
 
     @Override
     public void exitKeyIdArgument(CorrlangParser.KeyIdArgumentContext ctx) {
-        if (this.keyConcatenation != null) {
+        if (this.keyConcatenation.getParts().size() ==1) {
+            this.keyIdentification.add(this.keyConcatenation.getParts().get(0));
+        } else {
             this.keyIdentification.add(this.keyConcatenation);
-            this.keyConcatenation = null;
         }
+        this.keyConcatenation = null;
     }
 
     @Override
     public void enterStringConstant(CorrlangParser.StringConstantContext ctx) {
-        if (this.keyConcatenation != null) {
-            this.keyConcatenation.add(new ElementCondition.ConstantArgument(ctx.getText().substring(1,ctx.getText().length()-1), ElementCondition.ConstantArgument.Type.STRING));
-        } else {
-            this.keyIdentification.add(new ElementCondition.ConstantArgument(ctx.getText().substring(1,ctx.getText().length()-1), ElementCondition.ConstantArgument.Type.STRING));
-        }
+        this.keyConcatenation.add(new ElementCondition.ConstantArgument(ctx.getText().substring(1,ctx.getText().length()-1), ElementCondition.ConstantArgument.Type.STRING));
     }
 
     @Override
@@ -423,6 +412,7 @@ public class DefaultCorrlangListener extends CorrlangBaseListener {
     }
 
 
+
     @Override
     public void enterRuleBodyContent(CorrlangParser.RuleBodyContentContext ctx) {
         String body = ctx.getText();
@@ -509,7 +499,7 @@ public class DefaultCorrlangListener extends CorrlangBaseListener {
             this.currenGoal.forTarget(new GoalTarget.Visitor() {
                 @Override
                 public void handle(GoalTarget.ServerRuntime serverRuntime) throws Exception {
-                    serverRuntime.setContextPath(ctx.getText().substring(1, ctx.getText().length() - 1));
+                    serverRuntime.setContextPath(ctx.getText());
                 }
 
                 @Override

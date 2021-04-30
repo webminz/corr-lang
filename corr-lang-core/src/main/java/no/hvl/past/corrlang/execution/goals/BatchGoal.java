@@ -6,12 +6,23 @@ import no.hvl.past.plugin.UnsupportedFeatureException;
 import no.hvl.past.techspace.TechSpace;
 import no.hvl.past.techspace.TechSpaceAdapter;
 import no.hvl.past.techspace.TechSpaceException;
+import no.hvl.past.util.Holder;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
 public class BatchGoal extends LanguageGoal {
+
+    private Holder<Object> result;
+
+    public Holder<Object> getResult() {
+        return result;
+    }
+
+    public void setResult(Holder<Object> result) {
+        this.result = result;
+    }
 
     @Autowired
     private ReportFacade reportFacade;

@@ -4,3 +4,6 @@
 [submodule "mdegraphlib-gql"]
 	path = mdegraphlib-gql
 	url = ./mdegraphlib-gql
+[submodule "mdegraphlib-emf"]
+	path = mdegraphlib-emf
+	url = ./mdegraphlib-emf

@@ -41,11 +41,13 @@ public class LoadTechSpaceTraverser extends AbstractTraverser {
     @Override
     public void handle(Goal goal) throws Throwable {
         TechSpace techSpace = goal.getTechSpace();
-        Optional<TechSpaceAdapterFactory> extension = metaRegistry.getExtension(techSpace.ID(), TechSpaceAdapterFactory.class);
-        if (extension.isPresent()) {
-            goal.linkTechSpaceAdapter(extension.get().createAdapter());
-        } else {
-            throw new LanguageException(goal, ReportErrorType.PLUGIN, "Technology " + techSpace.ID() + " does not provide an adapter!");
+        if (techSpace != null) {
+            Optional<TechSpaceAdapterFactory> extension = metaRegistry.getExtension(techSpace.ID(), TechSpaceAdapterFactory.class);
+            if (extension.isPresent()) {
+                goal.linkTechSpaceAdapter(extension.get().createAdapter());
+            } else {
+                throw new LanguageException(goal, ReportErrorType.PLUGIN, "Technology " + techSpace.ID() + " does not provide an adapter!");
+            }
         }
     }
 }
