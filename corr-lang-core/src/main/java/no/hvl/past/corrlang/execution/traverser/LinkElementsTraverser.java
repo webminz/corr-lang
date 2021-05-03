@@ -33,9 +33,7 @@ public class LinkElementsTraverser extends AbstractTraverser {
         if (!ref.getElement().isPresent()) {
             Sys endpoint = ref.getEndpoint().getSystem().get();
             Optional<Triple> lookup = ref.lookup(endpoint);
-            if (lookup.isPresent()) {
-                ref.setElement(lookup.get());
-            } else {
+            if (!lookup.isPresent()) {
                 throw new LanguageException(ref, ReportErrorType.SEMANTICS, "The element '" + ref.toString()+ "' does not exist in " + ref.getEndpointName());
             }
         }

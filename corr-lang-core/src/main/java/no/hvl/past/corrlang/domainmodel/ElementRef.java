@@ -106,10 +106,7 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     @Override
     public Key toKey(Name targetType) {
         if (isPath()) {
-            List<Triple> path = new ArrayList<>();
-            path.add(element);
-            path.addAll(elementPath);
-            return new AttributeBasedKey(endpoint.getSystem().get(), targetType, path);
+            return new AttributeBasedKey(endpoint.getSystem().get(), targetType, elementPath);
         } else {
             Optional<Triple> lookup = getEndpoint().getSystem().get().lookup(this.pathExpression.get(1));
             if (!lookup.get().getLabel().equals(this.element.getSource())) {
@@ -138,14 +135,23 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
 
     public Optional<Triple> lookup(Sys system) {
         if (this.pathExpression.size() == 2) {
-            return system.lookup(this.pathExpression.get(1));
+            Optional<Triple> nodeLookup = system.lookup(this.pathExpression.get(1));
+            nodeLookup.ifPresent(triple -> this.element = triple);
+            return nodeLookup;
         }
         if (this.pathExpression.size() == 3) {
             Optional<Triple> lookup = system.lookup(this.pathExpression.get(1), this.pathExpression.get(2));
-            if (lookup.isPresent()) {
-                return lookup;
-                //system.lookup(this.pathExpression.get(1));
-            }
+            lookup.ifPresent(triple -> {
+                this.element = triple;
+                system.lookup(this.pathExpression.get(1))
+                        .map(Triple::getLabel)
+                        .filter(src -> !src.equals(triple.getSource()))
+                        .ifPresent(src -> {
+                            this.elementPath.add(Triple.node(src));
+                            this.elementPath.add(this.element);
+                        });
+            });
+            return lookup;
         }
         boolean foundStart = false;
         int idx = 1;
@@ -165,6 +171,7 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
             }
         }
         Name start = lookup.get().getTarget();
+        this.elementPath.add(Triple.node(start));
         while (idx < this.pathExpression.size()) {
             Optional<Triple> triple = system.lookup(system.displayName(start), pathExpression.get(idx));
             if (triple.isPresent()) {
@@ -175,6 +182,7 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
                 idx = this.pathExpression.size();
             }
         }
+        lookup.ifPresent(t -> this.element = t);
         return lookup;
     }
 

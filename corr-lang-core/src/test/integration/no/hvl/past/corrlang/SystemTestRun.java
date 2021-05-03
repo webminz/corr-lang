@@ -85,10 +85,13 @@ public class SystemTestRun extends AbstractRun {
     }
 
     public static Pair<SystemTestRun, TestReportFacade> create(File baseDir, File corrSpec) {
-        Properties p = new Properties();
-        p.setProperty(PropertyHolder.BASE_DIR, baseDir.getAbsolutePath());
+        return create(baseDir, corrSpec, new Properties());
+    }
+
+    public static Pair<SystemTestRun, TestReportFacade> create(File baseDir, File corrSpec, Properties properties) {
+        properties.setProperty(PropertyHolder.BASE_DIR, baseDir.getAbsolutePath());
         TestReportFacade testReportFacade = new TestReportFacade();
-        SystemTestRun testRun = new SystemTestRun(testReportFacade, p, Collections.singletonList(corrSpec.getAbsolutePath()));
+        SystemTestRun testRun = new SystemTestRun(testReportFacade, properties, Collections.singletonList(corrSpec.getAbsolutePath()));
         return new Pair<>(testRun, testReportFacade);
     }
 

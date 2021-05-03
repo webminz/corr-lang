@@ -10,6 +10,8 @@ import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
 import org.junit.Test;
 
+import java.util.Properties;
+
 import static org.junit.Assert.assertEquals;
 
 public class FamiliesAndPersons extends SystemTest {
@@ -26,7 +28,9 @@ public class FamiliesAndPersons extends SystemTest {
 
     @Test
     public void testRunVerify() throws Throwable {
-        runGoal(CORRSPEC_FILE, "Check");
+        Properties properties = new Properties();
+        properties.put("goals.verify.print", "true");
+        runGoal(CORRSPEC_FILE, "Check", properties);
         // TODO check expected file
     }
 

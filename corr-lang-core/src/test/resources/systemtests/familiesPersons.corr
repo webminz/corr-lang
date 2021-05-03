@@ -1,13 +1,13 @@
 endpoint Families {
     type FILE
-    at /Users/past/Documents/dev/bx/corrlang-performance/execution/data/Families.families
+    at smallFamily.model
     technology ECORE
     schema Families.ecore
 }
 
 endpoint Persons {
     type FILE
-    at /Users/past/Documents/dev/bx/corrlang-performance/execution/data/Persons.persons
+    at smallPersons.model
     technology ECORE
     schema Persons.ecore
 }

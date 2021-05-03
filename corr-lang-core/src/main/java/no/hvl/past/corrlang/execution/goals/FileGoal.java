@@ -2,6 +2,7 @@ package no.hvl.past.corrlang.execution.goals;
 
 import no.hvl.past.corrlang.domainmodel.CorrSpec;
 import no.hvl.past.corrlang.domainmodel.ServerEndpoint;
+import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.PropertyHolder;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.names.Name;
@@ -38,6 +39,9 @@ public class FileGoal extends LanguageGoal {
 
     @Autowired
     FileSystemUtils fileSystemUtils;
+
+    @Autowired
+    ReportFacade reportFacade;
 
     public void setFile(File file, boolean overwrite) throws GoalException {
         this.file = file;
@@ -76,6 +80,8 @@ public class FileGoal extends LanguageGoal {
             rule.violations(comprDataInstance).forEach(v -> violations.add(new Pair<>(rule,v)));
         });
 
+        boolean printToConsole = propertyHolder.getBooleanProperty("goals.verify.print");
+
         if (techSpace == null) {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
             BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(fileOutputStream));
@@ -90,6 +96,9 @@ public class FileGoal extends LanguageGoal {
                     bufferedWriter.append("' is violated for Element: '");
                     bufferedWriter.append(violation.getRight().print(PrintingStrategy.DETAILED));
                     bufferedWriter.append("'!\n");
+                    if (printToConsole) {
+                        reportFacade.reportInfo(violation.getFirst().getClass().getName() +  " on '" + violation.getFirst().commonality().printRaw() + "' is violated for Element:" + violation.getRight().print(PrintingStrategy.DETAILED));
+                    }
                 }
             }
             bufferedWriter.flush();

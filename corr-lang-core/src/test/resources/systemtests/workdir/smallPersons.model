@@ -2,4 +2,5 @@
 <Persons:PersonRegister xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Persons="Persons.ecore" xmi:id="_Meq0MKHAEeuOecDQxDHZAg">
   <persons xsi:type="Persons:Male" xmi:id="_NRLPMKHAEeuOecDQxDHZAg" name="Hubert Hubermann"/>
   <persons xsi:type="Persons:Female" xmi:id="_QqQq4KHAEeuOecDQxDHZAg" name="Hertha Hubermann"/>
+  <persons xsi:type="Persons:Female" xmi:id="_Q31245u8903u126QxDHZAg" name="Unknown Hubermann"/>
 </Persons:PersonRegister>
