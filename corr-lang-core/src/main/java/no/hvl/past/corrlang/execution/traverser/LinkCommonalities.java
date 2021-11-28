@@ -8,6 +8,7 @@ import no.hvl.past.corrlang.execution.AbstractExecutor;
 import no.hvl.past.corrlang.reporting.ReportErrorType;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
+import no.hvl.past.names.PrintingStrategy;
 import no.hvl.past.util.StreamExt;
 
 import java.util.*;
@@ -88,7 +89,7 @@ public class LinkCommonalities extends AbstractTraverser  {
         } else {
             throw new LanguageException(parent, ReportErrorType.SEMANTICS,
                     "Could not infer target commonality: There is no commonality between (" +
-                            StreamExt.stream(parent.getRelates()).fuse(", ", ElementRef::toString) +
+                            StreamExt.stream(parent.getRelates()).map(er -> er.getElement().get().getTarget().prefixWith(Name.identifier(er.getEndpoint().getName()))).fuse(", ", n -> n.print(PrintingStrategy.DETAILED)) +
                             ")");
         }
     }

@@ -2,6 +2,7 @@ package no.hvl.past.di;
 
 import no.hvl.past.corrlang.reporting.PrintStreamReportFacade;
 import no.hvl.past.corrlang.reporting.ReportFacade;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +14,7 @@ public class CorrLangConfiguration {
 
 
     @Bean
+    @Qualifier("defaultReportFacade")
     public ReportFacade defaultReportFacade() {
         return new PrintStreamReportFacade(System.out);
     }

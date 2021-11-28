@@ -4,7 +4,7 @@ import no.hvl.past.corrlang.domainmodel.CorrSpec;
 import no.hvl.past.corrlang.parser.SyntacticalResult;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.ServerStarter;
-import no.hvl.past.graph.trees.QueryHandler;
+import no.hvl.past.systems.QueryHandler;
 import no.hvl.past.plugin.MetaRegistry;
 import no.hvl.past.plugin.UnsupportedFeatureException;
 import no.hvl.past.server.HttpMethod;
@@ -19,8 +19,6 @@ import no.hvl.past.util.GenericIOHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;

@@ -2,13 +2,16 @@ package no.hvl.past.corrlang.execution;
 
 import no.hvl.past.corrlang.domainmodel.*;
 import no.hvl.past.corrlang.parser.SyntacticalResult;
+import no.hvl.past.corrlang.reporting.PrintStreamReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
+import no.hvl.past.di.TestWithDIContainer;
 import no.hvl.past.graph.Star;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.keys.AttributeBasedKey;
 import no.hvl.past.keys.ConcatenatedKey;
 import no.hvl.past.keys.ConstantKey;
 import no.hvl.past.names.Name;
+import no.hvl.past.systems.ComprSys;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,14 +22,8 @@ import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.*;
 
-public class FormalAlignmentTest {
+public class FormalAlignmentTest extends TestWithDIContainer {
 
-    private DependencyInjectionContainer container;
-
-    @Before
-    public void setUp() throws IOException {
-        container = DependencyInjectionContainer.create();
-    }
 
     @Test
     public void testCreateAlignment() {
@@ -88,7 +85,7 @@ public class FormalAlignmentTest {
 
         assertFalse(fed.getFormalRepresentation().isPresent());
 
-        ExecutionFacade executionFacade = new ExecutionFacade(container);
+        ExecutionFacade executionFacade = new ExecutionFacade(getDiContainer(), new PrintStreamReportFacade(System.out));
         executionFacade.execute("ALIGN_SCHEMA", dm);
 
         // check that dependent traverseers have run as well
@@ -97,28 +94,28 @@ public class FormalAlignmentTest {
         assertTrue(sync.getRelates().get(0).getElement().isPresent()); // elemRef linking
 
         // FormalAlignment was run
-        assertTrue(fed.getFormalRepresentation().isPresent());
+        assertNotNull(fed.getComprSys());
 
         // test if members are built correctly
+        ComprSys compSys = fed.getComprSys();
 
-        Star star = fed.getFormalRepresentation().get();
-        Set<Name> commWitns = star.apex().carrier().nodes().collect(Collectors.toSet());
-        assertEquals(5, commWitns.size());
-        assertTrue(commWitns.contains(Name.identifier("Partner")));
-        assertTrue(commWitns.contains(Name.identifier("sync")));
-        assertEquals(Name.identifier("Purchase"), star.projection(1).get().map(Name.identifier("sync")).get());
-        assertEquals(Name.identifier("Invoice"), star.projection(2).get().map(Name.identifier("sync")).get());
-        assertFalse(star.projection(3).get().map(Name.identifier("sync")).isPresent());
-        Set<Triple> edges = star.apex().carrier().edges().collect(Collectors.toSet());
-        assertEquals(1, edges.size());
-        Triple edge = edges.iterator().next();
-        assertEquals(Name.identifier("Partner"), edge.getSource());
-        assertEquals(Name.identifier("id"), edge.getLabel());
-        assertEquals(Name.identifier("INTEGER_NUMBER_TYPE_IMPLICIT_IDENTITY"), edge.getTarget());
-        // implicit identities
-        assertTrue(commWitns.contains(Name.identifier("STRING_TYPE_IMPLICIT_IDENTITY")));
-        assertTrue(commWitns.contains(Name.identifier("FLOATING_POINT_NUMBER_TYPE_IMPLICIT_IDENTITY")));
-        assertTrue(commWitns.contains(Name.identifier("INTEGER_NUMBER_TYPE_IMPLICIT_IDENTITY")));
+
+
+
+        assertTrue(compSys.schema().carrier().mentions(Name.identifier("Partner").prefixWith(Name.identifier("Fed"))));
+        assertTrue(compSys.schema().carrier().mentions(Name.identifier("sync").prefixWith(Name.identifier("Fed"))));
+        assertEquals(Name.identifier("Purchase"), compSys.projection(sales.getSystem().get(), Name.identifier("sync")).get());
+        assertEquals(Name.identifier("Invoice"), compSys.projection(invoices.getSystem().get(), Name.identifier("sync")).get());
+        assertFalse(compSys.projection(hr.getSystem().get(), Name.identifier("sync").prefixWith(Name.identifier("Fed"))).isPresent());
+
+        Triple edge = compSys.schema().carrier().get(Name.identifier("id").prefixWith(Name.identifier("Partner")).prefixWith(Name.identifier("Fed"))).get();
+        assertEquals(Name.identifier("Partner").prefixWith(Name.identifier("Fed")), edge.getSource());
+        assertEquals(ComprSys.GLOBAL_INT_NAME.prefixWith(Name.identifier("Fed")), edge.getTarget());
+
+//        // implicit identities
+        assertTrue(compSys.schema().carrier().mentions(ComprSys.GLOBAL_STRING_NAME.prefixWith(Name.identifier("Fed"))));
+        assertTrue(compSys.schema().carrier().mentions(ComprSys.GLOBAL_FLOAT_NAME.prefixWith(Name.identifier("Fed"))));
+        assertFalse(compSys.schema().carrier().mentions(ComprSys.GLOBAL_BOOL_NAME.prefixWith(Name.identifier("Fed"))));
 
         Set<no.hvl.past.keys.Key> formalKeys = fed.getFormalKeys();
         assertEquals(4, formalKeys.size());

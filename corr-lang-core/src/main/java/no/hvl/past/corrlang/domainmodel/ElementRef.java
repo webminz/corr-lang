@@ -24,6 +24,10 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     private Triple element;
     private List<Triple> elementPath = new ArrayList<>();
 
+    public ElementRef(List<String> pathExpression) {
+        this.pathExpression = pathExpression;
+    }
+
     public ElementRef() {
     }
 
@@ -134,11 +138,13 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     }
 
     public Optional<Triple> lookup(Sys system) {
+        // Node
         if (this.pathExpression.size() == 2) {
             Optional<Triple> nodeLookup = system.lookup(this.pathExpression.get(1));
             nodeLookup.ifPresent(triple -> this.element = triple);
             return nodeLookup;
         }
+        // Edge or Message
         if (this.pathExpression.size() == 3) {
             Optional<Triple> lookup = system.lookup(this.pathExpression.get(1), this.pathExpression.get(2));
             lookup.ifPresent(triple -> {
@@ -152,6 +158,14 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
                         });
             });
             return lookup;
+        }
+        // maybe message argument
+        if (this.pathExpression.size() == 4) {
+            Optional<Triple> lookup = system.lookup(this.pathExpression.get(1), this.pathExpression.get(2), this.pathExpression.get(3));
+            if (lookup.isPresent()) {
+                this.element = lookup.get();
+                return lookup;
+            }
         }
         boolean foundStart = false;
         int idx = 1;

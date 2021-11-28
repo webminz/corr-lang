@@ -1,5 +1,6 @@
 package no.hvl.past.corrlang.domainmodel;
 
+import no.hvl.past.util.FileSystemAccessPoint;
 import no.hvl.past.util.FileSystemUtils;
 
 import java.io.File;
@@ -23,16 +24,22 @@ public class URLReference {
         return fullyResolvedUrl;
     }
 
-    public void retrieve(FileSystemUtils base) throws IOException {
+    public void retrieve(FileSystemAccessPoint base) throws IOException {
         if (!url.contains(":")) {
             if (url.startsWith("/")) {
-                this.fullyResolvedUrl = "file://" + url;
+                this.fullyResolvedUrl = "file:///" + url;
             } else {
-                this.fullyResolvedUrl = "file://" + base.file(url).getAbsolutePath();
+                this.fullyResolvedUrl = "file:///" + base.file(url).getAbsolutePath();
             }
         } else {
-
-            if (url.startsWith("classpath:")) {
+            if (url.startsWith("file:")) {
+                if (url.charAt(5) == '.') {
+                    this.fullyResolvedUrl = "file:///" + base.file(url.substring(5)).getAbsolutePath();
+                } else {
+                    this.fullyResolvedUrl = url;
+                }
+            } else if (url.startsWith("classpath:")) {
+                // TODO this does not seem right
                this.fullyResolvedUrl = "file://" +  base.file(url).getAbsolutePath();
             } else {
                 this.fullyResolvedUrl = url;

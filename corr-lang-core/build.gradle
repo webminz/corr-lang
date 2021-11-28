@@ -20,8 +20,9 @@ dependencies {
     implementation 'org.springframework:spring-context:5.3.3'
     compile 'org.antlr:antlr4-runtime:4.8'
     antlr "org.antlr:antlr4:4.8"
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.30'
-    compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '1.7.30'
+    implementation 'org.apache.logging.log4j:log4j-api:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.14.0'
+    implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.0'
     testCompile project(':mdegraphlib').sourceSets.test.output
     implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.3.2'
 
@@ -43,12 +44,12 @@ compileJava.dependsOn generateGrammarSource
 
 sourceSets {
     main {
+        antlr.srcDirs 'src/main/antlr'
         java.srcDir 'src/main/java'
         java.srcDir 'src/generated'
         resources.srcDir 'src/main/resources'
     }
     test {
-        java.srcDir 'src/test/integration'
         java.srcDir 'src/test/java'
         resources.srcDir 'src/test/resources'
     }
@@ -115,7 +116,7 @@ clean {
 }
 
 run {
-    args = ["/Users/past/Desktop/Demo/def.corrlang", "\"GQLFile\""]
+    args = []
 }
 
 shadowJar {

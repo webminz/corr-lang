@@ -8,15 +8,22 @@ import no.hvl.past.corrlang.parser.SyntacticalResult;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
 import no.hvl.past.di.PropertyHolder;
-import no.hvl.past.util.FileSystemUtils;
+import no.hvl.past.util.FileSystemAccessPoint;
 import no.hvl.past.util.Holder;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Properties;
+import java.util.TimeZone;
+
 
 public class AbstractRun {
 
@@ -33,6 +40,7 @@ public class AbstractRun {
 
     private DependencyInjectionContainer diContainer;
     private ExecutionFacade executionFacade;
+    private Logger logger;
 
     public AbstractRun(
             ReportFacade reportFacade,
@@ -44,32 +52,26 @@ public class AbstractRun {
         this.syntacticalResult = new SyntacticalResult();
     }
 
-    protected void initialise(boolean silent) throws IOException {
-        if (properties.containsKey(PropertyHolder.CONFIG_FILE)) {
-            this.diContainer = DependencyInjectionContainer.create(new File(properties.getProperty(PropertyHolder.CONFIG_FILE)));
-        } else if (properties.containsKey(PropertyHolder.BASE_DIR)) {
-            this.diContainer = DependencyInjectionContainer.create(properties.getProperty(PropertyHolder.BASE_DIR));
-        } else {
-            this.diContainer = DependencyInjectionContainer.create();
-        }
-        this.diContainer.load(properties);
-        if (!silent) {
-            printLogoAndSysInfo();
-        }
-        this.executionFacade = new ExecutionFacade(diContainer);
+    protected SyntacticalResult getSyntacticalResult() {
+        return syntacticalResult;
     }
 
-    private void printLogoAndSysInfo() throws IOException {
-        reportFacade.reportInfo(LOGO);
+    protected void initialise(boolean silent) throws Exception {
+        this.diContainer = DependencyInjectionContainer.create("CorrLang", properties);
+        this.logger = LogManager.getLogger(getClass());
+        printLogoAndSysInfo(silent);
+        this.executionFacade = new ExecutionFacade(diContainer, reportFacade);
+    }
+
+    private void printLogoAndSysInfo(boolean silent) throws IOException {
         ClassPathResource versionFile = new ClassPathResource("VERSION.INFO");
+        PropertyHolder propertyHolder = diContainer.getPropertyHolder();
         if (versionFile.exists()) {
             InputStream inputStream = versionFile.getInputStream();
             Properties versionProps = new Properties();
             versionProps.load(inputStream);
             inputStream.close();
-            if (versionProps.containsKey("VERSION")) {
-                reportFacade.reportInfo("VERSION: " + versionProps.getProperty("VERSION"));
-            }
+            propertyHolder.setProperty("corrlang.version", versionProps.getProperty("VERSION"));
         }
         ClassPathResource buildFile = new ClassPathResource("BUILD.INFO");
         if (buildFile.exists()) {
@@ -78,19 +80,41 @@ public class AbstractRun {
             buildProps.load(inputStream);
             inputStream.close();
             if (buildProps.getProperty("BUILD_TYPE", "DEVELOPER").equals("RELEASE")) {
-                reportFacade.reportInfo("RELEASE: " + buildProps.getProperty("BUILD_NO"));
+                propertyHolder.setProperty("corrlang.build.type","release");
+                propertyHolder.setProperty("corrlang.build.desc",buildProps.getProperty("BUILD_NO"));
             } else {
-                reportFacade.reportInfo("DEVELOPER-BUILD: created from git branch <" + buildProps.getProperty("COMMIT") + "> at " + buildProps.getProperty("BUILD_DATE"));
+                propertyHolder.setProperty("corrlang.build.type","developer");
+                propertyHolder.setProperty("corrlang.build.desc", "DEVELOPER-BUILD: created from git branch <" + buildProps.getProperty("COMMIT") + "> at " + buildProps.getProperty("BUILD_DATE"));
             }
         }
-        reportFacade.reportInfo("WORKDIR: " + diContainer.getPropertyHolder().getBaseDir().getAbsolutePath());
-        reportFacade.reportInfo("JAVA: " + System.getProperty("java.runtime.version"));
+        logger.info("CorrLang started ¯\\_(ツ)_/¯ System Time is: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) +
+                " Timezone is: "+ TimeZone.getDefault().getDisplayName() + " (" + TimeZone.getDefault().toZoneId().getRules().getStandardOffset(Instant.now()).getId() + ")");
+        logger.info("VERSION:    " + propertyHolder.getProperty("corrlang.version"));
+        logger.info("RELEASE:    " + propertyHolder.getProperty("corrlang.build.desc"));
+        logger.info("WORKDIR:    " + propertyHolder.getProperty(PropertyHolder.BASE_DIR));
+        logger.info("CONFIG:     " + propertyHolder.getProperty(PropertyHolder.CONFIG_FILE));
+        logger.info("JAVA:       " + propertyHolder.getProperty(PropertyHolder.JVM));
+        logger.info("Log Level:  " + propertyHolder.getProperty(PropertyHolder.LOG_LEVEL));
+        if (!silent) {
+            reportFacade.reportInfo(LOGO);
+            reportFacade.reportInfo("VERSION:    " + propertyHolder.getProperty("corrlang.version"));
+            reportFacade.reportInfo("RELEASE:    " + propertyHolder.getProperty("corrlang.build.desc"));
+            reportFacade.reportInfo("WORKDIR:    " + propertyHolder.getProperty(PropertyHolder.BASE_DIR));
+            reportFacade.reportInfo("CONFIG:     " + propertyHolder.getProperty(PropertyHolder.CONFIG_FILE));
+            reportFacade.reportInfo("JAVA:       " + propertyHolder.getProperty(PropertyHolder.JVM));
+        }
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                logger.info("CorrLang shutting down now ... System Time is: " + LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+            }
+        }));
 
     }
 
 
     private void parseCorrSpecFiles() throws IOException {
-        FileSystemUtils fsUtils = this.diContainer.getFSUtils();
+        FileSystemAccessPoint fsUtils = this.diContainer.getFSAccessPoint();
         for (String corrSpecFile : corrSpecs) {
             File file = fsUtils.file(corrSpecFile);
             if (!file.exists()) {
@@ -99,7 +123,7 @@ public class AbstractRun {
             try {
                 this.syntacticalResult = ParserChain.parseFromFile(file, reportFacade, this.syntacticalResult);
             } catch (ParseException e) {
-                reportFacade.reportError(e);
+                reportFacade.reportException(e);
             }
         }
     }
@@ -123,6 +147,11 @@ public class AbstractRun {
 
     }
 
+    protected DependencyInjectionContainer getDiContainer() {
+        return diContainer;
+    }
 
-
+    protected List<String> getCorrSpecs() {
+        return corrSpecs;
+    }
 }

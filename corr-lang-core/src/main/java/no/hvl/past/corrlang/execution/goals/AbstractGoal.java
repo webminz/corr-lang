@@ -16,6 +16,8 @@ import java.util.Optional;
 
 public abstract class AbstractGoal extends AbstractExecutor {
 
+    public static final String CURRENT_GOAL_PROPERTY = "goal.current";
+
     public AbstractGoal(String goalName) {
         super(goalName);
     }
@@ -43,6 +45,7 @@ public abstract class AbstractGoal extends AbstractExecutor {
         } else if (goal.equals(ParseGoal.GOAL_NAME)) {
             executor.execute(diContainer.getBean(ParseGoal.class), syntaxResult);
         } else {
+            diContainer.getPropertyHolder().setProperty(CURRENT_GOAL_PROPERTY, goal);
             Optional<Goal> goalWithName = syntaxResult.getGoalWithName(goal);
             if (goalWithName.isPresent()) {
                 goalWithName.get().forTarget(new GoalTarget.Visitor() {
@@ -67,8 +70,9 @@ public abstract class AbstractGoal extends AbstractExecutor {
                     public void handle(GoalTarget.FileCreation fileCreation) throws Exception {
                         FileGoal file = diContainer.getBean(FileGoal.class);
                         file.setGoalName(goal);
+                        // TODO check whether the file actually exists and give a good error message if not
                         URLReference location = fileCreation.getLocation();
-                        location.retrieve(diContainer.getFSUtils());
+                        location.retrieve(diContainer.getFSAccessPoint());
                         file.setFile(new File(new URI(location.getUrl())), fileCreation.isOverwrite());
                         executor.execute(file, syntaxResult);
                     }
@@ -82,7 +86,7 @@ public abstract class AbstractGoal extends AbstractExecutor {
                     }
                 });
             } else {
-                throw new GoalException("Goal with name '" + goalWithName + "' does not exist");
+                throw new GoalException("Goal with name '" + goal + "' does not exist");
             }
         }
         return holder;

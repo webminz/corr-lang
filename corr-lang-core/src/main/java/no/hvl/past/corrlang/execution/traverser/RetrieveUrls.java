@@ -2,6 +2,7 @@ package no.hvl.past.corrlang.execution.traverser;
 
 import no.hvl.past.corrlang.domainmodel.Endpoint;
 import no.hvl.past.corrlang.execution.AbstractExecutor;
+import no.hvl.past.util.FileSystemAccessPoint;
 import no.hvl.past.util.FileSystemUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -11,7 +12,7 @@ import java.util.Set;
 public class RetrieveUrls extends AbstractTraverser {
 
     @Autowired
-    FileSystemUtils fileSystemUtils;
+    FileSystemAccessPoint fileSystemUtils;
 
     public RetrieveUrls() {
         super("RetrieveUrls");

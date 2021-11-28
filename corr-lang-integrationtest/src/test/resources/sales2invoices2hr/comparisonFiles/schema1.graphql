@@ -1,0 +1,203 @@
+type Query {
+   client(client : ID!) : Client
+   clients : [Client]
+   customer(customer : ID!) : Customer
+   customers : [Customer]
+   department(department : ID!) : Department
+   departments : [Department]
+   employee(employee : ID!) : Employee
+   employees : [Employee]
+   invoice(invoice : ID!) : Invoice
+   invoices : [Invoice]
+   purchase(purchase : ID!) : Purchase
+   purchases : [Purchase]
+   store(store : ID!) : Store
+   stores : [Store]
+}
+
+type Mutation {
+   addPurchaseItem(purchase : ID!
+      product : ID!
+      quantity : Int) : PurchaseItem
+   createClient(name : String) : Client
+   createCustomer(name : String!, email : String) : Customer!
+   createDepartment(name : String, manager : ID) : Department
+   createEmployee(department : ID
+      firstname : String
+      lastname : String
+      hiredAt : String
+      email : String
+      phone : String) : Employee
+   createInvoice(client : ID!
+      createdAt : String
+      dueAt : String
+      payedAt : String
+      total : Int) : Invoice
+   createPurchase(customer : ID!
+      date : String!
+      store : ID!) : Purchase
+   createStore(manager : ID
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      country : String) : Store
+   deleteClient(client : ID!) : Client
+   deleteCustomer(customer : ID!) : Customer
+   deleteDepartment(department : ID!) : Department
+   deleteEmployee(employee : ID!) : Employee
+   deleteInvoice(invoice : ID!) : Invoice
+   deletePurchase(purchase : ID!) : Purchase
+   deleteStore(store : ID!) : Store
+   invoices_Mutation_setAddress(client : ID!
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      Country : String) : Client
+   sales_Mutation_setAddress(customer : ID!
+      street : String
+      city : String
+      postalCode : String
+      state : String
+      country : String) : Customer
+   setBankingDetails(employee : ID!
+      iban : String
+      bic : String) : Employee
+   setPaymentDetails(client : ID!
+      iban : String
+      bic : String
+      cardNumber : String
+      validUntil : String) : Client
+   updateClient(client : ID!, name : String) : Client
+   updateCustomer(customer : ID!
+      name : String
+      email : String) : Customer
+   updateDepartment(department : ID!
+      name : String
+      manager : ID) : Department
+   updateEmployee(employee : ID!
+      department : ID
+      firstname : String
+      lastname : String
+      hiredAt : String
+      email : String
+      phone : String) : Employee
+   updateInvoice(invoice : ID!
+      client : ID!
+      createdAt : String
+      dueAt : String
+      payedAt : String
+      total : Int) : Invoice
+}
+
+type BankingDetails {
+   bic : String
+   iban : String
+}
+
+type Client {
+   address : Invoices_Address
+   id : ID!
+   invoices : [Invoice]
+   name : String
+   paymentDetails : PaymentDetails
+}
+
+type Customer {
+   address : Sales_Address
+   email : String
+   id : ID!
+   name : String
+   purchases : [Purchase]
+}
+
+type Department {
+   id : ID!
+   manager : Employee
+   name : String
+   workingAt : [Employee]
+}
+
+type Employee {
+   bankAccount : BankingDetails
+   email : String
+   firstname : String
+   hiredAt : String
+   id : ID!
+   lastname : String
+   phone : String
+   worksAt : Department
+}
+
+type HR_Mutation {
+}
+
+type HR_Query {
+}
+
+type Invoice {
+   client : Client!
+   createdAt : String
+   dueAt : String
+   id : ID!
+   payedAt : String
+   total : Int
+}
+
+type Invoices_Address {
+   city : String
+   country : String
+   postalCode : String
+   state : String
+   street : String
+}
+
+type Invoices_Mutation {
+}
+
+type Invoices_Query {
+}
+
+type PaymentDetails {
+   bic : String
+   cardNumber : String
+   iban : String
+   validUntil : String
+}
+
+type Purchase {
+   customer : Customer!
+   date : String
+   id : ID!
+   items : [PurchaseItem]
+   store : Store!
+}
+
+type PurchaseItem {
+   productId : ID!
+   purchaseId : ID!
+   quantity : Int
+}
+
+type Sales_Address {
+   city : String
+   country : String
+   postalCode : String
+   state : String
+   street : String
+}
+
+type Sales_Mutation {
+}
+
+type Sales_Query {
+}
+
+type Store {
+   address : Sales_Address
+   id : ID!
+   manager : ID!
+   purchases : [Purchase]
+}
+

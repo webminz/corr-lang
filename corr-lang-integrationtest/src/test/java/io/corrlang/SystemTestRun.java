@@ -1,11 +1,14 @@
 package no.hvl.past.corrlang;
 
 import no.hvl.past.corrlang.domainmodel.CorrLangElement;
+import no.hvl.past.corrlang.parser.SyntacticalResult;
 import no.hvl.past.corrlang.reporting.ReportErrorType;
 import no.hvl.past.corrlang.reporting.ReportFacade;
 import no.hvl.past.corrlang.runner.AbstractRun;
 import no.hvl.past.di.PropertyHolder;
 import no.hvl.past.util.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,6 +53,7 @@ public class SystemTestRun extends AbstractRun {
 
         @Override
         public void reportError(Throwable cause) {
+            cause.printStackTrace();
             exceptions.add(cause);
         }
 
@@ -60,26 +64,32 @@ public class SystemTestRun extends AbstractRun {
 
         @Override
         public void reportError(ReportErrorType errorType, CorrLangElement languageElement, String message) {
-
+            this.errors.append(errorType.toString() + " " + message);
         }
 
         @Override
         public void reportError(ReportErrorType errorType, Throwable cause) {
+            cause.printStackTrace();
+            this.errors.append(errorType.toString() + " " + cause.getMessage());
 
         }
 
         @Override
         public void reportError(ReportErrorType errorType, String message) {
+            this.errors.append(errorType.toString() + " " + message);
 
         }
 
         @Override
         public void reportError(ReportErrorType errorType, String key, String message) {
+            this.errors.append(errorType.toString() + " " + message);
 
         }
 
         @Override
         public void reportError(ReportErrorType errorType, Throwable cause, CorrLangElement langElement) {
+            cause.getMessage();
+            this.errors.append(errorType.toString() + " " + cause.getMessage());
 
         }
     }
@@ -97,6 +107,12 @@ public class SystemTestRun extends AbstractRun {
 
     public void testRun(String goal, boolean silent) throws Throwable {
         initialise(silent);
+        Logger logger = LogManager.getLogger(SystemTest.class);
+        logger.info("Running Systemtest on for goal " + goal);
         executeGoal(goal, Void.class);
+    }
+
+    public SyntacticalResult getParseResult() {
+        return getSyntacticalResult();
     }
 }

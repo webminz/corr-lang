@@ -1,0 +1,42 @@
+endpoint Families {
+    type FILE
+    at ./files/Families.families
+    technology ECORE
+    schema ./files/Families.ecore
+}
+
+endpoint Persons {
+    type FILE
+    at ./files/Persons.persons
+    technology ECORE
+    schema ./files/Persons.ecore
+}
+
+
+correspondence Families2Persons (Families,Persons) {
+
+
+sync (Families.FamilyMember as fm , Persons.Male as m) as syncMale
+      when (fm.name ++ " " ++ fm.fatherInverse.name == m.name ||  fm.name ++ " " ++ fm.sonsInverse.name == m.name );
+
+sync (Families.FamilyMember as fm, Persons.Female as f) as syncFemale
+      when (fm.name ++ " " ++ fm.motherInverse.name == f.name ||  fm.name ++ " " ++ fm.daughtersInverse.name == f.name );
+
+}
+
+goal Check {
+    correspondence Families2Persons
+    action VERIFY
+    target FILE {
+        at ./checkResults.txt
+    }
+}
+
+goal Plot {
+    correspondence Families2Persons
+    action SCHEMA
+    technology PNG
+    target FILE {
+        at ./familiesAndPersons.png
+    }
+}

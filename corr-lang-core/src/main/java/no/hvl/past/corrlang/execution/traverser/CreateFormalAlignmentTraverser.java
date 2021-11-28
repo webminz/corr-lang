@@ -10,6 +10,7 @@ import no.hvl.past.keys.Key;
 import no.hvl.past.names.Name;
 import no.hvl.past.plugin.MetaRegistry;
 import no.hvl.past.systems.ComprSys;
+import no.hvl.past.systems.QualifiedName;
 import no.hvl.past.systems.Sys;
 import no.hvl.past.util.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
 
     @Override
     public Set<Class<? extends AbstractExecutor>> dependsOn() {
-        return Collections.singleton(LinkCommonalities.class);
+        return Collections.singleton(ApplyFinalTechnologySpecificRulesTraverser.class);
     }
 
     @Override
@@ -81,7 +82,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
         Name lblName = Name.identifier(commonality.getName()).prefixWith(srcName);
         Name trgName = Name.identifier(commonality.getTarget().get().getName());
         this.builder.edgeCommonality(srcName, lblName, trgName, commonality.getRelates().stream().map(
-                com -> ComprSys.qname(com.getEndpoint().getSystem().get(),com.getElement().get().getLabel())
+                com -> QualifiedName.qname(com.getEndpoint().getSystem().get(),com.getElement().get().getLabel())
         ).collect(Collectors.toList()));
         if (commonality.isIdentity()) {
             this.builder.identification(lblName);
@@ -91,7 +92,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
     public void handleNode(Commonality commonality) {
         Name commWitnsName = Name.identifier(commonality.getName());
         this.builder.nodeCommonality(commWitnsName, commonality.getRelates().stream()
-                .map(com -> ComprSys.qname(com.getEndpoint().getSystem().get(), com.getElement().get().getLabel()))
+                .map(com -> QualifiedName.qname(com.getEndpoint().getSystem().get(), com.getElement().get().getLabel()))
                 .collect(Collectors.toList()));
         if (commonality.isIdentity()) {
             this.builder.identification(commWitnsName);

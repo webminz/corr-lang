@@ -9,16 +9,8 @@ import org.apache.log4j.Logger;
 
 public abstract class AbstractTraverser extends AbstractExecutor implements SyntaxVisitor  {
 
-    private Logger logger;
-
     public AbstractTraverser(String key) {
         super(key);
-        this.logger = Logger.getLogger(getClass());
-    }
-
-    @Override
-    public Logger getLogger() {
-        return logger;
     }
 
     public void executeTransitive(SyntacticalResult domainModel) throws Throwable {
@@ -42,7 +34,7 @@ public abstract class AbstractTraverser extends AbstractExecutor implements Synt
         for (Goal g : domainModel.allGoals()) {
             g.accept(this);
         }
-            postBlock(domainModel);
+        postBlock(domainModel);
     }
 
     private void processCommonality(Commonality comm) throws Throwable {

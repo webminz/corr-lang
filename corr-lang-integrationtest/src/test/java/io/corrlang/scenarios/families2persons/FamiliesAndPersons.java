@@ -29,7 +29,7 @@ public class FamiliesAndPersons extends SystemTest {
     @Test
     public void testRunVerify() throws Throwable {
         Properties properties = new Properties();
-        properties.put("goals.verify.print", "true");
+        properties.put("useConfig", "/Users/past/Documents/dev/bx/corrlang-performance/checkFileBased-execution/solutions/corrlang/corrlang.conf");
         runGoal(CORRSPEC_FILE, "Check", properties);
         // TODO check expected file
     }

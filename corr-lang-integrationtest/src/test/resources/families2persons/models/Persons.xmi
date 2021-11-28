@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ASCII"?>
+<Persons:PersonRegister xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Persons="https://ict.hvl.no/people/patrick-stunkel/metamodels/Persons.ecore">
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann0" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Schantal0 Mustermann0" birthday="1970-01-01T01:00:11.808+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann0" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Male" name="Ole0 Mustermann1-Nordmann" birthday="1970-01-01T01:00:06.970+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann1" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Male" name="Max1 Mustermann1" birthday="1970-01-01T01:00:11.211+0100"/>
+  <persons xsi:type="Persons:Female" name="Juniper0 Mustermann2" birthday="1970-01-01T01:00:17.928+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann2" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann3" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann3" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann4" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Male" name="Ole0 Mustermann4-Nordmann" birthday="1970-01-01T01:00:06.970+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann5" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann5" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Schantal0 Mustermann5" birthday="1970-01-01T01:00:11.808+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann6" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann6" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Female" name="Mandy0 Mustermann6" birthday="1970-01-01T01:00:11.680+0100"/>
+  <persons xsi:type="Persons:Male" name="Max0 Mustermann6" birthday="1970-01-01T01:00:11.211+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann7" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Female" name="Mandy0 Mustermann7" birthday="1970-01-01T01:00:11.680+0100"/>
+  <persons xsi:type="Persons:Female" name="Mandy1 Mustermann7" birthday="1970-01-01T01:00:11.680+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann8" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann8" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Male" name="Hans Mustermann8" birthday="1970-01-01T01:00:00.000+0100"/>
+  <persons xsi:type="Persons:Male" name="Max0 Mustermann8" birthday="1970-01-01T01:00:11.211+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann9" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Manuela Mustermann10" birthday="1970-01-01T01:00:01.906+0100"/>
+  <persons xsi:type="Persons:Female" name="Schantal0 Mustermann10" birthday="1970-01-01T01:00:11.808+0100"/>
+</Persons:PersonRegister>

@@ -30,15 +30,13 @@ import java.util.Set;
 
 public class FileGoal extends LanguageGoal {
 
+    public static final String PRINT_VERIFICATION = "goals.verify.print";
     private File file;
     private String queryFile;
 
 
     @Autowired
     PropertyHolder propertyHolder;
-
-    @Autowired
-    FileSystemUtils fileSystemUtils;
 
     @Autowired
     ReportFacade reportFacade;
@@ -80,7 +78,7 @@ public class FileGoal extends LanguageGoal {
             rule.violations(comprDataInstance).forEach(v -> violations.add(new Pair<>(rule,v)));
         });
 
-        boolean printToConsole = propertyHolder.getBooleanProperty("goals.verify.print");
+        boolean printToConsole = propertyHolder.getBooleanProperty(PRINT_VERIFICATION);
 
         if (techSpace == null) {
             FileOutputStream fileOutputStream = new FileOutputStream(file);
@@ -89,7 +87,9 @@ public class FileGoal extends LanguageGoal {
                 bufferedWriter.append("CONSISTENT");
             } else {
                 // TODO good if violations also knows its original system and better if rules also have proper names
+                long noOfViolations = 0;
                 for (Pair<ConsistencyRule, Name> violation : violations) {
+                    noOfViolations++;
                     bufferedWriter.append(violation.getFirst().getClass().getName());
                     bufferedWriter.append(" on '");
                     bufferedWriter.append(violation.getFirst().commonality().printRaw());
@@ -97,8 +97,13 @@ public class FileGoal extends LanguageGoal {
                     bufferedWriter.append(violation.getRight().print(PrintingStrategy.DETAILED));
                     bufferedWriter.append("'!\n");
                     if (printToConsole) {
-                        reportFacade.reportInfo(violation.getFirst().getClass().getName() +  " on '" + violation.getFirst().commonality().printRaw() + "' is violated for Element:" + violation.getRight().print(PrintingStrategy.DETAILED));
+                        reportFacade.reportInfo(violation.getFirst().getClass().getName() +  " on '" + violation.getFirst().commonality().printRaw() + "' is violated for Element '" + violation.getRight().print(PrintingStrategy.DETAILED) + "'");
                     }
+                }
+                bufferedWriter.append(Long.toString(noOfViolations));
+                bufferedWriter.append(" violations");
+                if (printToConsole) {
+                    reportFacade.reportInfo(noOfViolations + " violations");
                 }
             }
             bufferedWriter.flush();

@@ -89,7 +89,7 @@ batchTarget: 'LIB';
 fileTarget: 'FILE' WHITESPACE '{' WHITESPACE 'at' WHITESPACE fileCreationTarget WHITESPACE ('overwrite' WHITESPACE fileCreationOverwrite WHITESPACE)? '}';
 
 fileCreationOverwrite: BOOL;
-fileCreationTarget: URL_STRING;
+fileCreationTarget: URL_STRING | QUALIFIED_ID;
 
 codegenTarget: 'CODEGEN' WHITESPACE '{' WHITESPACE
         'outputDir' WHITESPACE codegenTargetLocation WHITESPACE 

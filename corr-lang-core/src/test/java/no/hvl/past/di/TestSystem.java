@@ -4,9 +4,11 @@ import no.hvl.past.graph.Sketch;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
+import no.hvl.past.systems.MessageType;
 import no.hvl.past.systems.Sys;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class TestSystem implements Sys  {
 
@@ -36,5 +38,10 @@ public class TestSystem implements Sys  {
     @Override
     public String url() {
         return url;
+    }
+
+    @Override
+    public Stream<MessageType> messages() {
+        return Stream.empty();
     }
 }

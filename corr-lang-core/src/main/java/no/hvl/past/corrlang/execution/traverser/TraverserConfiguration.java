@@ -58,6 +58,10 @@ public class TraverserConfiguration {
         return new AddImplicitCommonalities();
     }
 
+    @Bean
+    public ApplyFinalTechnologySpecificRulesTraverser applyFinalTechnologySpecificRules() {
+        return new ApplyFinalTechnologySpecificRulesTraverser();
+    }
 
 
 }

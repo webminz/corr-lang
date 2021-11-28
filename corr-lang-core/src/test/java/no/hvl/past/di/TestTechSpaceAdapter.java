@@ -2,21 +2,17 @@ package no.hvl.past.di;
 
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.predicates.*;
-import no.hvl.past.graph.trees.QueryHandler;
+import no.hvl.past.systems.QueryHandler;
 import no.hvl.past.names.Name;
 import no.hvl.past.plugin.UnsupportedFeatureException;
-import no.hvl.past.server.WebserviceRequestHandler;
 import no.hvl.past.systems.Data;
 import no.hvl.past.systems.Sys;
-import no.hvl.past.techspace.TechSpace;
-import no.hvl.past.techspace.TechSpaceAdapter;
-import no.hvl.past.techspace.TechSpaceDirective;
-import no.hvl.past.techspace.TechSpaceException;
+import no.hvl.past.techspace.*;
 import no.hvl.past.util.ShouldNotHappenException;
+import org.checkerframework.checker.nullness.Opt;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -435,27 +431,77 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
 
 
     @Override
-    public Optional<Name> stringDataType() {
-        return Optional.ofNullable(stringTypeName).map(Name::identifier);
+    public Stream<StringTypeDescription> stringDataType() {
+        if (stringTypeName != null) {
+           return Stream.of(() -> Name.identifier(stringTypeName));
+        } else {
+            return Stream.empty();
+        }
     }
 
     @Override
-    public Optional<Name> boolDataType() {
-        return Optional.ofNullable(boolTypeName).map(Name::identifier);
+    public Stream<BaseTypeDescription> boolDataType() {
+        if (boolTypeName != null) {
+            return Stream.of(() -> Name.identifier(boolTypeName));
+        } else {
+            return Stream.empty();
+        }
     }
 
     @Override
-    public Optional<Name> integerDataType() {
-        return Optional.ofNullable(intTypeName).map(Name::identifier);
+    public Stream<IntTypeDescription> integerDataType() {
+        if (intTypeName != null) {
+            return Stream.of(new IntTypeDescription() {
+                @Override
+                public int limit() {
+                    return -1;
+                }
+
+                @Override
+                public IntTypeSizeRestriction restriction() {
+                    return IntTypeSizeRestriction.UNLIMITED;
+                }
+
+                @Override
+                public Name typeName() {
+                    return Name.identifier(intTypeName);
+                }
+            });
+        } else {
+            return Stream.empty();
+        }
+
     }
 
     @Override
-    public Optional<Name> floatingPointDataType() {
-        return Optional.ofNullable(floatTypeName).map(Name::identifier);
+    public Stream<FloatTypeDescription> floatingPointDataType() {
+        if (floatTypeName != null) {
+            return Stream.of(new IEEEFloatTypeDescription() {
+                @Override
+                public int bitSize() {
+                    return 64;
+                }
+
+                @Override
+                public Name typeName() {
+                    return Name.identifier(floatTypeName);
+                }
+
+            });
+        } else {
+            return Stream.empty();
+        }
     }
 
     @Override
-    public Stream<Name> implicitTypeIdentities() {
+    public Stream<CustomBaseTypeDescription> otherDataTypes() {
         return Stream.empty();
     }
+
+    @Override
+    public void additionalTechnologySpecificRules(TechnologySpecificRules configure) {
+        
+    }
+
+
 }
