@@ -1,0 +1,47 @@
+plugins {
+    id 'antlr'
+    id "application"
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ['-package', 'no.hvl.past.corrlang.parser']
+    outputDirectory = new File("src/generated/no/hvl/past/corrlang/parser")
+}
+
+dependencies {
+    implementation project(':corr-lang-core')
+    implementation 'org.antlr:antlr4-runtime:4.8'
+    antlr "org.antlr:antlr4:4.8"
+    testImplementation project(':mdegraphlib').sourceSets.test.output
+}
+
+
+application {
+    mainClassName = "no.hvl.past.corrlang.runner.ConsoleRun"
+}
+
+clean {
+    delete 'src/generated'
+}
+
+run {
+    args = []
+}
+
+
+compileJava.dependsOn generateGrammarSource
+
+sourceSets {
+    main {
+        antlr.srcDirs 'src/main/antlr'
+        java.srcDir 'src/main/java'
+        java.srcDir 'src/generated'
+        resources.srcDir 'src/main/resources'
+    }
+    test {
+        java.srcDir 'src/test/java'
+        resources.srcDir 'src/test/resources'
+    }
+}
+

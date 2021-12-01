@@ -1,6 +1,7 @@
 rootProject.name = 'modelvm'
-include 'mdegraphlib'
-include 'mdegraphlib-gql'
-include 'mdegraphlib-emf'
-include 'corr-lang-core'
-include 'corr-lang-integrationtest'
+include 'mdegraphlib' // Essential base library that CorrLang depends on
+include 'mdegraphlib-gql' // Comment/Uncomment whether you want to build the official CorrLang integration with GraphQL
+include 'mdegraphlib-emf' // Comment/Uncomment whether you want to build the official CorrLang integration with Eclipse Modeling Framework
+include 'corr-lang-core' // Central CorrLang components, also required for plugin development
+include 'corr-lang-engine' // The CorrLang Application, builds on the core project
+include 'corr-lang-integrationtest' // Comment/Uncomment whether you want to run/develop CorrLang system tests

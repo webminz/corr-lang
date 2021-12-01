@@ -1,3 +1,6 @@
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+
 allprojects {
    
     apply plugin: 'java'
@@ -12,17 +15,71 @@ allprojects {
 	}
 
 	dependencies {
-	    testCompile group: 'junit', name: 'junit', version: '4.12'
-	    implementation 'com.google.guava:guava:30.1-jre'
+	    testImplementation 'junit:junit:4.13.2'
+	    implementation 'com.google.guava:guava:31.0.1-jre'
+		implementation 'org.apache.logging.log4j:log4j-api:2.14.1'
+		implementation 'org.apache.logging.log4j:log4j-core:2.14.1'
+		implementation 'org.apache.logging.log4j:log4j-slf4j18-impl:2.14.1'
 	}
-
-
 }
+
+
+task updateVersionInfo {
+	group = "corrlang"
+	def isRelease = findProperty('release') ?: 'false'
+	def gitBranch = "Unknown branch"
+	try {
+		def workingDir = new File("${project.projectDir}/corr-lang-engine")
+		def result = 'git rev-parse HEAD'.execute(null, workingDir)
+		result.waitFor()
+		if (result.exitValue() == 0) {
+			gitBranch = result.text.trim()
+		}
+	} catch (e) {
+		e.printStackTrace()
+	}
+	Properties props = new Properties()
+	File propsFile = new File("${project.projectDir}/corr-lang-engine/src/main/resources/BUILD.INFO")
+	if (propsFile.exists()) {
+		props.load(propsFile.newDataInputStream())
+	}
+	def buildNo = 1 + Integer.parseInt(props.getProperty("BUILD_NO", "0"))
+	props.setProperty("BUILD_NO", buildNo.toString())
+	props.setProperty("COMMIT",gitBranch)
+	props.setProperty("BUILD_DATE", LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME))
+	if (Boolean.parseBoolean(isRelease)) {
+		props.setProperty("BUILD_TYPE", "RELEASE")
+	} else {
+		props.setProperty("BUILD_TYPE", "DEVELOPER")
+	}
+	props.store(propsFile.newDataOutputStream(),null)
+}
+
+task copyResult(type: Copy) {
+	group = "corrlang"
+	from("${project}/corr-lang-engine/build/libs") {
+		include '**/*.jar'
+	}
+	into("${project}/release")
+}
+
 
 task buildCorrlang {
 	group = "corrlang"
 	description = "Builds the whole project and produces an executable Jarfile"
-	dependsOn(":corr-lang-core:buildCorrlang")
+	dependsOn(clean)
+	dependsOn(updateVersionInfo)
+	dependsOn(copyResult)
+	doLast {
+		File releaseDirectory = new File("${project}/release")
+		println("CorrLang successfully built: file://${releaseDirectory.getAbsolutePath()}/corrlang.jar ")
+	}
+}
+
+
+
+task corrlangTestSuite(type: Test) {
+	include '**/GraphLibUnitTestSuit.class'
 }
 
 
