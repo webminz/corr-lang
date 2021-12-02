@@ -18,4 +18,3 @@ corr-lang-core/src/generated
 hs_err_pid*
 corr-lang-core/execution
 BUILD.INFO
-corr-lang-integrationtest

@@ -7,3 +7,6 @@
 [submodule "mdegraphlib-emf"]
 	path = mdegraphlib-emf
 	url = ./mdegraphlib-emf
+[submodule "corr-lang-integrationtest"]
+	path = corr-lang-integrationtest
+	url = https://github.com/webminz/corr-lang-integrationtest.git
