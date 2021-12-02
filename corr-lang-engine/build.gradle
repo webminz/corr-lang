@@ -5,8 +5,8 @@ plugins {
 
 generateGrammarSource {
     maxHeapSize = "64m"
-    arguments += ['-package', 'no.hvl.past.corrlang.parser']
-    outputDirectory = new File("src/generated/no/hvl/past/corrlang/parser")
+    arguments += ['-package', 'io.corrlang.parser']
+    outputDirectory = new File("src/generated/io/corrlang/parser")
 }
 
 dependencies {
@@ -47,7 +47,7 @@ sourceSets {
 
 test {
     filter {
-        includeTestsMatching "no.hvl.past.corrlang.CorrLangEngineSuite*"
+        includeTestsMatching "io.corrlang.engine.CorrLangEngineSuite*"
     }
 }
 
