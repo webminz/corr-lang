@@ -78,8 +78,6 @@ task buildCorrlang {
 
 
 
-task corrlangTestSuite(type: Test) {
-	include '**/GraphLibUnitTestSuit.class'
-}
+
 
 

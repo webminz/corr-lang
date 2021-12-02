@@ -8,3 +8,9 @@ dependencies {
     implementation 'net.sourceforge.plantuml:plantuml:1.2021.4'
     testImplementation project(':mdegraphlib').sourceSets.test.output
 }
+
+test {
+    filter {
+        includeTestsMatching "io.corrlang.CoreTestSuite*"
+    }
+}

@@ -18,7 +18,7 @@ dependencies {
 
 
 application {
-    mainClassName = "no.hvl.past.corrlang.runner.ConsoleRun"
+    mainClass.set("no.hvl.past.corrlang.runner.ConsoleRun")
 }
 
 clean {
@@ -44,4 +44,11 @@ sourceSets {
         resources.srcDir 'src/test/resources'
     }
 }
+
+test {
+    filter {
+        includeTestsMatching "no.hvl.past.corrlang.CorrLangEngineSuite*"
+    }
+}
+
 
