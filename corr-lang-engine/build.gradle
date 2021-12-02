@@ -1,6 +1,7 @@
 plugins {
     id 'antlr'
     id "application"
+    id 'distribution'
 }
 
 generateGrammarSource {
@@ -18,7 +19,7 @@ dependencies {
 
 
 application {
-    mainClass.set("no.hvl.past.corrlang.runner.ConsoleRun")
+    mainClass.set("io.corrlang.engine.runner.ConsoleRun")
 }
 
 clean {
@@ -48,6 +49,35 @@ sourceSets {
 test {
     filter {
         includeTestsMatching "io.corrlang.engine.CorrLangEngineSuite*"
+    }
+}
+
+distributions {
+    main {
+        contents {
+            into('plugins') {
+                from("${buildDir}/plugins")
+            }
+            into('pluginDependencies') {
+                from("${buildDir}/pluginDeps")
+            }
+        }
+    }
+}
+
+startScripts {
+    applicationName = "corrlang"
+    classpath += files('../plugins')
+    classpath += files('../pluginDependencies')
+    // Apparently the gradle plugin is a bit "stupid" ...
+    // https://discuss.gradle.org/t/classpath-in-application-plugin-is-building-always-relative-to-app-home-lib-directory/2012
+    doLast {
+        def windowsScriptFile = file getWindowsScript()
+        def unixScriptFile = file getUnixScript()
+        windowsScriptFile.text = windowsScriptFile.text.replaceAll('%APP_HOME%\\\\lib\\\\plugins', '%APP_HOME%\\plugins\\*')
+        windowsScriptFile.text = windowsScriptFile.text.replaceAll('%APP_HOME%\\\\lib\\\\pluginDependencies', '%APP_HOME%\\pluginDependencies\\*')
+        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/plugins', '$APP_HOME/plugins/*')
+        unixScriptFile.text = unixScriptFile.text.replace('$APP_HOME/lib/pluginDependencies', '$APP_HOME/pluginDependencies/*')
     }
 }
 
