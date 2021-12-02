@@ -2,10 +2,10 @@
 	path = mdegraphlib
 	url = ./mdegraphlib
 [submodule "mdegraphlib-gql"]
-	path = mdegraphlib-gql
+	path = corr-lang-gql
 	url = ./mdegraphlib-gql
 [submodule "mdegraphlib-emf"]
-	path = mdegraphlib-emf
+	path = corr-lang-emf
 	url = ./mdegraphlib-emf
 [submodule "corr-lang-integrationtest"]
 	path = corr-lang-integrationtest
