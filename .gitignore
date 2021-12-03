@@ -20,3 +20,4 @@ corr-lang-core/execution
 BUILD.INFO
 corr-lang-engine/src/generated
 .idea
+release
