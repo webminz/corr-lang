@@ -27,7 +27,7 @@ url: "http://webminz.github.io/" # the base hostname & protocol for your site, e
 github_username:  webminz
 
 # Build settings
-theme: "just-the-docs"
+remote_theme: pmarsceill/just-the-docs
 
 
 # Exclude from processing.
