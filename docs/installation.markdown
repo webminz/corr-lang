@@ -9,6 +9,8 @@ nav_order: 3
 
 Pre-built _CorrLang_ bytecode binaries can be downloaded in .zip or .tar format:
 
+[Download .zip](https://github.com/webminz/corr-lang/releases/download/v0.9/corrlang-0.9.zip)
+
 The layout of the archive follows the convention for java applications.
 Inside the `/bin` folder you will find start scripts to run CorrLang on UNIX and Windows platforms.
 
