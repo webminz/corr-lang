@@ -52,8 +52,9 @@ canvas{
   height:160px;
   background:rgba(255, 255, 255, 0.9);
   top:50%;
-  left:45%;
-  margin:-110px 0 0 -100px;
+  left:50%;
+  margin:0;
+  transform: translate(-50%, -50%);
   padding:20px;
   z-index:100;
   box-shadow: 6px 6px 17px 0px rgba(0,0,0,0.49);
@@ -111,6 +112,30 @@ canvas{
   color: white;
 }
 
+
+@media only screen and (max-width: 600px) {
+  #panel {
+    font-size: 1.5rem;
+    width:100%;
+    height:45%;
+    top:25%;
+    left:0px;
+    margin: 0;
+    padding:10px;
+    transform:none;
+  }
+  #panel .btn-row {
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+  }
+  #panel .btn-row a {
+    font-size: 1.5rem;
+    width: 200px;
+    margin: 2px 0;
+  }
+
+}
 
 /* ---- particles.js container ---- */
 
