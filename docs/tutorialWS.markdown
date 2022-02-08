@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Tutorial: Web Service Federation"
-permalink: /tutorialWS/
+permalink: tutorialWS/
 nav_order: 4
 ---
 

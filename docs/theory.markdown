@@ -1,11 +1,11 @@
 ---
 layout: page
-title: "Tutorial: Web Service Federation"
-permalink: /Theory/
+title: "Theory"
+permalink: theory/
 nav_order: 5
 ---
 
 
 # Overview
 
-<img src="CorrLangPrinciple.svg">
+<img src="./CorrLangPrinciple.svg">
