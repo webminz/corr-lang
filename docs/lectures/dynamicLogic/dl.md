@@ -1,6 +1,7 @@
 ---
 layout: page
 permalink: /lectures/dynamicLogic/
+nav_exclude: true
 ---
 
 
