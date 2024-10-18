@@ -1,4 +1,5 @@
-# CorrLang
+# CorrLang v.0.9
+
 CorrLang is a tool/library that helps you with several model and system integration tasks.
 It is based on a DSL with the same name.
 In this DSL you specify structural relations between schemas of different endpoints. 
@@ -7,7 +8,15 @@ In this DSL you specify structural relations between schemas of different endpoi
 
 To run CorrLang on your own machine you have to check it out from here and build it on your machine.
 
-You have to have `java` (>= 1.8) and `git` installed!
+This version requires Java in version `8` and Gradle in version `6.8.2`!
+If you are on a NIX-like operating system like Mac OS X or GNU/Linux, the recommended way is to use [SDKman](https://sdkman.io/):
+
+```bash
+sdk install java 8.0.432-amzn # E.g. using Amazon Corretto
+sdk use java 8.0.432-amzn
+sdk install gradle 6.8.2
+sdk use gradle 6.8.2
+```
 
 First check out with `git clone`.
 Please note that this project has _submodules_ ([You can learn more about submodules here](https://git-scm.com/book/en/v2/Git-Tools-Submodules)).
