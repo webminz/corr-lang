@@ -23,12 +23,12 @@ public class BuiltinPlugins {
     }
 
 
-    @Bean
-    @Scope("singleton")
-    @Lazy
-    public ServerStarter serverStarter() {
-        return new ServerStarter();
-    }
+//    @Bean
+//    @Scope("singleton")
+//    @Lazy
+//    public ServerStarter serverStarter() {
+//        return new ServerStarter();
+//    }
 
 
     // TODO register beans for all the builtin stuff

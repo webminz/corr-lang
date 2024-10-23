@@ -1,12 +1,12 @@
-package io.corrlang.components.server;
+package io.corrlang.server;
 
 
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import no.hvl.past.util.GenericIOHandler;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.List;
@@ -25,7 +25,7 @@ public abstract class WebserviceRequestHandler implements Handler {
     private final String contextPath;
     private final HttpMethod method;
     private final ResponseType responseType;
-    private Logger logger = LogManager.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
 
     protected WebserviceRequestHandler(String contextPath, HttpMethod method, ResponseType responseType) {

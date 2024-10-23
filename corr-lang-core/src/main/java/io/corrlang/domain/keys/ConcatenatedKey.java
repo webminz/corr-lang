@@ -7,8 +7,6 @@ import no.hvl.past.attributes.IntegerValue;
 import no.hvl.past.attributes.StringValue;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.graph.elements.Triple;
-import no.hvl.past.graph.trees.Node;
-import no.hvl.past.graph.trees.TypedTree;
 import no.hvl.past.names.Name;
 
 import java.util.ArrayList;
@@ -71,19 +69,19 @@ public class ConcatenatedKey implements Key {
     }
 
     // TODO refactor
-    @Override
-    public Optional<Name> evaluate(Node element, TypedTree typedTree) {
-        List<Name> childEvals = new ArrayList<>();
-        for (Key child : childKeys) {
-            Optional<Name> evaluate = child.evaluate(element, typedTree);
-            if (evaluate.isPresent()) {
-                childEvals.add(evaluate.get());
-            } else {
-                return Optional.empty();
-            }
-        }
-        return Optional.of(concatenation(childEvals));
-    }
+//    @Override
+//    public Optional<Name> evaluate(Node element, TypedTree typedTree) {
+//        List<Name> childEvals = new ArrayList<>();
+//        for (Key child : childKeys) {
+//            Optional<Name> evaluate = child.evaluate(element, typedTree);
+//            if (evaluate.isPresent()) {
+//                childEvals.add(evaluate.get());
+//            } else {
+//                return Optional.empty();
+//            }
+//        }
+//        return Optional.of(concatenation(childEvals));
+//    }
 
     private Name concatenation(List<Name> evaluatedKeys) {
         StringBuilder builder = new StringBuilder();

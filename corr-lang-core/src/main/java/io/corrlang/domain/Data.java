@@ -84,7 +84,7 @@ public interface Data {
     }
 
 
-    static Data fromTree(Sys system, TypedTree tree) {
+    static Data fromTree(Sys system, Tree tree) {
         return new Data() {
             @Override
             public Sys origin() {
@@ -93,29 +93,29 @@ public interface Data {
 
             @Override
             public Stream<Name> all(Name type) {
-                Set<TypedNode> result = new HashSet<>();
-                tree.root().nodesWithType(type, result);
-                return result.stream().map(TypedNode::elementName);
+                Set<Node> result = new HashSet<>();
+                tree.root().aggregateNodesOfType(type, result);
+                return result.stream().map(Node::elementName);
             }
 
             @Override
             public Stream<Name> properties(Name elementId, Name propertyName) {
                 return tree.findNodeById(elementId)
-                        .filter(n -> n instanceof TypedNode)
-                        .map(n -> (TypedNode)n)// TODO also include the parent branch?
-                        .map(tn -> tn.typedChildren().filter(tb -> tb.typeFeature().getLabel().equals(propertyName)).map(TypedBranch::child).map(Node::elementName))
+                        .filter(n -> n instanceof Node)
+                        .map(n -> (Node)n)// TODO also include the parent branch?
+                        .map(tn -> tn.children().filter(tb -> tb.type().get().getLabel().equals(propertyName)).map(Branch::child).map(Node::elementName))
                         .orElse(Stream.empty());
             }
 
             @Override
             public void index(Multimap<Name, Key> keys, Commonalities commonalities) {
-                Iterator<TypedNode> iterator = TreeIterator.depthFirstTypedComplex(tree.root());
+                Iterator<Node> iterator = TreeIterator.depthFirstTypedComplex(tree.root());
                 while (iterator.hasNext()) {
-                    TypedNode typedNode = iterator.next();
-                    if (!keys.get(typedNode.nodeType()).isEmpty()) {
+                    Node typedNode = iterator.next();
+                    if (!keys.get(typedNode.nodeType().get()).isEmpty()) {
                         Multimap<Name, Name> evalKeys = HashMultimap.create();
-                        for (Key key : keys.get(typedNode.nodeType())) {
-                            key.evaluate(typedNode, tree).ifPresent(value -> evalKeys.put(key.targetType(), value));
+                        for (Key key : keys.get(typedNode.nodeType().get())) {
+                            key.evaluate(typedNode.elementName(), tree).ifPresent(value -> evalKeys.put(key.targetType(), value));
                         }
                         for (Name commType : evalKeys.keySet()) {
                             for (Name commId : evalKeys.get(commType)) {
@@ -132,7 +132,7 @@ public interface Data {
 
             @Override
             public Name typeOf(Name element) {
-                return tree.findNodeById(element).filter(n -> n instanceof TypedNode).map(n -> (TypedNode)n).map(TypedNode::nodeType).orElse(null);
+                return tree.findNodeById(element).filter(n -> n instanceof Node).map(n -> (Node)n).map(Node::nodeType).orElse(null).get();
             }
         };
     }

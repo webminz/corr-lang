@@ -4,8 +4,9 @@ import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.ReportErrorType;
 import io.corrlang.engine.reporting.ReportFacade;
 import no.hvl.past.di.DependencyInjectionContainer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class ExecutionFacade {
 
     public Logger getLogger() {
         if (this.logger == null) {
-            logger = LogManager.getLogger(ExecutionFacade.class);
+            logger = LoggerFactory.getLogger(ExecutionFacade.class);
         }
         return logger;
     }
@@ -62,7 +63,7 @@ public class ExecutionFacade {
             this.alreadyExecuted.put(executor.getClass(), executor);
             return executor.isExecutedCorrectly();
        } catch (Throwable throwable) {
-           getLogger().error(throwable);
+           getLogger().error("", throwable);
            reportFacade.reportException(throwable);
            return false;
        }

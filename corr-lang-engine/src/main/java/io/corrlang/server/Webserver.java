@@ -1,7 +1,10 @@
-package io.corrlang.components.server;
+package io.corrlang.server;
 
 import io.javalin.Javalin;
-import io.javalin.core.event.EventHandler;
+import io.javalin.config.EventConfig;
+import io.javalin.event.LifecycleEventListener;
+
+import java.util.function.Consumer;
 
 public class Webserver {
 
@@ -40,9 +43,14 @@ public class Webserver {
         this.javalin.stop();
     }
 
-    public static Webserver start(int port, EventHandler startedHandler, EventHandler stoppedHandler) {
+    public static Webserver start(int port, LifecycleEventListener startedHandler,LifecycleEventListener stoppedHandler) {
         Javalin javalin = Javalin.create(config -> {
-            config.enableCorsForAllOrigins();
+            config.bundledPlugins.enableCors(corsConfig ->
+                    corsConfig.addRule(corsRule -> {
+                        corsRule.anyHost();
+                        corsRule.allowCredentials = true;
+                    }
+                    ));
         }).events(event -> {
             event.serverStarted(startedHandler);
             event.serverStopped(stoppedHandler);

@@ -5,8 +5,8 @@ import io.corrlang.domain.Sys;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.graph.trees.Node;
-import no.hvl.past.graph.trees.TypedNode;
-import no.hvl.past.graph.trees.TypedTree;
+
+
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
 import org.w3c.dom.Element;
@@ -78,51 +78,51 @@ public class AttributeBasedKey implements Key {
         return Optional.empty();
     }
 
-    private Optional<Name> evaluateImpl(
-            Node element,
-            TypedTree container,
-            int idx) {
-
-        if (attributeEdges.get(idx).isNode()) {
-            if (element instanceof TypedNode) {
-                if (!((TypedNode) element).nodeType().equals(attributeEdges.get(idx).getLabel())) {
-                    return Optional.empty();
-                }
-            }
-            return evaluateImpl(element, container, idx + 1);
-        }
-
-        Optional<Node> result;
-        if (element instanceof TypedNode) {
-            result = ((TypedNode) element).feature(attributeEdges.get(idx)).findFirst().map(x -> x);
-        } else {
-            String label = attributeEdges.get(idx).getLabel().printRaw();
-            result = element.childNodesByKey(label).findFirst();
-        }
-        int currentIdx = idx + 1;
-        if (result.isPresent()) {
-            if (currentIdx == attributeEdges.size()) {
-                return result.map(Node::elementName);
-            } else {
-                if (element.isLeaf()) {
-                    return evaluateImpl(container.findNodeById(result.get().elementName()).get(),container,currentIdx);
-                } else {
-                    return evaluateImpl(result.get(), container, currentIdx);
-                }
-            }
-        }
-        return Optional.empty();
-    }
+//    private Optional<Name> evaluateImpl(
+//            Node element,
+//            TypedTree container,
+//            int idx) {
+//
+//        if (attributeEdges.get(idx).isNode()) {
+//            if (element instanceof TypedNode) {
+//                if (!((TypedNode) element).nodeType().equals(attributeEdges.get(idx).getLabel())) {
+//                    return Optional.empty();
+//                }
+//            }
+//            return evaluateImpl(element, container, idx + 1);
+//        }
+//
+//        Optional<Node> result;
+//        if (element instanceof TypedNode) {
+//            result = ((TypedNode) element).feature(attributeEdges.get(idx)).findFirst().map(x -> x);
+//        } else {
+//            String label = attributeEdges.get(idx).getLabel().printRaw();
+//            result = element.childNodesByKey(label).findFirst();
+//        }
+//        int currentIdx = idx + 1;
+//        if (result.isPresent()) {
+//            if (currentIdx == attributeEdges.size()) {
+//                return result.map(Node::elementName);
+//            } else {
+//                if (element.isLeaf()) {
+//                    return evaluateImpl(container.findNodeById(result.get().elementName()).get(),container,currentIdx);
+//                } else {
+//                    return evaluateImpl(result.get(), container, currentIdx);
+//                }
+//            }
+//        }
+//        return Optional.empty();
+//    }
 
     @Override
     public Optional<Name> evaluate(Name element, GraphMorphism typedContainer) {
         return evaluateImpl(element, typedContainer, 0);
     }
 
-    @Override
-    public Optional<Name> evaluate(Node element, TypedTree typedTree) {
-        return evaluateImpl(element, typedTree, 0);
-    }
+    //@Override
+    //public Optional<Name> evaluate(Node element, TypedTree typedTree) {
+    //    return evaluateImpl(element, typedTree, 0);
+    //}
 
     @Override
     public Name evaluate(Object element) throws KeyNotEvaluated {
@@ -133,7 +133,7 @@ public class AttributeBasedKey implements Key {
 
         if (element instanceof Node) {
 
-            Optional<Name> attribute = ((Node) element).childrenByKey(attributeEdges.get(0).getLabel().printRaw()).findFirst().map(c -> c.child().elementName());
+            Optional<Name> attribute = ((Node) element).childrenByKey(Name.identifier(attributeEdges.get(0).getLabel().printRaw())).findFirst().map(c -> c.child().elementName());
             if (attribute.isPresent()) {
                 return attribute.get();
             }

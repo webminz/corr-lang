@@ -10,8 +10,9 @@ import no.hvl.past.di.DependencyInjectionContainer;
 import no.hvl.past.di.PropertyHolder;
 import no.hvl.past.util.FileSystemAccessPoint;
 import no.hvl.past.util.Holder;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.File;
@@ -58,7 +59,7 @@ public class AbstractRun {
 
     protected void initialise(boolean silent) throws Exception {
         this.diContainer = DependencyInjectionContainer.create("CorrLang", properties);
-        this.logger = LogManager.getLogger(getClass());
+        this.logger = LoggerFactory.getLogger(getClass());
         printLogoAndSysInfo(silent);
         this.executionFacade = new ExecutionFacade(diContainer, reportFacade);
     }

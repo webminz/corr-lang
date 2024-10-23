@@ -14,9 +14,9 @@ import no.hvl.past.names.*;
 
 import no.hvl.past.util.Pair;
 import no.hvl.past.util.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 
 import java.io.*;
 import java.util.*;
@@ -320,7 +320,6 @@ public class PlantUMLPlotter {
         return "";
     }
 
-    @NotNull
     private String makeMult(Pair<Integer, Integer> targetMultiplicity) {
         return "" + (targetMultiplicity.getLeft() < 0 ? "*" : targetMultiplicity.getLeft()) + ".." + (targetMultiplicity.getRight() < 0 ? "*" : targetMultiplicity.getRight()) + "";
     }

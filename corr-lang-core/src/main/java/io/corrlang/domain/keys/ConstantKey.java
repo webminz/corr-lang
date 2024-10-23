@@ -3,8 +3,6 @@ package io.corrlang.domain.keys;
 import io.corrlang.domain.Sys;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.graph.elements.Triple;
-import no.hvl.past.graph.trees.Node;
-import no.hvl.past.graph.trees.TypedTree;
 import no.hvl.past.names.Name;
 
 import java.util.Collections;
@@ -65,10 +63,10 @@ public class ConstantKey implements Key {
         return Optional.of(value);
     }
 
-    @Override
-    public Optional<Name> evaluate(Node element, TypedTree typedTree) {
-        return Optional.of(value);
-    }
+//    @Override
+//    public Optional<Name> evaluate(Node element, TypedTree typedTree) {
+//        return Optional.of(value);
+//    }
 
     @Override
     public Name evaluate(Object element) {

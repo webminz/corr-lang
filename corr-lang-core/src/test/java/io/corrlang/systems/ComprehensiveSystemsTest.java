@@ -8,15 +8,15 @@ import io.corrlang.domain.Sys;
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static io.corrlang.domain.QualifiedName.qname;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class ComprehensiveSystemsTest extends GraphTest {
+public class ComprehensiveSystemsTest extends TestWithGraphLib {
 
 
     @Test

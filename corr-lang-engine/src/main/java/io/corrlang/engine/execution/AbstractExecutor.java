@@ -2,8 +2,8 @@ package io.corrlang.engine.execution;
 
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.ReportFacade;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
@@ -23,7 +23,7 @@ public abstract class AbstractExecutor {
 
     protected Logger getLogger() {
         if (logger == null) {
-            this.logger = LogManager.getLogger(getClass());
+            this.logger = LoggerFactory.getLogger(getClass());
         }
         return this.logger;
     }

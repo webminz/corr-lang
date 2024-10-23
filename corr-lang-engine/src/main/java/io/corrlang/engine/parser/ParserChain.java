@@ -6,8 +6,9 @@ import io.corrlang.parser.CorrlangParser;
 import io.corrlang.engine.reporting.ReportFacade;
 import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.io.*;
 import java.util.ArrayList;
@@ -29,7 +30,7 @@ public class ParserChain {
         DefaultCorrlangListener listener = new DefaultCorrlangListener(result, fileName, reportFacade);
         List<String> recognitionExceptions = new ArrayList<>();
 
-        Logger logger = LogManager.getLogger(getClass());
+        Logger logger = LoggerFactory.getLogger(getClass());
 
         final CorrlangLexer lexer = new CorrlangLexer(stream);
         final CorrlangParser parser = new CorrlangParser(new CommonTokenStream(lexer));

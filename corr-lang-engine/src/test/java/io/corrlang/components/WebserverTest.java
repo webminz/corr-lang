@@ -2,9 +2,10 @@ package io.corrlang.components;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
-import io.corrlang.components.server.HttpMethod;
-import io.corrlang.components.server.Webserver;
-import io.corrlang.components.server.WebserviceRequestHandler;
+
+import io.corrlang.server.HttpMethod;
+import io.corrlang.server.Webserver;
+import io.corrlang.server.WebserviceRequestHandler;
 import no.hvl.past.util.GenericIOHandler;
 import org.junit.Test;
 

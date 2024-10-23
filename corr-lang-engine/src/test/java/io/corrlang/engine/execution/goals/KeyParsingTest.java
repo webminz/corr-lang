@@ -9,7 +9,7 @@ import io.corrlang.engine.parser.ParserChain;
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.PrintStreamReportFacade;
 import no.hvl.past.graph.GraphExampleLibrary;
-import no.hvl.past.graph.GraphTest;
+import no.hvl.past.graph.TestWithGraphLib;
 import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.AttributeBasedKey;
 import io.corrlang.domain.keys.ConcatenatedKey;
@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static io.corrlang.domain.QualifiedName.qname;
 
-public class KeyParsingTest extends GraphTest {
+public class KeyParsingTest extends TestWithGraphLib {
 
 
     Sys families;

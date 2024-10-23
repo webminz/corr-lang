@@ -1,4 +1,4 @@
-package io.corrlang.components.server;
+package io.corrlang.server;
 
 /**
  * The request methods defined in the HTTP protocol.

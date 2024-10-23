@@ -7,25 +7,27 @@ import io.corrlang.domain.Sys;
 import no.hvl.past.graph.GraphError;
 import no.hvl.past.graph.GraphExampleLibrary;
 import no.hvl.past.graph.GraphMorphism;
-import no.hvl.past.graph.GraphTest;
+
+import no.hvl.past.graph.TestWithGraphLib;
 import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.AttributeBasedKey;
 import io.corrlang.domain.keys.ConcatenatedKey;
 import io.corrlang.domain.keys.ConstantKey;
 import no.hvl.past.names.Identifier;
 import no.hvl.past.names.Name;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.corrlang.domain.QualifiedName.qname;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class SynchronisationTest extends GraphTest {
+
+public class SynchronisationTest extends TestWithGraphLib {
 
 
 
@@ -33,7 +35,7 @@ public class SynchronisationTest extends GraphTest {
     private Sys families;
     private Sys persons;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         GraphExampleLibrary.INSTANCE.initialize(getContextCreatingBuilder());
 

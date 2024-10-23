@@ -8,8 +8,9 @@ import no.hvl.past.ExtensionPoint;
 import no.hvl.past.MetaRegistry;
 import io.corrlang.plugins.techspace.TechSpace;
 import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
 
 import java.util.HashMap;
 import java.util.Map;

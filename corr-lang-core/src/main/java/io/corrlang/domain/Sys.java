@@ -5,7 +5,6 @@ import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.graph.elements.Tuple;
 import no.hvl.past.graph.operations.Invert;
 import no.hvl.past.graph.predicates.*;
-import no.hvl.past.graph.trees.TreeBuildStrategy;
 import no.hvl.past.names.Name;
 import no.hvl.past.util.Pair;
 
@@ -195,6 +194,7 @@ public interface Sys {
             updateCaches();
         }
 
+        // TODO has to go into the new class
         private void updateCaches() {
             this.sketch.diagrams().forEach(diagram -> {
                 if (AbstractType.getInstance().diagramIsOfType(diagram)) {
@@ -216,10 +216,10 @@ public interface Sys {
                     diagram.nodeBinding().ifPresent(this.otherDataTypes::add);
                 } else if (TargetMultiplicity.class.isAssignableFrom(diagram.label().getClass())) {
                     TargetMultiplicity multiplicity = (TargetMultiplicity) diagram.label();
-                    diagram.edgeBinding().ifPresent(t -> this.targetMultiplicities.put(t, new Pair<>(multiplicity.getLowerBound(), multiplicity.getUpperBound())));
+                   // diagram.edgeBinding().ifPresent(t -> this.targetMultiplicities.put(t, new Pair<>(multiplicity.getLowerBound(), multiplicity.getUpperBound())));
                 } else if (SourceMultiplicity.class.isAssignableFrom(diagram.label().getClass())) {
                     SourceMultiplicity multiplicity = (SourceMultiplicity) diagram.label();
-                    diagram.edgeBinding().ifPresent(t -> this.sourceMultiplicities.put(t, new Pair<>(multiplicity.getLowerBound(), multiplicity.getUpperBound())));
+                   // diagram.edgeBinding().ifPresent(t -> this.sourceMultiplicities.put(t, new Pair<>(multiplicity.getLowerBound(), multiplicity.getUpperBound())));
                 } else if (Ordered.getInstance().diagramIsOfType(diagram)) {
                     diagram.edgeBinding().ifPresent(this.orderedTriples::add);
                 } else if (Unique.getInstance().diagramIsOfType(diagram)) {
@@ -409,50 +409,50 @@ public interface Sys {
         return messages().filter(m -> m.typeName().equals(type)).findFirst().orElse(null);
     }
 
-    default TreeBuildStrategy treeBuildStrategy() {
-        return new TreeBuildStrategy.TypedStrategy() {
-
-            @Override
-            public Graph getSchemaGraph() {
-                return schema().carrier();
-            }
-
-            @Override
-            public Optional<Name> rootType(String label) {
-                return lookup(label).map(Triple::getLabel);
-            }
-
-            @Override
-            public Optional<Triple> lookupType(Name parentType, String field) {
-                return features(parentType).filter(t -> t.getLabel().printRaw().equals(field)).findFirst();
-            }
-
-            @Override
-            public boolean isStringType(Name typeName) {
-                return Sys.this.isStringType(typeName);
-            }
-
-            @Override
-            public boolean isBoolType(Name typeName) {
-                return Sys.this.isBoolType(typeName);
-            }
-
-            @Override
-            public boolean isFloatType(Name typeName) {
-                return Sys.this.isFloatType(typeName);
-            }
-
-            @Override
-            public boolean isIntType(Name typeName) {
-                return Sys.this.isIntType(typeName);
-            }
-
-            @Override
-            public boolean isEnumType(Name typeName) {
-                return Sys.this.isEnumType(typeName);
-            }
-        };
-    }
+//    default TreeBuildStrategy treeBuildStrategy() {
+//        return new TreeBuildStrategy.TypedStrategy() {
+//
+//            @Override
+//            public Graph getSchemaGraph() {
+//                return schema().carrier();
+//            }
+//
+//            @Override
+//            public Optional<Name> rootType(String label) {
+//                return lookup(label).map(Triple::getLabel);
+//            }
+//
+//            @Override
+//            public Optional<Triple> lookupType(Name parentType, String field) {
+//                return features(parentType).filter(t -> t.getLabel().printRaw().equals(field)).findFirst();
+//            }
+//
+//            @Override
+//            public boolean isStringType(Name typeName) {
+//                return Sys.this.isStringType(typeName);
+//            }
+//
+//            @Override
+//            public boolean isBoolType(Name typeName) {
+//                return Sys.this.isBoolType(typeName);
+//            }
+//
+//            @Override
+//            public boolean isFloatType(Name typeName) {
+//                return Sys.this.isFloatType(typeName);
+//            }
+//
+//            @Override
+//            public boolean isIntType(Name typeName) {
+//                return Sys.this.isIntType(typeName);
+//            }
+//
+//            @Override
+//            public boolean isEnumType(Name typeName) {
+//                return Sys.this.isEnumType(typeName);
+//            }
+//        };
+//    }
 
     default Stream<Name> types() {
         return this.schema().carrier().nodes().filter(n -> !this.isMessageType(n));
@@ -525,22 +525,26 @@ public interface Sys {
                 });
     }
 
+    // TODO
     default Pair<Integer, Integer> getTargetMultiplicity(Triple edge) {
-        return this.schema().diagramsOn(edge)
-                .filter(d -> TargetMultiplicity.class.isAssignableFrom(d.label().getClass()))
-                .findFirst()
-                .map(d -> (TargetMultiplicity)d.label())
-                .map(mult -> new Pair<>(mult.getLowerBound(), mult.getUpperBound()))
-                .orElse(new Pair<>(0, -1));
+        return new Pair<>(0, 1);
+//        return this.schema().diagramsOn(edge)
+//                .filter(d -> TargetMultiplicity.class.isAssignableFrom(d.label().getClass()))
+//                .findFirst()
+//                .map(d -> (TargetMultiplicity)d.label())
+//                .map(mult -> new Pair<>(mult.getLowerBound(), mult.getUpperBound()))
+//                .orElse(new Pair<>(0, -1));
     }
 
+    // TODO
     default Pair<Integer, Integer> getSourceMultiplicity(Triple edge) {
-        return this.schema().diagramsOn(edge)
-                .filter(d -> SourceMultiplicity.class.isAssignableFrom(d.label().getClass()))
-                .findFirst()
-                .map(d -> (SourceMultiplicity)d.label())
-                .map(mult -> new Pair<>(mult.getLowerBound(), mult.getUpperBound()))
-                .orElse(new Pair<>(0, -1));
+        return new Pair<>(0, 1);
+//        return this.schema().diagramsOn(edge)
+//                .filter(d -> SourceMultiplicity.class.isAssignableFrom(d.label().getClass()))
+//                .findFirst()
+//                .map(d -> (SourceMultiplicity)d.label())
+//                .map(mult -> new Pair<>(mult.getLowerBound(), mult.getUpperBound()))
+//                .orElse(new Pair<>(0, -1));
     }
 
     default boolean isCollectionValued(Triple edge) {
@@ -591,7 +595,7 @@ public interface Sys {
 
     default boolean isComposition(Triple edge) {
         return this.schema().diagramsOn(edge).anyMatch(d -> Acyclicity.class.isAssignableFrom(d.label().getClass())) &&
-                this.schema().diagramsOn(edge).anyMatch(d -> d.label() instanceof SourceMultiplicity && ((SourceMultiplicity)d.label()).getUpperBound() == 1);
+                this.schema().diagramsOn(edge).anyMatch(d -> d.label() instanceof SourceMultiplicity);
     }
 
 

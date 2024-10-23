@@ -37,6 +37,12 @@ public enum SchemaElement {
             return false;
         }
     },
+    DATA_TYPE {
+        @Override
+        public boolean belongsToDynamicPart() {
+            return false;
+        }
+    },
     LINK {
         @Override
         public boolean belongsToDynamicPart() {
@@ -55,6 +61,7 @@ public enum SchemaElement {
             return false;
         }
     };
+
 
     public abstract boolean belongsToDynamicPart();
 

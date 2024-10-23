@@ -1,17 +1,19 @@
 package io.corrlang.engine.execution;
 
 import io.corrlang.engine.domainmodel.*;
-import io.corrlang.engine.execution.ExecutionFacade;
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.PrintStreamReportFacade;
-import no.hvl.past.di.TestWithDIContainer;
+import no.hvl.past.TestWithDIContainer;
 import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.AttributeBasedKey;
 import io.corrlang.domain.keys.ConcatenatedKey;
 import io.corrlang.domain.keys.ConstantKey;
 import no.hvl.past.names.Name;
 import io.corrlang.domain.ComprSys;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -20,6 +22,13 @@ import static junit.framework.TestCase.*;
 
 public class FormalAlignmentTest extends TestWithDIContainer {
 
+    private final Logger logger = LoggerFactory.getLogger(FormalAlignmentTest.class);
+
+    @BeforeEach
+    public void initTest() throws Exception {
+        logger.info("Initializing DI container");
+        this.setUp();
+    }
 
     @Test
     public void testCreateAlignment() {

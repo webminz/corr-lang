@@ -13,8 +13,8 @@ import io.corrlang.plugins.dm.PlantUMLPlotter;
 import no.hvl.past.graph.predicates.*;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.Value;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
 
 import java.io.File;
 import java.io.FileOutputStream;
