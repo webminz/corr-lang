@@ -10,10 +10,8 @@ import io.corrlang.domain.keys.ConcatenatedKey;
 import io.corrlang.domain.keys.ConstantKey;
 import no.hvl.past.names.Name;
 import io.corrlang.domain.ComprSys;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 import java.util.Arrays;
 import java.util.Set;
@@ -22,13 +20,7 @@ import static junit.framework.TestCase.*;
 
 public class FormalAlignmentTest extends TestWithDIContainer {
 
-    private final Logger logger = LoggerFactory.getLogger(FormalAlignmentTest.class);
 
-    @BeforeEach
-    public void initTest() throws Exception {
-        logger.info("Initializing DI container");
-        this.setUp();
-    }
 
     @Test
     public void testCreateAlignment() {

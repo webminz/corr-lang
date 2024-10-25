@@ -3,7 +3,7 @@ package io.corrlang.engine.execution.goals;
 import io.corrlang.engine.domainmodel.CorrSpec;
 import io.corrlang.engine.domainmodel.ServerEndpoint;
 import io.corrlang.engine.reporting.ReportFacade;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.PropertyHolder;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
 import no.hvl.past.UnsupportedFeatureException;

@@ -6,8 +6,8 @@ import io.corrlang.engine.execution.ExecutionFacade;
 import io.corrlang.engine.execution.goals.AbstractGoal;
 import io.corrlang.engine.parser.ParserChain;
 import io.corrlang.engine.reporting.ReportFacade;
-import no.hvl.past.di.DependencyInjectionContainer;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.DependencyInjectionContainer;
+import io.corrlang.di.PropertyHolder;
 import no.hvl.past.util.FileSystemAccessPoint;
 import no.hvl.past.util.Holder;
 

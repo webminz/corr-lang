@@ -8,7 +8,7 @@ import io.corrlang.engine.execution.SemanticException;
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.domainmodel.CorrSpec;
 import io.corrlang.engine.domainmodel.ElementRef;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.PropertyHolder;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
 import io.corrlang.domain.ComprSys;

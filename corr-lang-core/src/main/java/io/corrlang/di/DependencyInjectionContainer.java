@@ -1,4 +1,4 @@
-package no.hvl.past.di;
+package io.corrlang.di;
 
 import no.hvl.past.graph.Universe;
 import no.hvl.past.MetaRegistry;
@@ -7,6 +7,7 @@ import no.hvl.past.util.FileSystemUtils;
 
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 
@@ -19,15 +20,11 @@ import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
 public class DependencyInjectionContainer {
 
-    public static final String SPRING_BEAN_CONFIG_XML = "spring-bean-config.xml";
-    public static final String UPDATE_CONFIG_COMMAND = "saveConfig";
-    public static final String USE_CONFIG_COMMAND = "useConfig";
+
     private final ApplicationContext applicationContext;
 
     private DependencyInjectionContainer(ApplicationContext applicationContext) {
@@ -63,33 +60,33 @@ public class DependencyInjectionContainer {
     }
 
 
-    private void setUpHttps() throws KeyManagementException, NoSuchAlgorithmException {
-        if (getPropertyHolder().isSSLAllowAll()) {
-                TrustManager[] trustAllCerts = new TrustManager[]{
-                        new X509TrustManager() {
-                            @Override
-                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                                return null;
-                            }
-
-                            @Override
-                            public void checkClientTrusted(
-                                    java.security.cert.X509Certificate[] certs, String authType) {
-                            }
-
-                            @Override
-                            public void checkServerTrusted(
-                                    java.security.cert.X509Certificate[] certs, String authType) {
-                            }
-                        }};
-                SSLContext context = SSLContext.getInstance("SSL");
-                context.init(null, trustAllCerts, new SecureRandom());
-                HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-        }
-    }
+//    private void setUpHttps() throws KeyManagementException, NoSuchAlgorithmException {
+//        if (getPropertyHolder().isSSLAllowAll()) {
+//                TrustManager[] trustAllCerts = new TrustManager[]{
+//                        new X509TrustManager() {
+//                            @Override
+//                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+//                                return null;
+//                            }
+//
+//                            @Override
+//                            public void checkClientTrusted(
+//                                    java.security.cert.X509Certificate[] certs, String authType) {
+//                            }
+//
+//                            @Override
+//                            public void checkServerTrusted(
+//                                    java.security.cert.X509Certificate[] certs, String authType) {
+//                            }
+//                        }};
+//                SSLContext context = SSLContext.getInstance("SSL");
+//                context.init(null, trustAllCerts, new SecureRandom());
+//                HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
+//        }
+//    }
 
     @SuppressWarnings("unchecked raw")
-    private void setUpLogging() throws IOException {
+//    private void setUpLogging() throws IOException {
 //        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 //        final Configuration config = ctx.getConfiguration();
 //        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(getPropertyHolder().getLogLayoutPattern()).build();
@@ -156,49 +153,12 @@ public class DependencyInjectionContainer {
 //        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.Request").getName(), Level.OFF);
 //        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.AbstractConnection").getName(), Level.OFF);
 //        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.http.HttpCookie").getName(), Level.OFF);
-    }
+//    }
 
 
-    public static DependencyInjectionContainer create(String appName, Properties configArgs) throws Exception {
-        PropertyHolder propertyHolder = setUpPropertyHolder(appName, configArgs);
-
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
-        beanFactory.registerSingleton("propertyHolder", propertyHolder);
-        GenericApplicationContext genericApplicationContext = new GenericApplicationContext(beanFactory);
-        genericApplicationContext.refresh();
-
-        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(new String[] {SPRING_BEAN_CONFIG_XML},genericApplicationContext);
-        DependencyInjectionContainer dependencyInjectionContainer = new DependencyInjectionContainer(applicationContext);
-
-        dependencyInjectionContainer.setUpLogging();
-        dependencyInjectionContainer.setUpHttps();
-
-
-        return dependencyInjectionContainer;
-    }
-
-    private static PropertyHolder setUpPropertyHolder(String appName, Properties configArgs) throws IOException {
-        FileSystemUtils fileSystemUtils = FileSystemUtils.getInstance();
-        File configFile;
-        if (configArgs.containsKey(USE_CONFIG_COMMAND)) {
-            configFile = fileSystemUtils.accessPoint("").file(configArgs.getProperty(USE_CONFIG_COMMAND));
-        } else {
-            if (configArgs.containsKey(PropertyHolder.BASE_DIR)) {
-                configFile = new File(configArgs.getProperty(PropertyHolder.BASE_DIR) + "/" + appName.toLowerCase() + ".conf");
-            } else {
-                configFile = fileSystemUtils.accessPoint("").file(appName.toLowerCase() + ".conf");
-            }
-        }
-        PropertyHolder propertyHolder = PropertyHolder.bootstrap(appName, configFile);
-        for (Object o : configArgs.keySet()) {
-            if (!o.equals(UPDATE_CONFIG_COMMAND) && !o.equals(USE_CONFIG_COMMAND)) {
-                propertyHolder.setProperty(o.toString(), configArgs.get(o).toString());
-            }
-        }
-        if (configArgs.containsKey(UPDATE_CONFIG_COMMAND)) {
-            propertyHolder.write();
-        }
-        return propertyHolder;
+    public static DependencyInjectionContainer create() throws Exception {
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        return new DependencyInjectionContainer(applicationContext);
     }
 
 

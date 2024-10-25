@@ -6,7 +6,7 @@ import io.corrlang.engine.domainmodel.Identification;
 import io.corrlang.engine.execution.AbstractExecutor;
 import io.corrlang.engine.execution.goals.AbstractGoal;
 import io.corrlang.engine.domainmodel.Goal;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.PropertyHolder;
 import no.hvl.past.MetaRegistry;
 import io.corrlang.plugins.techspace.TechnologySpecificRules;
 import org.springframework.beans.factory.annotation.Autowired;

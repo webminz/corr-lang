@@ -3,7 +3,7 @@ package io.corrlang.engine.execution;
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.ReportErrorType;
 import io.corrlang.engine.reporting.ReportFacade;
-import no.hvl.past.di.DependencyInjectionContainer;
+import io.corrlang.di.DependencyInjectionContainer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

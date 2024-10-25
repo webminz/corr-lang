@@ -1,14 +1,10 @@
-package io.corrlang.tests;
+package io.corrlang.testfixtures;
 
 import io.corrlang.domain.IntfcDesc;
-import io.corrlang.domain.Sys;
 import io.corrlang.domain.builders.SystemInterfaceDescriptionBuilder;
 import no.hvl.past.attributes.BuiltinOperations;
 import no.hvl.past.attributes.DataOperation;
-import no.hvl.past.graph.Sketch;
-import no.hvl.past.graph.Universe;
-import no.hvl.past.graph.operations.Invert;
-import no.hvl.past.graph.predicates.*;
+import no.hvl.past.graph.predicates.DataTypePredicate;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.Value;
 import no.hvl.past.util.Multiplicity;

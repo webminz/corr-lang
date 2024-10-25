@@ -1,4 +1,4 @@
-package io.corrlang.plugins;
+package io.corrlang.di;
 
 import no.hvl.past.attributes.DataOperation;
 import no.hvl.past.attributes.UserValue;
@@ -8,8 +8,8 @@ import no.hvl.past.ExtensionPoint;
 import no.hvl.past.MetaRegistry;
 import io.corrlang.plugins.techspace.TechSpace;
 import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 import java.util.HashMap;
@@ -18,7 +18,7 @@ import java.util.Optional;
 
 public class RegistryImpl implements MetaRegistry {
 
-    private Logger logger = LogManager.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(RegistryImpl.class);
 
     private final Map<Class<? extends ExtensionPoint>, Map<String, ExtensionPoint>> registryMap;
 

@@ -21,3 +21,4 @@ BUILD.INFO
 corr-lang-engine/src/generated
 .idea
 release
+corr-lang-core/temp

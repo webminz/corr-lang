@@ -1,7 +1,7 @@
 package io.corrlang.domain;
 
 import io.corrlang.domain.builders.SystemInterfaceDescriptionBuilder;
-import io.corrlang.tests.ExampleSystems;
+import io.corrlang.testfixtures.ExampleSystems;
 import no.hvl.past.graph.TestWithGraphLib;
 import no.hvl.past.names.Name;
 import org.junit.jupiter.api.BeforeEach;

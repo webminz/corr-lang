@@ -6,7 +6,7 @@ import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.domainmodel.Goal;
 import io.corrlang.engine.domainmodel.GoalTarget;
 import io.corrlang.engine.domainmodel.URLReference;
-import no.hvl.past.di.DependencyInjectionContainer;
+import io.corrlang.di.DependencyInjectionContainer;
 import no.hvl.past.util.Holder;
 
 import java.io.File;

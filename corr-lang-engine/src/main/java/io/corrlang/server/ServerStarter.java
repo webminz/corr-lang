@@ -1,14 +1,11 @@
 package io.corrlang.server;
 
-import io.javalin.config.EventConfig;
 import io.javalin.event.LifecycleEventListener;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.PropertyHolder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.function.Consumer;
 
 
 public class ServerStarter {

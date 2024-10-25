@@ -2,7 +2,7 @@ package io.corrlang.engine.execution.goals;
 
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.ReportFacade;
-import no.hvl.past.di.PropertyHolder;
+import io.corrlang.di.PropertyHolder;
 import no.hvl.past.MetaRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 
