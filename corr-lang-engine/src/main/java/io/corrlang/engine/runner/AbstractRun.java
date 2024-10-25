@@ -58,7 +58,7 @@ public class AbstractRun {
     }
 
     protected void initialise(boolean silent) throws Exception {
-        this.diContainer = DependencyInjectionContainer.create("CorrLang", properties);
+        this.diContainer = DependencyInjectionContainer.create();
         this.logger = LoggerFactory.getLogger(getClass());
         printLogoAndSysInfo(silent);
         this.executionFacade = new ExecutionFacade(diContainer, reportFacade);
@@ -95,7 +95,6 @@ public class AbstractRun {
         logger.info("WORKDIR:    " + propertyHolder.getProperty(PropertyHolder.BASE_DIR));
         logger.info("CONFIG:     " + propertyHolder.getProperty(PropertyHolder.CONFIG_FILE));
         logger.info("JAVA:       " + propertyHolder.getProperty(PropertyHolder.JVM));
-        logger.info("Log Level:  " + propertyHolder.getProperty(PropertyHolder.LOG_LEVEL));
         if (!silent) {
             reportFacade.reportInfo(LOGO);
             reportFacade.reportInfo("VERSION:    " + propertyHolder.getProperty("corrlang.version"));
