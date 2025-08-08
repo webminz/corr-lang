@@ -6,11 +6,7 @@ import java.util.Objects;
 
 public class QualifiedName {
 
-
-    /**
-     *
-     */
-    private final Name system; // TODO should be an explicit url name
+    private final Name system;
     private final Name element;
 
     public QualifiedName(Name system, Name element) {
@@ -50,10 +46,10 @@ public class QualifiedName {
     }
 
     public static QualifiedName qname(String systemURI, Name element) {
-        return new QualifiedName(Name.identifier(systemURI), element); // TODO exchange later with a proper URI type
+        return new QualifiedName(Name.identifier(systemURI), element);
     }
 
-    public static QualifiedName qname(Sys system, Name element) {
-        return new QualifiedName(Name.identifier(system.url()), element);
+    public static QualifiedName qname(Endpoint system, Name element) {
+        return new QualifiedName(system.asId(), element);
     }
 }

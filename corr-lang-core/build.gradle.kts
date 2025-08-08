@@ -11,6 +11,7 @@ dependencies {
     api("org.springframework:spring-context:6.1.14")
     implementation("ch.qos.logback:logback-classic:1.5.11")
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-toml:2.18.0")
+    compileOnly("jakarta.servlet:jakarta.servlet-api:6.1.0")
 
     testImplementation(testFixtures(project(":mdegraphlib")))
     testFixturesCompileOnly("org.junit.jupiter:junit-jupiter:5.8.1")

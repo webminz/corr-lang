@@ -1,6 +1,7 @@
 package io.corrlang.domain;
 
 import com.google.common.base.Objects;
+import no.hvl.past.names.Name;
 import no.hvl.past.util.StringUtils;
 
 import java.util.Arrays;
@@ -33,6 +34,17 @@ public class ElemRef implements Iterable<String> {
 
     public static ElemRef eref(String... path) {
         return new ElemRef(path);
+    }
+
+    public Name asPrefixedName() {
+        int i = this.path.length - 1;
+        Name current = Name.identifier(this.path[1]);
+        i--;
+        while (i >= 0) {
+            current.prefixWith(Name.identifier(this.path[i]));
+            i--;
+        }
+        return current;
     }
 
     @Override

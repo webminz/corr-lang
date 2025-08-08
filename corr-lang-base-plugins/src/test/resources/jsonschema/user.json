@@ -1,0 +1,29 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/user.json",
+  "title": "User",
+  "description": "A user of the blogging system.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier for the user.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "username": {
+      "description": "The user's public username.",
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9_]{3,20}$"
+    },
+    "email": {
+      "description": "The user's email address.",
+      "type": "string",
+      "format": "email"
+    }
+  },
+  "required": [
+    "id",
+    "username",
+    "email"
+  ]
+}

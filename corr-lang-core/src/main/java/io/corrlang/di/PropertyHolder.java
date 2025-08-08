@@ -27,6 +27,12 @@ import java.util.Map;
  */
 public class PropertyHolder {
 
+    // TODO: better integration with Spring
+
+
+    public static final String VIRTUAL_CONFIG = "config.virtual"; // bool, if exists no file is read, limited functionality
+    public static final String BOOTSTRAP_CONFIG = "config.bootstrap"; // bool, if file does not exist, default config is created
+    public static final String CONFIG_LOCATION = "config.location"; // path, file path to where to location is stored
 
     // Implicit params
     public static final String BASE_DIR = "dir.work";
@@ -192,13 +198,6 @@ public class PropertyHolder {
 
         return new PropertyHolder(environment, properties);
     }
-
-
-
-
-
-
-
 
 
 }

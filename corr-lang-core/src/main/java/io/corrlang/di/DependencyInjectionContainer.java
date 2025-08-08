@@ -1,5 +1,7 @@
 package io.corrlang.di;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import no.hvl.past.graph.Universe;
 import no.hvl.past.MetaRegistry;
 import no.hvl.past.util.FileSystemAccessPoint;
@@ -23,7 +25,6 @@ import java.security.SecureRandom;
 import java.util.Properties;
 
 public class DependencyInjectionContainer {
-
 
     private final ApplicationContext applicationContext;
 
@@ -60,101 +61,6 @@ public class DependencyInjectionContainer {
     }
 
 
-//    private void setUpHttps() throws KeyManagementException, NoSuchAlgorithmException {
-//        if (getPropertyHolder().isSSLAllowAll()) {
-//                TrustManager[] trustAllCerts = new TrustManager[]{
-//                        new X509TrustManager() {
-//                            @Override
-//                            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-//                                return null;
-//                            }
-//
-//                            @Override
-//                            public void checkClientTrusted(
-//                                    java.security.cert.X509Certificate[] certs, String authType) {
-//                            }
-//
-//                            @Override
-//                            public void checkServerTrusted(
-//                                    java.security.cert.X509Certificate[] certs, String authType) {
-//                            }
-//                        }};
-//                SSLContext context = SSLContext.getInstance("SSL");
-//                context.init(null, trustAllCerts, new SecureRandom());
-//                HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
-//        }
-//    }
-
-    @SuppressWarnings("unchecked raw")
-//    private void setUpLogging() throws IOException {
-//        final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
-//        final Configuration config = ctx.getConfiguration();
-//        PatternLayout layout = PatternLayout.newBuilder().withConfiguration(config).withPattern(getPropertyHolder().getLogLayoutPattern()).build();
-//        SizeBasedTriggeringPolicy policy = SizeBasedTriggeringPolicy.createPolicy(getPropertyHolder().getLogMaxFileSize());
-//        DefaultRolloverStrategy rolloverStrategy = DefaultRolloverStrategy.newBuilder().withConfig(config).withFileIndex(getPropertyHolder().getLogMaxBackupIndex()).build();
-////        RollingFileManager fileManager = RollingFileManager.getFileManager(getPropertyHolder().getLogDir().getAbsolutePath() + "/%d{yyyy-MM-dd}.log",
-////                getPropertyHolder().getLogDir().getAbsolutePath() + "/%d{yyyy-MM-dd}.%i.log",
-////                true,
-////                false,
-////                policy,
-////                rolloverStrategy,
-////                null,
-////                layout,
-////                128,
-////                false,
-////                true,
-////                null,
-////                null,
-////                null,
-////                config);
-////        policy.initialize(fileManager);
-//
-//
-//
-//
-//
-//        RollingFileAppender fileAppender = RollingFileAppender.newBuilder()
-//                .setName("main")
-//                .withPolicy(policy)
-//                .withStrategy(rolloverStrategy)
-//                .withAppend(true)
-//                .withFileName(getPropertyHolder().getLogDir().getAbsolutePath() + "/" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) + ".log")
-//                .withFilePattern(getPropertyHolder().getLogDir().getAbsolutePath() + "/" + LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE) + ".%i.log")
-//                .setLayout(layout)
-//                .build();
-//
-//
-//
-//        fileAppender.start();
-//        config.addAppender(fileAppender);
-//        config.getRootLogger().removeAppender("Console");
-//        config.getRootLogger().addAppender(fileAppender, null, null);
-//
-//        config.getLoggerConfig("org.eclipse.jetty").setLevel(Level.OFF);
-//        config.getLoggerConfig("graphql.execution.ExecutionStrategy").setLevel(Level.OFF);
-//        config.getRootLogger().setLevel(getPropertyHolder().getLogLevel());
-//
-//
-//        ctx.updateLoggers();
-//        // TODO FIXME the following must be moved somewhere else...
-//       // Configurator.setLevel(LogManager.getLogger("io.javalin.Javalin").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.http.HttpParser").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("notprivacysafe.graphql.GraphQL").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("graphql.GraphQL").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("notprivacysafe.graphql.execution.Execution").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("graphql.execution.ExecutionStrategy").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.HttpOutput").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.HttpConnection").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.HttpInput").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.HttpChannelState").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.ChannelEndPoint").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.session").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.WriteFlusher").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.corrlang.components.server.Request").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.io.AbstractConnection").getName(), Level.OFF);
-//        Configurator.setLevel(LogManager.getLogger("org.eclipse.jetty.http.HttpCookie").getName(), Level.OFF);
-//    }
-
 
     public static DependencyInjectionContainer create() throws Exception {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(DIConfiguration.class);
@@ -165,4 +71,9 @@ public class DependencyInjectionContainer {
     public FileSystemAccessPoint getFSAccessPoint() {
         return getBean(FileSystemAccessPoint.class);
     }
+
+    public ObjectMapper getObjectMapper() {
+        return applicationContext.getBean(ObjectMapper.class);
+    }
+
 }

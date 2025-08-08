@@ -30,7 +30,7 @@ public interface Commonalities {
 
     Stream<Commonality> commonalitiesFor(Name system, Name element);
 
-    class CommonalitiesHashMapImpl implements  Commonalities {
+    class CommonalitiesHashMapImpl implements Commonalities {
 
         private final Map<Name, Commonality> db = new HashMap<>();
         private final ComprSys comprSys;

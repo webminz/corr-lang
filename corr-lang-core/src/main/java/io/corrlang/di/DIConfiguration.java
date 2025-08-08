@@ -1,6 +1,10 @@
 package io.corrlang.di;
 
 import ch.qos.logback.core.joran.spi.JoranException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import io.corrlang.domain.schemas.SchemaBuilder;
+import io.corrlang.techspaces.TechSpaceRegistry;
 import no.hvl.past.MetaRegistry;
 import no.hvl.past.graph.Universe;
 import no.hvl.past.graph.UniverseImpl;
@@ -43,6 +47,22 @@ public class DIConfiguration {
     public PropertyHolder propertyHolder(@Autowired Environment environment) throws IOException, JoranException {
         return PropertyHolder.bootstrap("corrlang", environment);
     }
+
+    @Bean
+    @Scope("singleton")
+    public TechSpaceRegistry techSpaceRegistry() {
+        return TechSpaceRegistry.newRegistry();
+    }
+
+    @Bean
+    @Primary
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        return mapper;
+    }
+
+
 
     @Bean
     @Lazy

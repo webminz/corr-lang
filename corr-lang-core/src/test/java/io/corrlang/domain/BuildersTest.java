@@ -1,8 +1,10 @@
 package io.corrlang.domain;
 
 import com.google.common.collect.Sets;
-import io.corrlang.domain.builders.SystemInterfaceDescriptionBuilder;
+import io.corrlang.domain.schemas.Schema;
+import io.corrlang.domain.schemas.SchemaBuilder;
 import io.corrlang.domain.diagrams.*;
+import io.corrlang.domain.schemas.SpecialNames;
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.graph.elements.Tuple;
@@ -12,7 +14,6 @@ import no.hvl.past.names.Name;
 import no.hvl.past.util.Multiplicity;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,13 +32,13 @@ public class BuildersTest extends TestWithGraphLib {
 
     @Test
     public void testSystemInterfaceDescriptionBuilding() {
-        SystemInterfaceDescriptionBuilder builder = new SystemInterfaceDescriptionBuilder(Name.identifier("SysA"), getUniverse());
-        IntfcDesc desc = builder.stringValueType("str")
+        SchemaBuilder builder = new SchemaBuilder(Name.identifier("SysA"), getUniverse());
+        Schema desc = builder.stringValueType("str")
                 .intValueType("int")
                 .enumValueType("ResourceStatus", TestEnum.class)
                 .build();
 
-        Sketch sketch = desc.getFormalRepresentation();
+        Sketch sketch = desc.sketch();
 
         assertGraphsEqual(sketch.carrier(),
                 Triple.node(id("str")),
@@ -61,8 +62,8 @@ public class BuildersTest extends TestWithGraphLib {
 
     @Test
     public void testBuildSymmetricAssociation() {
-        SystemInterfaceDescriptionBuilder builder = new SystemInterfaceDescriptionBuilder(Name.identifier("SysA"), getUniverse());
-        IntfcDesc desc = builder
+        SchemaBuilder builder = new SchemaBuilder(Name.identifier("SysA"), getUniverse());
+        Schema desc = builder
                 .objectType("A")
                 .buildField("x", "B")
                 .multiplicity(Multiplicity.of(1, 2))
@@ -74,7 +75,7 @@ public class BuildersTest extends TestWithGraphLib {
                 .endObjectType()
                 .build();
 
-        Sketch sketch = desc.getFormalRepresentation();
+        Sketch sketch = desc.sketch();
         assertGraphsEqual(sketch.carrier(),
                 Triple.node(id("A")),
                 Triple.node(id("B")),
@@ -127,8 +128,8 @@ public class BuildersTest extends TestWithGraphLib {
 
     @Test
     public void testBuildWithInheritanceAndContainment() {
-        SystemInterfaceDescriptionBuilder builder = new SystemInterfaceDescriptionBuilder(Name.identifier("Sys"), getUniverse());
-        IntfcDesc build = builder.objectType("Person")
+        SchemaBuilder builder = new SchemaBuilder(Name.identifier("Sys"), getUniverse());
+        Schema build = builder.objectType("Person")
                 .makeAbstract()
                 .endObjectType()
                 .objectType("NaturalPerson")
@@ -144,7 +145,7 @@ public class BuildersTest extends TestWithGraphLib {
                 .endObjectType()
                 .build();
 
-        Sketch form = build.getFormalRepresentation();
+        Sketch form = build.sketch();
 
         assertTrue(form.carrier() instanceof InheritanceAugmentedGraph);
         InheritanceAugmentedGraph ig = (InheritanceAugmentedGraph) form.carrier();
@@ -184,36 +185,32 @@ public class BuildersTest extends TestWithGraphLib {
 
     @Test
     public void testBuildMessagesInGroups() {
-        SystemInterfaceDescriptionBuilder builder = new SystemInterfaceDescriptionBuilder(Name.identifier("Sys"), getUniverse());
-        IntfcDesc desc = builder.customValueType("DateTime", DataTypePredicate.getInstance())
+        SchemaBuilder builder = new SchemaBuilder(Name.identifier("Sys"), getUniverse());
+        Schema desc = builder
+                .customValueType("DateTime", DataTypePredicate.getInstance())
                 .stringValueType("String")
                 .objectType("Employee")
                 .endObjectType()
                 .objectType("Contract")
                 .endObjectType()
+                // actions
                 .actionGroup("company")
-                .startChildGroup("people", true)
-                .action("GET")
-                .buildInputArg("employedSince", "DateTime")
-                .multiplicity(Multiplicity.of(false))
-                .endArgument()
-                .outputArg("RESULT", "Employee")
-                .endActionAndBackToGroup()
+                    .startChildGroup("people", true)
+                        .action("GET")
+                            .buildInputArg("employedSince", "DateTime").multiplicity(Multiplicity.of(false)).endArgument()
+                            .buildReturnArg("Employee").endArgument()
+                        .endActionAndBackToGroup()
                 .action("POST")
-                .buildInputArg("email", "String")
-                .multiplicity(Multiplicity.of(true, false))
-                .endArgument()
-                .buildInputArg("dateOfEmployment", "DateTime")
-                .multiplicity(Multiplicity.of(true, false))
-                .endArgument()
+                    .buildInputArg("email", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("dateOfEmployment", "DateTime").multiplicity(Multiplicity.of(true, false)).endArgument()
                 .endActionAndBackToGroup()
                 .endCurrentGroup()
                 .startChildGroup("contracts", true)
-                .action("GET")
-                .outputArg("RESULT", "Contract")
-                .end()
+                    .action("GET")
+                        .buildReturnArg("Contract").endArgument()
+                    .end()
                 .build();
-        Sketch sketch = desc.getFormalRepresentation();
+        Sketch sketch = desc.sketch();
         Graph graph = sketch.carrier();
 
         Set<Name> expectedNames = Sets.newHashSet(
@@ -257,7 +254,7 @@ public class BuildersTest extends TestWithGraphLib {
         assertEquals(1, sketch.diagramsOn(
                         Triple.edge(
                                 Name.identifier("GET").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company"))),
-                                Name.identifier("RESULT").index(1).prefixWith(Name.identifier("GET").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company")))),
+                                SpecialNames.RESULT_SUCCESS.prefixWith(Name.identifier("GET").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company")))),
                                 Name.identifier("Employee")))
                 .filter(d -> d.label() instanceof ActionOutputMarker)
                 .count());

@@ -1,6 +1,6 @@
 package io.corrlang.domain.keys;
 
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
@@ -17,7 +17,7 @@ import java.util.Optional;
  */
 public class ConstantKey implements Key {
 
-    private Sys originalSystem;
+    private Endpoint originalSystem;
     private Name sourceElement;
     private final Name value;
     private final Name definedOn;
@@ -40,7 +40,7 @@ public class ConstantKey implements Key {
         return sourceElement;
     }
 
-    public void setOriginalSystem(Sys originalSystem) {
+    public void setOriginalSystem(Endpoint originalSystem) {
         this.originalSystem = originalSystem;
     }
 
@@ -49,7 +49,7 @@ public class ConstantKey implements Key {
     }
 
     @Override
-    public Sys sourceSystem() {
+    public Endpoint sourceSystem() {
         return originalSystem;
     }
 

@@ -1,7 +1,9 @@
 package no.hvl.past;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.corrlang.di.DependencyInjectionContainer;
 import io.corrlang.di.PropertyHolder;
+import no.hvl.past.graph.TestWithGraphLib;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
@@ -11,7 +13,7 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public abstract class TestWithDIContainer extends TestBase {
+public abstract class TestWithDIContainer extends TestWithGraphLib {
 
     protected File baseDir;
 
@@ -58,7 +60,10 @@ public abstract class TestWithDIContainer extends TestBase {
 
     public DependencyInjectionContainer getDiContainer() {
         return diContainer;
+    }
 
+    protected ObjectMapper om() {
+        return diContainer.getObjectMapper();
     }
 }
 

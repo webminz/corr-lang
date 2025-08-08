@@ -1,5 +1,6 @@
 package io.corrlang.domain;
 
+import io.corrlang.domain.data.ComprData;
 import no.hvl.past.names.Name;
 
 import java.util.List;

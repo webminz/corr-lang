@@ -17,7 +17,6 @@ public abstract class Marker implements GraphTheory {
         return representation;
     }
 
-
     @Override
     public final boolean isSatisfied(Model<Graph> model) {
         return true;

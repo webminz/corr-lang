@@ -1,6 +1,6 @@
 package io.corrlang.domain.keys;
 
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import no.hvl.past.attributes.BoolValue;
 import no.hvl.past.attributes.FloatValue;
 import no.hvl.past.attributes.IntegerValue;
@@ -17,12 +17,12 @@ import java.util.stream.Collectors;
 
 public class ConcatenatedKey implements Key {
 
-    private final Sys originalSystem;
+    private final Endpoint originalSystem;
     private final Name sourceType;
     private final Name targetType;
     private final List<Key> childKeys;
 
-    public ConcatenatedKey(Name targetType, Name sourceType, Sys originalSystem, List<Key> childKeys) {
+    public ConcatenatedKey(Name targetType, Name sourceType, Endpoint originalSystem, List<Key> childKeys) {
         this.childKeys = childKeys;
         this.targetType = targetType;
         this.originalSystem = originalSystem;
@@ -41,7 +41,7 @@ public class ConcatenatedKey implements Key {
     }
 
     @Override
-    public Sys sourceSystem() {
+    public Endpoint sourceSystem() {
         return originalSystem;
     }
 

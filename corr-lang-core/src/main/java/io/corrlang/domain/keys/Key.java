@@ -1,10 +1,8 @@
 package io.corrlang.domain.keys;
 
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import no.hvl.past.graph.GraphMorphism;
 import no.hvl.past.graph.elements.Triple;
-import no.hvl.past.graph.trees.Node;
-import no.hvl.past.graph.trees.Tree;
 import no.hvl.past.names.Name;
 
 import java.util.List;
@@ -30,7 +28,7 @@ public interface Key {
     /**
      * The system which hosts the original type.
      */
-    Sys sourceSystem();
+    Endpoint sourceSystem();
 
     /**
      * The type of the (local) elements that are required to evaluate the key.

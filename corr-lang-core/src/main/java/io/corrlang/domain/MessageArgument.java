@@ -6,6 +6,7 @@ import no.hvl.past.names.Name;
 
 
 public class MessageArgument {
+    // TODO: can probably be removed
 
     private final MessageType owner;
     private final Triple type;

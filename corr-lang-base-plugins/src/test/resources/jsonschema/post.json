@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://example.com/schemas/post.json",
+  "title": "Blog Post",
+  "description": "A schema representing a blog post, including its author and tags.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier for the post.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "title": {
+      "description": "The title of the blog post.",
+      "type": "string",
+      "minLength": 1
+    },
+    "content": {
+      "description": "The main body of the blog post, can contain HTML or Markdown.",
+      "type": "string"
+    },
+    "authorId": {
+      "description": "The ID of the user who wrote the post. This links to a User entity.",
+      "type": "integer"
+    },
+    "publishedAt": {
+      "description": "The date and time the post was published, in ISO 8601 format.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "tags": {
+      "description": "A list of tags associated with the post.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/tag"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "content",
+    "authorId",
+    "publishedAt"
+  ],
+  "definitions": {
+    "tag": {
+      "title": "Tag",
+      "description": "A keyword or category for a blog post.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string",
+          "pattern": "^[a-z0-9-]+$"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
+    }
+  }
+}

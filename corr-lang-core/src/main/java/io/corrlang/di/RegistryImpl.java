@@ -6,8 +6,8 @@ import no.hvl.past.graph.GraphOperation;
 import no.hvl.past.graph.GraphPredicate;
 import no.hvl.past.ExtensionPoint;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

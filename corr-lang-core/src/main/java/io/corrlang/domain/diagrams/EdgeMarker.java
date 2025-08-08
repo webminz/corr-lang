@@ -5,7 +5,6 @@ import no.hvl.past.graph.Universe;
 
 public abstract class EdgeMarker extends Marker {
 
-
     public EdgeMarker(String tag) {
         super(tag);
     }
