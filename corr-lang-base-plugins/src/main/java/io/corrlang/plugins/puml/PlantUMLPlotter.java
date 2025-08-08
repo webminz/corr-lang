@@ -55,13 +55,15 @@ public class PlantUMLPlotter {
         ProcessBuilder command = new ProcessBuilder().command(pumlExecutable.split(" "));
         try {
             Process p = command.start();
-            int exitValue = p.exitValue();
+            int exitValue = p.waitFor();
             if (exitValue != 0) {
                 String text = new String(p.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
                 logger.error(text);
             }
         } catch (IOException e) {
             throw CorrLangException.io(e);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 
