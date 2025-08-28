@@ -1,154 +1,120 @@
 grammar Corrlang;
 
-corrfile: WHITESPACE? (fileImport)* (endpointDefinition | corrspec | consistencyRule | goal)+ EOF;
+file : definition*;
 
-fileImport: 'import' WHITESPACE importURL WHITESPACE? ';' WHITESPACE?;
-importURL: URL_STRING;
+definition: endpoint | correspondence | view;
 
-endpointDefinition: 'endpoint' WHITESPACE  endpointName WHITESPACE '{' WHITESPACE
-                    'type' WHITESPACE endpointType WHITESPACE
-                    'at' WHITESPACE endpointURL WHITESPACE
-                    'technology' WHITESPACE endpointPlaftorm WHITESPACE
-                    ('schema' WHITESPACE schemaURL WHITESPACE)?
-                    '}' WHITESPACE?;
+endpoint: 'endpoint' endpointName ':' endpointType '{' endpointSpec* '}' ;
 
-endpointName : IDENTIFIER;
-endpointType: 'FILE' | 'SERVER';
-endpointPlaftorm: TECH_IDENTIFIER | IDENTIFIER;
-endpointURL: QUALIFIED_ID | URL_STRING;
-schemaURL: QUALIFIED_ID | URL_STRING;
+correspondence : 'correspondence' correspondenceName '(' memberRef (',' memberRef)+ ')' '{' correspondenceSpec* '}';
 
-corrspec: 'correspondence' WHITESPACE corrSpecName WHITESPACE
-            ('instantiates' WHITESPACE corrSpecType WHITESPACE)?
-            '(' WHITESPACE? corrSpecEndpointRef WHITESPACE? (',' WHITESPACE? corrSpecEndpointRef WHITESPACE?)+ ')' WHITESPACE
-            '{' (WHITESPACE commonality)* WHITESPACE? '}' WHITESPACE?;
+view : 'view' viewName '(' correspondenceRef ')' ':' endpointType '{' endpointSpec* '}' ;
 
-corrSpecEndpointRef: IDENTIFIER;
-corrSpecName: IDENTIFIER;
-corrSpecType: IDENTIFIER;
+viewName: IDENTIFIER;
 
-commonality: commonalityType WHITESPACE?
-            '(' WHITESPACE? elmentRefDef WHITESPACE? (',' WHITESPACE? elmentRefDef WHITESPACE?)+ ')'
-            (WHITESPACE 'as' WHITESPACE commonalityName constraints?)?
-            (subCummonalities)?
-            (WHITESPACE 'when' WHITESPACE '(' WHITESPACE? keyExpression WHITESPACE? ')' )?
-            (WHITESPACE 'check' WHITESPACE (anonymousConssistencyRule || consistencyRuleRef))?
-            ';';
+correspondenceRef: IDENTIFIER;
 
-elmentRefDef: elmentRef (WHITESPACE 'as' WHITESPACE elmentRefAlias)?;
+correspondenceSpec : property | correspondenceDirective;
 
-elmentRefAlias: IDENTIFIER;
+correspondenceDirective : ('identify' | 'id') '(' elementRef (',' elementRef)+ ')' aliasDef? subSpec? matchRule? ';'? # idDirective
+                        | ('relate' | 'rel') '(' elementRef (',' elementRef)+ ')' relName? subSpec? matchRule? ';'? # relateDirective
+                        | ('synchronize' | 'sync')  '(' elementRef (syncDirection elementRef)+ ')' relName? subSpec? matchRule? ';'? #syncDirective;
 
 
-constraints: (WHITESPACE constraint)+;
+syncDirection : ',' #symmetricSync
+              | '~>' # asymmetricSync;
 
-constraint: '[' constraintName ']';
-constraintName: URL_STRING;
+relName: 'via' elementRef;
 
+matchRule : 'when' '[' matchDisjunction ']';
 
-commonalityType: 'relate' | 'sync' | 'identify';
-commonalityName: QUALIFIED_ID | IDENTIFIER;
-consistencyRuleRef: IDENTIFIER;
-subCummonalities: WHITESPACE 'with' WHITESPACE '{' (WHITESPACE commonality)+ WHITESPACE? '}';
+matchDisjunction : matchConjunction ('or' matchConjunction)*;
 
-consistencyRule: 'rule' WHITESPACE ruleName WHITESPACE consistencyRuleBody WHITESPACE?;
-ruleName: IDENTIFIER;
-anonymousConssistencyRule: consistencyRuleBody;
-consistencyRuleBody: '{' WHITESPACE 'using' WHITESPACE ruleLanguage WHITESPACE ruleBodyContent WHITESPACE '}';
-ruleLanguage: TECH_IDENTIFIER | IDENTIFIER;
-ruleBodyContent: EXTERNAL_CODE;
+matchConjunction : matchExpression ('and' matchExpression)*;
 
-keyExpression: keyAlternative ('||' WHITESPACE keyAlternative)*;
-keyAlternative: keyLiteral ('&&' WHITESPACE keyLiteral)*;
-keyLiteral: keyIdentity | keyRelation;
-keyIdentity: keyIdArgument '==' WHITESPACE keyIdArgument ('==' WHITESPACE keyIdArgument)*;
-keyIdArgument: keyIdArgumentContent  ('++' WHITESPACE keyIdArgumentContent)*;
-keyIdArgumentContent: (elmentRef | constant) WHITESPACE;
-keyRelation:  elmentRef WHITESPACE keyRelDirection  WHITESPACE (elmentRef | keyRelation);
-keyRelDirection: '<~>' | '~~>' | '<~~';
+matchExpression : elementRef* '~~' elementRef # matchedElements
+                | elementRef* '==' elementExpression # equalElements;
 
+elementExpression : elementExpression '+' elementExpression # sumExpression
+                  | elementExpression '*' elementExpression # productExpression
+                  | elementExpression '-' elementExpression # differenceExpression
+                  | functionName '(' elementExpression ')' # functionCallExpression
+                  | value # literalExpression
+                  | elementRef # elemRefExpression;
 
-goal: 'goal' WHITESPACE goalName WHITESPACE '{' WHITESPACE
-        'correspondence' WHITESPACE goalCorrespondence WHITESPACE
-       'action' WHITESPACE goalActionType WHITESPACE
-        ('technology' WHITESPACE goalTechSpace WHITESPACE)?
-        'target' WHITESPACE goalTargetType WHITESPACE
-        ('query' WHITESPACE goalQuery WHITESPACE)?
-        '}' WHITESPACE?;
+functionName : IDENTIFIER;
 
-goalCorrespondence: IDENTIFIER;
+subSpec: 'with' '{' correspondenceSpec* '}';
 
-goalQuery: URL_STRING;
-goalName: IDENTIFIER;
-goalTechSpace: TECH_IDENTIFIER | IDENTIFIER;
-goalActionType: 'SCHEMA' | 'FEDERATION' | 'TRANSFORMATION' | 'MATCH' | 'VERIFY' | 'RESTORE';
-goalTargetType: serverTarget | codegenTarget | fileTarget | batchTarget;
+aliasDef: 'as' elementRef;
 
-batchTarget: 'LIB';
+elementRef : path ('.' path)*;
 
-fileTarget: 'FILE' WHITESPACE '{' WHITESPACE 'at' WHITESPACE fileCreationTarget WHITESPACE ('overwrite' WHITESPACE fileCreationOverwrite WHITESPACE)? '}';
+path : IDENTIFIER #idPath
+     | STRING #stringPath
+     | URL #urlPath
+     | '*' #wildcardPath;
 
-fileCreationOverwrite: BOOL;
-fileCreationTarget: URL_STRING | QUALIFIED_ID;
+memberRef: IDENTIFIER;
 
-codegenTarget: 'CODEGEN' WHITESPACE '{' WHITESPACE
-        'outputDir' WHITESPACE codegenTargetLocation WHITESPACE 
-        'artefactId' WHITESPACE codegenArtefact WHITESPACE
-        'groupId' WHITESPACE codegenGroup WHITESPACE
-        ('version' WHITESPACE codegenVersion WHITESPACE)?
-        '}';
+correspondenceName: IDENTIFIER;
 
-codegenVersion: URL_STRING;
-codegenGroup: URL_STRING;
-codegenArtefact: URL_STRING;
-codegenTargetLocation: URL_STRING;
+endpointSpec: property | endpointDirective;
 
-serverTarget: 'SERVER' WHITESPACE '{' WHITESPACE 'contextPath' WHITESPACE serverTargetContextPath WHITESPACE 'port' WHITESPACE serverTargetPort WHITESPACE '}';
-
-serverTargetPort: INTEGER;
-serverTargetContextPath: URL_STRING;
+endpointDirective : 'file' '(' fileLocation ')' ';'?  # fileLocationDirective
+                  | 'url' '(' urlTarget ')' ';'?  # urlDirective
+                  | 'tech' '(' techSpaceName ')' ';'?  # techSpaceDirective
+                  | 'schema' '(' schemaSpec ')' ';'?  # schemaDirective
+                  | 'hide' '(' elementRef ')' ';'? #hideDirective;
 
 
-constant: stringConstant | boolConstant;
+techSpaceName: IDENTIFIER;
 
-stringConstant: '"' (WHITESPACE | IDENTIFIER) '"';
-intConstant: INTEGER;
-floatConstant: FLOAT;
-boolConstant: 'true' | 'false';
+schemaSpec : schemaLocation (',' schemaTech)?;
 
-elmentRef: QUALIFIED_ID;
+schemaLocation: 'file' '(' fileLocation ')' | 'url' '(' urlTarget ')' ;
 
+schemaTech: techSpaceName;
 
-fragment SPACE: ' ';
-fragment TAB: '\t';
-fragment LINE_TABULATION: '\u000B';
-fragment NEWLINE: '\n';
-fragment CARRIAGE_RETURN: '\r';
-fragment WHITESPACE_CHAR: SPACE | TAB | LINE_TABULATION | NEWLINE | CARRIAGE_RETURN;
-WHITESPACE: WHITESPACE_CHAR+;
+urlTarget: URL;
 
+fileLocation: STRING;
 
-fragment UNDERSCORE: '_';
-fragment DIGIT: '0' .. '9';
-fragment CAPITAL_LETTER: 'A' .. 'Z';
-fragment LETTER: 'a' .. 'z' | 'A' .. 'Z';
-fragment CAPITAL_LETTER_OR_UNDERSCORE: CAPITAL_LETTER | UNDERSCORE;
-fragment LETTER_OR_UNDERSCORE: LETTER | '_';
-fragment LETTER_OR_DIGIT: LETTER | DIGIT;
+property: propertyName ':' value ';';
 
-INTEGER: '-' DIGIT+ | DIGIT+;
-FLOAT: INTEGER ('.' DIGIT+);
+value: STRING # stringValue
+     | INTEGER #integerValue
+     | DECIMAL #decimalValue
+     | BOOLEAN  # boolValue
+     | listValueDefinition # listValue
+     | objectValueDefinition # objValue;
 
+objectValueDefinition: '{' objKVPair (',' objKVPair )* '}';
 
-IDENTIFIER: LETTER_OR_UNDERSCORE LETTER_OR_DIGIT*;
-QUALIFIED_ID: LETTER_OR_UNDERSCORE (LETTER_OR_DIGIT | '.')*;
-TECH_IDENTIFIER: CAPITAL_LETTER+ | (CAPITAL_LETTER_OR_UNDERSCORE)+;
-URL_STRING: ('a'..'z'|'A'..'Z'|'0'..'9'|'/'|':'|'-'|'#'|'?'|'.')+  ;
+objKVPair: STRING ':' value;
 
-fragment GEEK_CHAR: '(' | ')' | '[' | ']' | '{' | '}' | '.' | ';' | ':' | '+' | '-' | '/' | '*' | '=' | '?' | '\\' | '\''  | '"' | '<' | '>' | '|';
+listValueDefinition : '[' value (',' value)* ']';
+
+propertyName: IDENTIFIER | STRING;
+
+endpointType: 'DATABASE' | 'SERVER' | 'SOURCE' | 'SINK';
+endpointName: IDENTIFIER;
 
 
 
 
-EXTERNAL_CODE_DELIMITTER : '\'\'\'';
-EXTERNAL_CODE : EXTERNAL_CODE_DELIMITTER (DIGIT | LETTER | GEEK_CHAR | WHITESPACE_CHAR)* EXTERNAL_CODE_DELIMITTER;
+
+fragment DIGIT : '0' .. '9';
+fragment LETTER : [a-zA-Z];
+fragment IDENTIFIER_CHAR : LETTER | '-' | '_';
+fragment WHITESPACE_CHAR: ' ' | '\t' | '\n' | '\r';
+fragment TRUE_LITERAL : 'true';
+fragment FALSE_LITERAL : 'false';
+fragment URL_SCHEME : [^:/?#>]+ ':';
+BOOLEAN : TRUE_LITERAL | FALSE_LITERAL;
+IDENTIFIER : LETTER IDENTIFIER_CHAR*;
+INTEGER : '-'? DIGIT+;
+DECIMAL : INTEGER '.' DIGIT+;
+STRING: '"' .*? '"';
+URL: '<' .*? '>'; //('//' [^/?#]*? )? [^?#]*? ('?'[^#]*)? ('#'.*?)? '>';
+WHITESPACE : WHITESPACE_CHAR+ -> skip;

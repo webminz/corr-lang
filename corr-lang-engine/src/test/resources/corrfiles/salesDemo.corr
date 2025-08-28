@@ -1,0 +1,48 @@
+endpoint Sales : SERVER {
+     tech(GRAPH_QL)
+     url(<http://localhost:4011>)
+ }
+ endpoint Invoices : SERVER {
+     tech(GRAPH_QL)
+     url(<http://localhost:4012>)
+ }
+ endpoint HR : SERVER {
+     tech(GRAPH_QL)
+     url(<http://localhost:4012>)
+ }
+
+ correspondence Alignment (Sales, Invoices, HR) {
+
+     identify (Sales.Query,Invoices.Query.clients,HR.Query) as Query;
+     identify (Sales.Query.customers,Invoices.Query.clients,HR.Query.employees) as Query.partners;
+
+     identify (Sales.Customer,Invoices.Client,HR.Employee) as Partner
+          with {
+              identify (Sales.Customer."id",Invoices.Client."id",HR.Employee."id") as "id";
+              identify (Sales.Customer.name,Invoices.Client.name) as name;
+              identify (Sales.Customer.email,HR.Employee.email) as email;
+              identify (Sales.Customer.address,Invoices.Client.address) as address;
+          } when [
+             Sales.Customer."id" == Invoices.Client."id"
+               or
+             Sales.Customer.name == HR.Employee.firstname + " " + HR.Employee.lastname
+           ];
+
+     id (Sales.Address,Invoices.Address) as Address
+             with {
+                 identify (Sales.Address.street,Invoices.Address.street) as street;
+                 identify (Sales.Address.city,Invoices.Address.city) as city;
+                 identify (Sales.Address.postalCode,Invoices.Address.postalCode) as postalCode;
+                 identify (Sales.Address.country,Invoices.Address.country) as country;
+                 identify (Sales.Address.state,Invoices.Address.state) as state;
+             };
+
+
+ }
+
+ view Global(Alignment) : SERVER {
+     delimiterChar : "_";
+     tech(GRAPH_QL)
+     schema(file("globalSchema/"), PUML)
+     url(<http://0.0.0.0:9090/>))
+ }
