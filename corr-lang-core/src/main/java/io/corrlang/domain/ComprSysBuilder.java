@@ -2,6 +2,7 @@ package io.corrlang.domain;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import io.corrlang.domain.keys.ConsistencyRule;
 import io.corrlang.domain.keys.Key;
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.elements.Triple;

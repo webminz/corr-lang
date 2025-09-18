@@ -4,9 +4,6 @@
 [submodule "mdegraphlib-gql"]
 	path = corr-lang-gql
 	url = https://github.com/webminz/corr-lang-gql
-[submodule "mdegraphlib-emf"]
-	path = corr-lang-emf
-	url = https://github.com/webminz/corr-lang-emf
 [submodule "corr-lang-integrationtest"]
 	path = corr-lang-integrationtest
 	url = https://github.com/webminz/corr-lang-integrationtest.git

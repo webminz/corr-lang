@@ -7,13 +7,13 @@ import io.corrlang.di.PropertyHolder;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
 import no.hvl.past.UnsupportedFeatureException;
-import io.corrlang.domain.ComprData;
+import io.corrlang.domain.data.ComprData;
 import io.corrlang.domain.ConsistencyRule;
-import io.corrlang.domain.Data;
-import io.corrlang.domain.Sys;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
-import io.corrlang.plugins.techspace.TechSpaceException;
+import io.corrlang.domain.data.Data;
+import io.corrlang.domain.Endpoint;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpaceException;
 import no.hvl.past.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -120,7 +120,7 @@ public class FileGoal extends LanguageGoal {
                 TechSpaceAdapter<? extends TechSpace> techSpaceAdapter = correspondence.getEndpointRefs().get(ep).getAdaptor().get();
                 File file = new File(new URI(correspondence.getEndpointRefs().get(ep).getLocationURL().getUrl()));
                 FileInputStream fis = new FileInputStream(file);
-                Sys system = correspondence.getEndpointRefs().get(ep).getSystem().get();
+                Endpoint system = correspondence.getEndpointRefs().get(ep).getSystem().get();
                 Data d = techSpaceAdapter.readInstance(system, fis);
                 fis.close();
                 cdata.addDataSource(d);

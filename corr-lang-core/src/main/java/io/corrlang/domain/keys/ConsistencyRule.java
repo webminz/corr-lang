@@ -1,4 +1,4 @@
-package io.corrlang.domain;
+package io.corrlang.domain.keys;
 
 import io.corrlang.domain.data.ComprData;
 import no.hvl.past.names.Name;

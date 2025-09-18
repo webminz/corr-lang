@@ -6,8 +6,8 @@ import io.corrlang.engine.domainmodel.LanguageException;
 import io.corrlang.engine.execution.AbstractExecutor;
 import io.corrlang.engine.reporting.ReportErrorType;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;

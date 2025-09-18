@@ -1,6 +1,7 @@
 package io.corrlang.domain;
 
 import io.corrlang.domain.data.ComprData;
+import io.corrlang.domain.keys.ConsistencyRule;
 import no.hvl.past.names.Name;
 
 import java.util.List;

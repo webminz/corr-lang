@@ -1,4 +1,4 @@
-package io.corrlang.domain;
+package io.corrlang.domain.schemas;
 
 import no.hvl.past.graph.Graph;
 import no.hvl.past.graph.GraphMorphism;

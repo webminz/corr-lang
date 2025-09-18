@@ -61,7 +61,6 @@ public class DependencyInjectionContainer {
     }
 
 
-
     public static DependencyInjectionContainer create() throws Exception {
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(DIConfiguration.class);
         return new DependencyInjectionContainer(applicationContext);

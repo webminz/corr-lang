@@ -7,9 +7,9 @@ import io.corrlang.engine.domainmodel.CorrSpec;
 import io.corrlang.engine.domainmodel.Goal;
 import io.corrlang.engine.execution.traverser.CreateFormalAlignmentTraverser;
 import no.hvl.past.UnsupportedFeatureException;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
-import io.corrlang.plugins.techspace.TechSpaceException;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpaceException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

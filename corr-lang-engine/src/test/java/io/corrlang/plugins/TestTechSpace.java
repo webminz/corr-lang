@@ -1,6 +1,6 @@
 package io.corrlang.plugins;
 
-import io.corrlang.plugins.techspace.TechSpace;
+import io.corrlang.techspaces.TechSpace;
 
 public class TestTechSpace implements TechSpace {
 

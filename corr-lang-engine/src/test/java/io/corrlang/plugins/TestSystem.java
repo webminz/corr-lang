@@ -5,12 +5,12 @@ import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
 import no.hvl.past.names.PrintingStrategy;
 import io.corrlang.domain.MessageType;
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class TestSystem implements Sys  {
+public class TestSystem implements Endpoint {
 
     private final String url;
     private final Sketch schema;
@@ -36,7 +36,7 @@ public class TestSystem implements Sys  {
     }
 
     @Override
-    public String url() {
+    public String name() {
         return url;
     }
 

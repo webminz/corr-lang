@@ -1,12 +1,11 @@
 package io.corrlang.engine.execution.traverser;
 
 import com.google.common.collect.Sets;
-import io.corrlang.engine.domainmodel.Endpoint;
 import io.corrlang.engine.execution.AbstractExecutor;
 import no.hvl.past.names.Name;
-import io.corrlang.domain.Sys;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
+import io.corrlang.domain.Endpoint;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
 
 import java.util.Set;
 
@@ -17,9 +16,9 @@ public class ParseEndpointSchemaTraverser extends AbstractTraverser {
     }
 
     @Override
-    public void handleEndpoint(Endpoint endpoint) throws Throwable {
+    public void handleEndpoint(io.corrlang.engine.domainmodel.Endpoint endpoint) throws Throwable {
         TechSpaceAdapter<? extends TechSpace> techSpaceAdapter = endpoint.getAdaptor().get();
-        Sys result = techSpaceAdapter.parseSchema(
+        Endpoint result = techSpaceAdapter.parseSchema(
                 Name.identifier(endpoint.getName()),
                 endpoint.getSchemaURL().isPresent() ? endpoint.getSchemaURL().get().getUrl() : endpoint.getLocationURL().getUrl());
         endpoint.setSystem(result);

@@ -7,8 +7,8 @@ import io.corrlang.engine.execution.AbstractExecutor;
 import io.corrlang.engine.parser.SyntacticalResult;
 import io.corrlang.engine.reporting.ReportErrorType;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.*;
@@ -60,9 +60,8 @@ public class IdentifyTechSpaceTraverser extends AbstractTraverser {
     public void postBlock(SyntacticalResult domainModel, String... args) throws Throwable {
         for (TechSpace ts : discoveredTechSpaces) {
             Optional<TechSpaceAdapterFactory> extension = metaRegistry.getExtension(ts.ID(), TechSpaceAdapterFactory.class);
-            if (extension.isPresent()) {
-                extension.get().doSetUp();
-            }
+
+            // TODO: check that is presents
         }
     }
 }

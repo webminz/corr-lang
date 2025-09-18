@@ -1,7 +1,6 @@
 package io.corrlang.engine.execution.traverser;
 
 import com.google.common.collect.*;
-import io.corrlang.engine.domainmodel.Endpoint;
 import io.corrlang.engine.domainmodel.Identification;
 import io.corrlang.engine.execution.AbstractExecutor;
 import io.corrlang.engine.execution.SemanticException;
@@ -13,9 +12,9 @@ import no.hvl.past.graph.elements.Triple;
 import no.hvl.past.names.Name;
 import io.corrlang.domain.ComprSys;
 import io.corrlang.domain.MessageType;
-import io.corrlang.domain.Sys;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceDirective;
+import io.corrlang.domain.Endpoint;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceDirective;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,7 +59,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
 
 
     @Override
-    public void handleEndpoint(Endpoint endpoint) throws Throwable {
+    public void handleEndpoint(io.corrlang.engine.domainmodel.Endpoint endpoint) throws Throwable {
         TechSpace techSpace = endpoint.getTechSpace().get();
         involvedTechSpaces.put(techSpace, endpoint.getName());
         if (!directives.containsKey(techSpace)) {
@@ -74,7 +73,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
         super.handle(identification);
         // TODO check if the identification already has defined identifications on the result types
         ElementRef elementRef = identification.getRelates().get(0);
-        Sys s = elementRef.getEndpoint().getSystem().get();
+        Endpoint s = elementRef.getEndpoint().getSystem().get();
         // identification of messages which have exactly one result type are implicitly added
         if (elementRef.getElement().get().isNode()
                 && s.isMessageType(elementRef.getElement().get().getLabel())) {
@@ -120,7 +119,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
 
 
 
-    static void addElementRef(Identification to, Endpoint ep, String epName, Name element) {
+    static void addElementRef(Identification to, io.corrlang.engine.domainmodel.Endpoint ep, String epName, Name element) {
         ElementRef elementRef = new ElementRef(epName, element.printRaw());
         elementRef.setElement(ep.getSystem().get().schema().carrier().get(element).get());
         elementRef.setEndpoint(ep);
@@ -175,7 +174,7 @@ public class AddImplicitCommonalities extends AbstractTraverser {
                 oIds.put(oId, i);
             }
             for (String endpointName : involvedTechSpaces.get(ts)) {
-                Endpoint endpoint = corrSpec.getEndpointRefs().get(endpointName);
+                io.corrlang.engine.domainmodel.Endpoint endpoint = corrSpec.getEndpointRefs().get(endpointName);
                 if (defaultNames.containsKey(ts) && endpoint.getSystem().get().schema().carrier().mentions(defaultNames.get(ts))) {
                     addElementRef(defaultIdentification, endpoint, endpointName, defaultNames.get(ts));
                 }

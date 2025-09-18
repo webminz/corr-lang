@@ -55,6 +55,7 @@ public abstract class WebserviceRequestHandler implements Handler {
     @Override
     public void handle(@NotNull Context ctx) throws Exception {
         ByteArrayInputStream bis = new ByteArrayInputStream(ctx.bodyAsBytes());
+        ctx.req()
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         GenericIOHandler handler = createHandler(
                 ctx.headerMap(),

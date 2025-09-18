@@ -2,6 +2,7 @@ package io.corrlang.engine.execution.traverser;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import io.corrlang.domain.ComprSysBuilder;
 import io.corrlang.engine.domainmodel.Commonality;
 import io.corrlang.engine.domainmodel.CorrSpec;
 import io.corrlang.engine.execution.AbstractExecutor;
@@ -10,7 +11,6 @@ import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.Key;
 import no.hvl.past.names.Name;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.domain.ComprSys;
 import io.corrlang.domain.QualifiedName;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +27,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
     private Universe universe;
     private Multimap<Triple, Name> participations;
 
-    private ComprSys.Builder builder;
+    private ComprSysBuilder builder;
 
 
     public void setUniverse(Universe universe) {
@@ -50,7 +50,7 @@ public class CreateFormalAlignmentTraverser extends AbstractTraverser {
         // Init result vars
         buildKeys(corrSpec);
 
-        this.builder = new ComprSys.Builder(Name.identifier(corrSpec.getName()), universe);
+        this.builder = new ComprSysBuilder(Name.identifier(corrSpec.getName()), universe);
 
         for (String ep : corrSpec.getEndpointsList()) {
             this.builder.addSystem(corrSpec.getEndpointRefs().get(ep).getSystem().get());

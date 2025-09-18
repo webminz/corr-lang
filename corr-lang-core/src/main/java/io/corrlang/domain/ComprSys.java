@@ -1,5 +1,6 @@
 package io.corrlang.domain;
 
+import io.corrlang.domain.keys.ConsistencyRule;
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.Key;

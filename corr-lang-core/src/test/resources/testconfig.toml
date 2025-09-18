@@ -1,0 +1,16 @@
+[project]
+name = "$(pwd)"
+projectDaemon = false
+dataDir = ".corrlang"
+
+[logging]
+level = "INFO"
+mode = "FILE"
+
+[system]
+path = "$HOME/.corrlang"
+daemonPort = 6969
+
+
+[plugins.plantuml]
+showServices = true

@@ -4,7 +4,7 @@ import no.hvl.past.graph.elements.Triple;
 import io.corrlang.domain.keys.AttributeBasedKey;
 import io.corrlang.domain.keys.Key;
 import no.hvl.past.names.Name;
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import no.hvl.past.util.StringUtils;
 
 import java.util.*;
@@ -17,7 +17,7 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
     private List<String> pathExpression = new ArrayList<>();
     private String alias = null;
 
-    private Endpoint endpoint;
+    private io.corrlang.engine.domainmodel.Endpoint endpoint;
     private Triple element;
     private List<Triple> elementPath = new ArrayList<>();
 
@@ -40,11 +40,11 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
         this.pathExpression.set(0, endpointName);
     }
 
-    public Endpoint getEndpoint() {
+    public io.corrlang.engine.domainmodel.Endpoint getEndpoint() {
         return endpoint;
     }
 
-    public void setEndpoint(Endpoint endpoint) {
+    public void setEndpoint(io.corrlang.engine.domainmodel.Endpoint endpoint) {
         this.endpoint = endpoint;
     }
 
@@ -134,7 +134,7 @@ public class ElementRef extends CorrLangElement implements ElementCondition.Iden
         return !this.elementPath.isEmpty();
     }
 
-    public Optional<Triple> lookup(Sys system) {
+    public Optional<Triple> lookup(Endpoint system) {
         // Node
         if (this.pathExpression.size() == 2) {
             Optional<Triple> nodeLookup = system.lookup(this.pathExpression.get(1));

@@ -1,5 +1,6 @@
 package io.corrlang.engine.execution.goals;
 
+import io.corrlang.domain.ComprSysBuilder;
 import io.corrlang.engine.domainmodel.*;
 import io.corrlang.engine.execution.traverser.CreateFormalAlignmentTraverser;
 import io.corrlang.engine.execution.traverser.DesugarAliases;
@@ -18,7 +19,7 @@ import io.corrlang.domain.keys.Key;
 import no.hvl.past.names.Identifier;
 import no.hvl.past.names.Name;
 import io.corrlang.domain.ComprSys;
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,16 +33,16 @@ import static io.corrlang.domain.QualifiedName.qname;
 public class KeyParsingTest extends TestWithGraphLib {
 
 
-    Sys families;
-    Sys persons;
+    Endpoint families;
+    Endpoint persons;
 
     @Before
     public void setUp() throws Exception {
         GraphExampleLibrary.INSTANCE.initialize(getContextCreatingBuilder());
 
 
-        families = new Sys.Builder("families", GraphExampleLibrary.INSTANCE.Families).build();
-        persons = new Sys.Builder("persons", GraphExampleLibrary.INSTANCE.Persons).build();
+        families = new Endpoint.Builder("families", GraphExampleLibrary.INSTANCE.Families).build();
+        persons = new Endpoint.Builder("persons", GraphExampleLibrary.INSTANCE.Persons).build();
 
     }
 
@@ -62,10 +63,10 @@ public class KeyParsingTest extends TestWithGraphLib {
         new DesugarAliases().executeTransitive(result);
 
         CorrSpec families2Persons = result.getCorrSpecWithName("Families2Persons").get();
-        Endpoint famEndpoint = new FileEndpoint("Families");
+        io.corrlang.engine.domainmodel.Endpoint famEndpoint = new FileEndpoint("Families");
         famEndpoint.setSystem(families);
 
-        Endpoint persEndpoint = new FileEndpoint("Persons");
+        io.corrlang.engine.domainmodel.Endpoint persEndpoint = new FileEndpoint("Persons");
         persEndpoint.setSystem(persons);
         result.addEndpoint(famEndpoint);
         result.addEndpoint(persEndpoint);
@@ -91,7 +92,7 @@ public class KeyParsingTest extends TestWithGraphLib {
 
 
         Identifier f2pName = Name.identifier("Families2Persons");
-        ComprSys expected = new ComprSys.Builder(f2pName, universe)
+        ComprSys expected = new ComprSysBuilder(f2pName, universe)
                 .addSystem(families)
                 .addSystem(persons)
                 .nodeCommonality(Name.identifier("String"), qname(families, Name.identifier("String")), qname(persons, Name.identifier("String")))

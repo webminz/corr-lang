@@ -4,7 +4,7 @@ import io.corrlang.domain.keys.ConcatenatedKey;
 import io.corrlang.domain.keys.ConstantKey;
 import io.corrlang.domain.keys.Key;
 import no.hvl.past.names.Name;
-import io.corrlang.domain.Sys;
+import io.corrlang.domain.Endpoint;
 import no.hvl.past.util.Holder;
 
 import java.util.*;
@@ -283,7 +283,7 @@ public abstract class ElementCondition extends CorrLangElement {
         public Key toKey(Name targetType) {
             List<Key> subs = new ArrayList<>();
             Holder<Name> originalSource = new Holder<>();
-            Holder<Sys> originalSystem = new Holder<>();
+            Holder<Endpoint> originalSystem = new Holder<>();
             for (IdentificationArgument arg : this.parts) {
                 Key e = arg.toKey(targetType);
                 subs.add(e);

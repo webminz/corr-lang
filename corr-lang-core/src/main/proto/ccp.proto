@@ -1,0 +1,110 @@
+syntax = "proto2";
+
+option java_package = "io.corrlang.protocol";
+
+service CorrLangMetaService {
+  rpc InspectSchema (InspectEndpointSchemaRequest) returns (stream SchemaElement);
+  rpc RegisterTechSpace (RegisterTechSpaceRequest) returns (TechSpaceRegistered);
+}
+
+message RegisterTechSpaceRequest {
+  required string techSpaceName = 1;
+  optional int32 runningOnPort = 2;
+  optional string localFileSystemLocation = 3;
+  repeated TechSpaceCapabilities capabilities = 4;
+}
+
+enum TechSpaceCapabilities {
+  PARSE_SCHEMA = 1;
+  PARSE_SCHEMA_FROM_URL = 2;
+  WRITE_SCHEMA = 3;
+  HANDLE_TCP = 4;
+  READ_DATA = 5;
+  WRITE_DATA = 6;
+  PUSH_DATA = 7;
+}
+
+message TechSpaceRegistered {
+  optional string systemServiceHostname = 1;
+  optional string systemServicePort = 2;
+  optional string systemServiceDataDir = 3;
+}
+
+message InspectEndpointSchemaRequest {
+  required string techSpaceName = 1;
+  oneof location {
+    string localFileSystemLocation = 2;
+    string urlLocation = 3;
+  }
+}
+
+enum SchemaElementType {
+  OBJECT_TYPE = 1;
+  DATA_TYPE = 2;
+  ATTRIBUTE = 3;
+  REFERENCE = 4;
+  ACTION = 5;
+  ACTION_INPUT = 6;
+  ACTION_OUTPUT = 7;
+  ACTION_GROUP = 8;
+  ANNOTATION = 9;
+}
+
+message SchemaElement {
+  repeated string fullyQualifiedName = 1;
+  optional string displayName = 2;
+  optional string documentationText = 3;
+  required SchemaElementType elementType = 4;
+  oneof elementDetails {
+    ObjectTypeInformation objectTypeDetails = 11;
+    DataTypeKinds dataTypeDetails  = 12;
+    AttributeTypeInformation attributeTypeDetails = 13;
+    ReferenceTypeInformation referenceTypeDetails = 14;
+  }
+}
+
+message ObjectTypeInformation {
+  optional bool isAbstract = 1;
+  optional bool isSingleton = 2;
+}
+
+enum DataTypeKinds {
+  BOOLEAN = 0;
+  UNSIGNED_INTEGER = 1;
+  SIGNED_INTEGER = 2;
+  IEEE754_FLOATING_POINT = 3;
+  UTF8_BYTES = 4;
+  TIMESTAMP = 5;
+  TIME_INTERVAL = 6;
+  ARBITRARY_BYTE_SEQUENCE = 7;
+}
+
+message DataTypeInformation {
+  required DataTypeKinds kind = 1;
+  optional uint32 noOfBytes = 2;
+  optional string minValue = 3;
+  optional string maxValue = 4;
+  optional string resolution = 5;
+  optional string pattern = 6;
+  optional string implementationDetails = 7;
+}
+
+message Multiplicity {
+  optional uint32 lowerBound = 1;
+  optional uint32 upperBound = 2;
+}
+
+message AttributeTypeInformation {
+  optional Multiplicity multiplicity = 1;
+  optional string defaultValue = 2;
+}
+
+message ReferenceTypeInformation {
+  optional Multiplicity multiplicity = 1;
+  optional bool hasInverse = 2;
+  optional bool isAcylic = 3;
+  optional bool isContainment = 4;
+  repeated string inverseName = 5;
+  optional Multiplicity inverseMultiplicity = 6;
+}
+

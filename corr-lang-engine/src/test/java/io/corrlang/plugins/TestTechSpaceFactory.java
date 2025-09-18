@@ -2,8 +2,8 @@ package io.corrlang.plugins;
 
 import no.hvl.past.graph.Universe;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
-import io.corrlang.plugins.techspace.TechSpaceAdapterFactory;
+import io.corrlang.techspaces.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpaceAdapterFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -28,28 +28,22 @@ public class TestTechSpaceFactory implements TechSpaceAdapterFactory<TestTechSpa
         this.boolTypeName = boolTypeName;
     }
 
-    @Autowired
-    Universe universe;
 
-    @Autowired
-    MetaRegistry pluginReg;
+
+
 
     @Override
-    public void doSetUp() {
+    @PostConstruct
+    public void register(MetaRegistry pluginRegistry) {
+        pluginRegistry.register(testTechSpace.ID(),testTechSpace);
+        pluginRegistry.register(testTechSpace.ID(), this);
     }
 
     @Override
     public TechSpaceAdapter<TestTechSpace> createAdapter() {
-        return new TestTechSpaceAdapter(testTechSpace, universe, stringTypeName, intTypeName, floatTypeName, boolTypeName);
+        return new TestTechSpaceAdapter(testTechSpace, stringTypeName, intTypeName, floatTypeName, boolTypeName);
     }
 
-    @Override
-    public void prepareShutdown() {
-    }
 
-    @PostConstruct
-    public void setUp() {
-        pluginReg.register(testTechSpace.ID(),testTechSpace);
-        pluginReg.register(testTechSpace.ID(), this);
-    }
+
 }

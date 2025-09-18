@@ -2,9 +2,9 @@ package io.corrlang.engine.execution.goals;
 
 import io.corrlang.engine.domainmodel.CorrSpec;
 import no.hvl.past.UnsupportedFeatureException;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
-import io.corrlang.plugins.techspace.TechSpaceException;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpaceException;
 
 public class CodegenGoal extends LanguageGoal {
 

@@ -42,15 +42,6 @@ public abstract class TestWithDIContainer extends TestWithGraphLib {
         System.setProperty("user.home", home.getAbsolutePath());
 
 
-        File corrlangDir = new File(home,".corrlang");
-        corrlangDir.mkdirs();
-
-        String logbackConf =  new String(PropertyHolder.class.getResourceAsStream("/logback-test.xml").readAllBytes(), StandardCharsets.UTF_8);
-        File defaultLogConfig = new File(corrlangDir, "logback.xml");
-        Files.writeString(defaultLogConfig.toPath(), logbackConf, StandardCharsets.UTF_8);
-
-        File defaultConfig = new File(corrlangDir, "config.toml");
-        Files.writeString(defaultConfig.toPath(), "[general]\nloggingConfig = \"" + defaultLogConfig.getAbsolutePath() + "\"", StandardCharsets.UTF_8);
 
 
         diContainer = DependencyInjectionContainer.create();

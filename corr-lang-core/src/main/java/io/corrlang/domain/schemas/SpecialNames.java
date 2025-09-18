@@ -18,6 +18,8 @@ public class SpecialNames {
     public static final Name GET_BY_ID_METHOD = Name.identifier("§get");
     public static final Name UPDATE_METHOD = Name.identifier("§update");
     public static final Name DELETE_METHOD = Name.identifier("§delete");
+    public static final Name FIND_METHOD = Name.identifier("§find");
+    public static final Name SUBSCRIBE_METHOD = Name.identifier("§subscribe");
     public static final Name GLOBAL_STRING_NAME = Name.identifier("String");
     public static final Name GLOBAL_INT_NAME = Name.identifier("Integer");
     public static final Name GLOBAL_FLOAT_NAME = Name.identifier("Float");

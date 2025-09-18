@@ -1,22 +1,24 @@
 package io.corrlang.plugins;
 
+import io.corrlang.di.PropertyHolder;
+import io.corrlang.domain.schemas.Schema;
+import io.corrlang.domain.schemas.SchemaBuilder;
+import io.corrlang.techspaces.*;
 import no.hvl.past.graph.*;
 import no.hvl.past.graph.predicates.*;
-import io.corrlang.domain.QueryHandler;
 import no.hvl.past.names.Name;
-import no.hvl.past.UnsupportedFeatureException;
-import io.corrlang.domain.Data;
-import io.corrlang.domain.Sys;
-import io.corrlang.plugins.techspace.*;
 import no.hvl.past.util.ShouldNotHappenException;
 
+
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.net.URL;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
-public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, TechSpaceDirective {
+public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, TechSpaceDirective, ParseSchemaCapabilities {
 
-    public static final String SALES = "Sales";
+    public static final String SALES_URL = "https://sales.example.org";
     public static final String SALES_PURCHASE_NODE = "Purchase";
     public static final String SALES_CUSTOMER_NODE = "Customer";
     public static final String SALES_PURCHASE2CCUSTOMER_EDGE = "byCustomer";
@@ -25,7 +27,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     public static final String SALES_CUSTOMER_ID_ATT = "id";
     public static final String SALES_CUSTOMER_FULLNAME_ATT = "fullName";
 
-    public static final String INVOICES = "Invoices";
+    public static final String INVOICES_URL = "https://invoices.example.org";
     public static final String INVOICES_INVOICE_NODE = "Invoice";
     public static final String INVOICES_CLIENT_NODE = "Client";
     public static final String INVOICES_INVOICE2CLIENT_EDGE = "ofClient";
@@ -36,9 +38,9 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     public static final String HR_EMPLOYEE_FIRSTNAME_ATT = "firstname";
     public static final String HR_EMPLOYEE_LASTNAME_ATT = "lastname";
     public static final String HR_EMPLOYEE_SALARY_ATT = "salary";
-    public static final String HR = "HR";
+    public static final String HR_URL = "https://hr.example.org";
 
-    public static final String TREE = "Tree";
+    public static final String TREE_URL = "https://trees.example.org";
     public static final String TREE_ROOT = "Root";
     public static final String TREE_NODE = "Node";
     public static final String TREE_NODE_ID_ATT = "id";
@@ -53,7 +55,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     public static final String GRAPHS_EDGE_KEY = "key";
     public static final String GRAPHS_ARCSRC_EDGE = "source";
     public static final String GRAPHS_ARCTRG_EDGE = "target";
-    public static final String GRAPHS = "Graphs";
+    public static final String GRAPHS_URL = "https://graphs.example.org";
     public static final String SIG_SIGNATURE = "Signature";
     public static final String SIG_SORT = "Sort";
     public static final String SIG_OP = "Operation";
@@ -68,10 +70,10 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     public static final String SIG_OPNAME_ATT = "operationName";
     public static final String SIG_ARGNAME_ATT = "argumentName";
     public static final String SIG_ARGORDER_ATT = "order";
-    public static final String SIG = "Sig";
+    public static final String SIG_URL = "https://signatures.example.org";
 
 
-    private final Universe universe;
+    private Universe universe;
     private final TechSpace techSpace;
     private String stringTypeName;
     private String intTypeName;
@@ -85,12 +87,10 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     private Sketch signatureSchema;
 
     public TestTechSpaceAdapter(TestTechSpace techSpace,
-                                Universe universe,
                                 String stringTypeName,
                                 String intTypeName,
                                 String floatTypeName,
                                 String boolTypeName) {
-        this.universe = universe;
         this.techSpace = techSpace;
         this.stringTypeName = stringTypeName;
         this.intTypeName = intTypeName;
@@ -126,7 +126,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .edge(SIG_ARG, SIG_ARGNAME_ATT, stringTypeName)
                 .edge(SIG_ARG, SIG_ARG2SORT_EDGE, SIG_SORT)
                 .edge(SIG_ARG, SIG_ARGORDER_ATT, intTypeName)
-                .graph(Name.identifier(SIG).absolute())
+                .graph(Name.identifier(SIG_URL).absolute())
                 .startDiagram(Singleton.getInstance())
                 .map(Universe.ONE_NODE_THE_NODE, Name.identifier(SIG_SIGNATURE))
                 .endDiagram(Name.anonymousIdentifier())
@@ -156,7 +156,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.ARROW_LBL_NAME, Name.identifier(SIG_SORTID_EDGE))
                 .map(Universe.ARROW_TRG_NAME, Name.identifier(intTypeName))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(Name.identifier(SIG))
+                .sketch(Name.identifier(SIG_URL))
                 .getResult(Sketch.class);
 
     }
@@ -172,7 +172,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .edge(GRAPHS_ARC, GRAPHS_ARCTRG_EDGE, GRAPHS_VERTEX)
                 .edge(GRAPHS_ARC, GRAPHS_ARC_NAME, stringTypeName)
                 .edge(GRAPHS_VERTEX, GRAPHS_EDGE_KEY, intTypeName)
-                .graph(Name.identifier(GRAPHS).absolute())
+                .graph(Name.identifier(GRAPHS_URL).absolute())
                 .startDiagram(Singleton.getInstance())
                 .map(Universe.ONE_NODE_THE_NODE, Name.identifier(GRAPHS_GRAPH))
                 .endDiagram(Name.anonymousIdentifier())
@@ -207,7 +207,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.ARROW_LBL_NAME, Name.identifier(GRAPHS_EDGE_KEY))
                 .map(Universe.ARROW_TRG_NAME, Name.identifier(intTypeName))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(Name.identifier(GRAPHS))
+                .sketch(Name.identifier(GRAPHS_URL))
                 .getResult(Sketch.class);
 
     }
@@ -219,7 +219,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .edge(TREE_NODE, TREE_NODE_ID_ATT, intTypeName)
                 .edge(TREE_NODE, TREE_NODE_CONTENT_ATT, stringTypeName)
                 .edge(TREE_NODE, TREE_NODE2NODE_EDGE, TREE_NODE)
-                .graph(Name.identifier(TREE).absolute())
+                .graph(Name.identifier(TREE_URL).absolute())
                 .startDiagram(Singleton.getInstance())
                 .map(Universe.ONE_NODE_THE_NODE, Name.identifier(TREE_ROOT))
                 .endDiagram(Name.anonymousIdentifier())
@@ -253,7 +253,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.LOOP_THE_LOOP.getSource(), Name.identifier(TREE_NODE))
                 .map(Universe.LOOP_THE_LOOP.getLabel(), Name.identifier(TREE_NODE2NODE_EDGE))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(TREE)
+                .sketch(TREE_URL)
                 .getResult(Sketch.class);
     }
 
@@ -285,7 +285,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.ARROW_LBL_NAME, Name.identifier(HR_EMPLOYEE_SALARY_ATT))
                 .map(Universe.ARROW_TRG_NAME, Name.identifier(flaotType))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(Name.identifier(HR))
+                .sketch(Name.identifier(HR_URL))
                 .getResult(Sketch.class);
     }
 
@@ -328,7 +328,7 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.ARROW_LBL_NAME, Name.identifier(INVOICES_INVOICE_DUE_ATT))
                 .map(Universe.ARROW_TRG_NAME, Name.identifier(INVOICES_DATE_TYPE))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(Name.identifier(INVOICES))
+                .sketch(Name.identifier(INVOICES_URL))
                 .getResult(Sketch.class);
     }
 
@@ -371,59 +371,8 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
                 .map(Universe.ARROW_LBL_NAME, Name.identifier(SALES_CUSTOMER_FULLNAME_ATT))
                 .map(Universe.ARROW_TRG_NAME, Name.identifier(stringTypeName))
                 .endDiagram(Name.anonymousIdentifier())
-                .sketch(Name.identifier(SALES))
+                .sketch(Name.identifier(SALES_URL))
                 .getResult(Sketch.class);
-    }
-
-
-    @Override
-    public Sys parseSchema(Name schemaName, String schemaLocationURI) throws TechSpaceException, UnsupportedFeatureException {
-        if (schemaName.equals(Name.identifier(SALES))) {
-            return new TestSystem(schemaLocationURI, salesSchema);
-        }
-        if (schemaName.equals(Name.identifier(INVOICES))) {
-            return new TestSystem(schemaLocationURI, invoicesSchema);
-        }
-        if (schemaName.equals(Name.identifier(HR))) {
-            return new TestSystem(schemaLocationURI, hrSchema);
-        }
-        if (schemaName.equals(Name.identifier(TREE))) {
-            return new TestSystem(schemaLocationURI, treeSchema);
-        }
-        if (schemaName.equals(Name.identifier(GRAPHS))) {
-            return new TestSystem(schemaLocationURI, graphSchema);
-        }
-        if (schemaName.equals(Name.identifier(SIG))) {
-            return new TestSystem(schemaLocationURI, signatureSchema);
-        }
-        throw new TechSpaceException("Schema at location " + schemaLocationURI + " not found", techSpace);
-    }
-
-    @Override
-    public void writeSchema(Sys sys, OutputStream outputStream) throws TechSpaceException, UnsupportedFeatureException {
-        throw new UnsupportedFeatureException();
-    }
-
-    @Override
-    public TechSpaceDirective directives() {
-        return this;
-    }
-
-
-
-    @Override
-    public QueryHandler queryHandler(Sys system) throws TechSpaceException, UnsupportedFeatureException {
-        throw new UnsupportedFeatureException();
-    }
-
-    @Override
-    public Data readInstance(Sys system, InputStream inputStream) throws TechSpaceException, UnsupportedFeatureException {
-        return null;
-    }
-
-    @Override
-    public void writeInstance(Sys system, GraphMorphism instance, OutputStream outputStream) throws TechSpaceException, UnsupportedFeatureException {
-
     }
 
 
@@ -502,4 +451,56 @@ public class TestTechSpaceAdapter implements TechSpaceAdapter<TestTechSpace>, Te
     }
 
 
+    @Override
+    public void doSetUp(Universe universe, PropertyHolder propertyHolder) {
+        this.universe = universe;
+    }
+
+    @Override
+    public Set<TechSpaceCapability> capabilities() {
+        return null;
+    }
+
+    @Override
+    public void prepareShutdown() {
+
+    }
+
+    @Override
+    public Optional<TechnologySpecificRules> schemaRules() {
+        return Optional.empty(); // TODO change
+    }
+
+    @Override
+    public SchemaParser<InputStream> parseSchema() {
+        throw new ShouldNotHappenException(TestTechSpaceAdapter.class, "should never be called this way");
+    }
+
+    @Override
+    public SchemaParser<URL> parseSchemaFromUrl() {
+        return new SchemaParser<URL>() {
+            @Override
+            public Schema parse(URL source, SchemaBuilder builderHelper) throws Exception {
+                if (source.toString().equals(SALES_URL)) {
+                    return new Schema(salesSchema);
+                }
+                if (source.toString().equals(INVOICES_URL)) {
+                    return new Schema(invoicesSchema);
+                }
+                if (source.toString().equals(HR_URL)) {
+                    return new Schema((hrSchema));
+                }
+                if (source.toString().equals(TREE_URL)) {
+                    return new Schema(treeSchema);
+                }
+                if (source.toString().equals(GRAPHS_URL)) {
+                    return new Schema(graphSchema);
+                }
+                if (source.toString().equals(SIG_URL)) {
+                    return new Schema(signatureSchema);
+                }
+                throw new TechSpaceException("Schema at location " + source.toString() + " not found", techSpace);
+            }
+        };
+    }
 }

@@ -1,7 +1,7 @@
 package io.corrlang.engine.domainmodel;
 
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,8 +1,7 @@
 package io.corrlang.engine.domainmodel;
 
-import io.corrlang.domain.Sys;
-import io.corrlang.plugins.techspace.TechSpace;
-import io.corrlang.plugins.techspace.TechSpaceAdapter;
+import io.corrlang.techspaces.TechSpace;
+import io.corrlang.techspaces.TechSpaceAdapter;
 
 import java.util.Optional;
 
@@ -13,7 +12,7 @@ public abstract class Endpoint extends CorrLangElement {
     private String technology;
     private TechSpace techSpace;
     private TechSpaceAdapter<? extends TechSpace> techSpaceAdapter;
-    private Sys system;
+    private io.corrlang.domain.Endpoint system;
 
 
     Endpoint(String name) {
@@ -69,11 +68,11 @@ public abstract class Endpoint extends CorrLangElement {
         return Optional.of(techSpace);
     }
 
-    public void setSystem(Sys system) {
+    public void setSystem(io.corrlang.domain.Endpoint system) {
         this.system = system;
     }
 
-    public Optional<Sys> getSystem() {
+    public Optional<io.corrlang.domain.Endpoint> getSystem() {
         return Optional.of(system);
     }
 }
