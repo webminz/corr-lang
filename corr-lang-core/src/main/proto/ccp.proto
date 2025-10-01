@@ -3,14 +3,39 @@ syntax = "proto2";
 option java_package = "io.corrlang.protocol";
 
 service CorrLangService {
+
   rpc RegisterTechSpace (RegisterTechSpaceRequest) returns (TechSpaceRegistered);
+  rpc ShutdownTechSpace (ShutdownTechSpaceRequest) returns (Ack);
 
   rpc ParseSchema (ParseEndpointSchemaRequest) returns (stream SchemaElement);
   rpc SerializeSchema (stream SchemaElement) returns (BinaryData);
 
-  rpc ParseData (BinaryData) returns (stream TreeData);
+  rpc ParseData (ParseDataRequest) returns (stream TreeData);
   rpc SerializeData (stream TreeData) returns (BinaryData);
 
+  rpc ParseCommand ( ParseCommandRequest ) returns (Command);
+  rpc SerializeCommand (Command) returns (BinaryData);
+
+  rpc PushData (stream TreeData) returns (Ack);
+
+}
+
+message Ack {}
+
+message ShutdownTechSpaceRequest {}
+
+message ParseDataRequest {
+  required Schema schema = 1;
+  oneof data {
+    BinaryData binary = 2;
+    string fileName = 3;
+    string url = 4;
+  }
+}
+
+message Schema {
+  required string name = 1;
+  repeated SchemaElement elements = 2;
 }
 
 
@@ -35,6 +60,7 @@ enum TechSpaceCapabilities {
   SERIALIZE_SCHEMA = 6;
   SERIALIZE_DATA = 7;
   SERIALIZE_COMMAND = 8;
+  PUSH_DATA = 9;
 }
 
 message TechSpaceRegistered {
@@ -108,17 +134,25 @@ message Multiplicity {
 }
 
 message AttributeTypeInformation {
-  optional Multiplicity multiplicity = 1;
-  optional string defaultValue = 2;
+  required string ownerTypeName = 1;
+  required string dataTypeName = 2;
+  optional Multiplicity multiplicity = 3;
+  optional string defaultValue = 4;
+  optional bool isOrdered = 5;
+  optional bool isUnique = 6;
 }
 
 message ReferenceTypeInformation {
-  optional Multiplicity multiplicity = 1;
-  optional bool hasInverse = 2;
-  optional bool isAcylic = 3;
-  optional bool isContainment = 4;
-  repeated string inverseName = 5;
-  optional Multiplicity inverseMultiplicity = 6;
+  required string srcTypeName = 1;
+  required string trgTypeName = 2;
+  optional Multiplicity multiplicity = 3;
+  optional bool hasInverse = 4;
+  optional bool isAcyclic = 5;
+  optional bool isContainment = 6;
+  optional bool isOrdered = 7;
+  optional bool isUnique = 8;
+  optional string inverseName = 9;
+  optional Multiplicity inverseMultiplicity = 10;
 }
 
 message TreeData {
@@ -159,6 +193,19 @@ message Leaf {
       CustomValue customValue = 6;
   }
 }
+
+message Command {
+  required string actionName = 1;
+  repeated TreeData commandRepresentation = 2;
+  repeated TreeData querySchemaRepresentation = 3;
+}
+
+
+message ParseCommandRequest {
+  required Schema schema = 1;
+  required BinaryData data = 2;
+}
+
 
 message StringValue {
   required string value = 1;
