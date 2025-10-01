@@ -6,8 +6,6 @@ import no.hvl.past.graph.GraphOperation;
 import no.hvl.past.graph.GraphPredicate;
 import no.hvl.past.ExtensionPoint;
 import no.hvl.past.MetaRegistry;
-import io.corrlang.techspaces.TechSpace;
-import io.corrlang.techspaces.TechSpaceAdapterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +22,6 @@ public class RegistryImpl implements MetaRegistry {
 
     public RegistryImpl() {
         this.registryMap = new HashMap<>();
-        this.registryMap.put(TechSpace.class, new HashMap<>());
-        this.registryMap.put(TechSpaceAdapterFactory.class, new HashMap<>());
         this.registryMap.put(UserValue.class, new HashMap<>());
         this.registryMap.put(GraphPredicate.class, new HashMap<>());
         this.registryMap.put(GraphOperation.class, new HashMap<>());
@@ -91,17 +87,6 @@ public class RegistryImpl implements MetaRegistry {
             builder.append(": ");
             builder.append(stringExtensionPointMap.get(key).getClass().getName());
             builder.append('\n');
-        }
-        stringExtensionPointMap = this.registryMap.get(TechSpace.class);
-        for (String key : stringExtensionPointMap.keySet()) {
-            builder.append("Tech Space: ");
-            builder.append(key);
-            builder.append(": ");
-            builder.append(stringExtensionPointMap.get(key).getClass().getName());
-            builder.append(" --> ");
-            builder.append(this.registryMap.get(TechSpaceAdapterFactory.class).get(key).getClass().getName());
-            builder.append('\n');
-
         }
         return builder.toString();
     }

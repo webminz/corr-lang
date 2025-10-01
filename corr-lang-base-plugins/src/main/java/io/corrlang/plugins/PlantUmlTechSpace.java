@@ -1,38 +1,60 @@
 package io.corrlang.plugins;
 
-import io.corrlang.plugins.puml.PlantUMLWriter;
-import io.corrlang.techspaces.TechSpace;
-import io.corrlang.techspaces.TechSpaceRegistry;
-import io.corrlang.techspaces.WriteSchemaCapabilities;
-import org.springframework.beans.factory.annotation.Autowired;
+import io.corrlang.plugins.puml.PlantUMLPlotter;
+import io.corrlang.techspaces.*;
+import no.hvl.past.graph.Universe;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
-import javax.annotation.PostConstruct;
+import java.util.Map;
+import java.util.Set;
 
 
 @Configuration
 public class PlantUmlTechSpace implements TechSpace {
 
+    public static final String SHOW_DIAGRAMS_PROPERTY = "showDiagrams";
+    public static final String SHOW_ACTIONS_PROPERTY = "showActions";
+
+    public static final String PUML_EXECUTABLE_PROPERTY = "pumlExecutable";
+
+    public static final String INVOKE_PUML_PROPERTY = "invokePuml";
+
     public static final String ID = "PUML";
 
-    private final TechSpaceRegistry registry;
-
-    private final WriteSchemaCapabilities writeSchemaCapabilities;
+    private final PlantUMLPlotter writeSchemaCapabilities;
 
 
-    public PlantUmlTechSpace(@Autowired TechSpaceRegistry registry, @Autowired Environment environment) {
-        this.registry = registry;
-        this.writeSchemaCapabilities = new PlantUMLWriter(environment);
+    public PlantUmlTechSpace() {
+        this.writeSchemaCapabilities = new PlantUMLPlotter();
     }
 
     @Override
-    public String ID() {
+    public String name() {
         return ID;
     }
 
-    @PostConstruct
-    public void init() {
-        registry.register(ID(), writeSchemaCapabilities );
+
+    @Override
+    public Set<TechSpaceCapability> initialize(Universe universe, Map<String, Object> configProperties) {
+        if (configProperties.containsKey(SHOW_DIAGRAMS_PROPERTY)) {
+            this.writeSchemaCapabilities.setPrintDiagrams(Boolean.parseBoolean(configProperties.get(SHOW_DIAGRAMS_PROPERTY).toString()));
+        }
+        if (configProperties.containsKey(SHOW_ACTIONS_PROPERTY)) {
+            this.writeSchemaCapabilities.setDrawServices(Boolean.parseBoolean(configProperties.get(SHOW_ACTIONS_PROPERTY).toString()));
+        }
+        if (configProperties.containsKey(INVOKE_PUML_PROPERTY)) {
+            this.writeSchemaCapabilities.setInvokePuml(Boolean.parseBoolean(configProperties.get(INVOKE_PUML_PROPERTY).toString()));
+        }
+        if (configProperties.containsKey(PUML_EXECUTABLE_PROPERTY)) {
+            this.writeSchemaCapabilities.setPumlExecutable(configProperties.get(SHOW_DIAGRAMS_PROPERTY).toString());
+        }
+
+
+        return Set.of(this.writeSchemaCapabilities);
+    }
+
+    @Override
+    public void prepareShutdown() {
+        // nothing to do
     }
 }

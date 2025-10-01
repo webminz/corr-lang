@@ -86,4 +86,43 @@ public class ElemRef implements Iterable<String> {
     public int length() {
         return path.length;
     }
+
+    /**
+     * Checks if the given element reference is a suffix of this element reference.
+     */
+    public boolean suffixMatch(ElemRef suffix) {
+        if (suffix.length() > this.length()) {
+            return false;
+        }
+        int diff = this.length() - suffix.length();
+        for (int i = this.length() - 1; i >= this.length() - suffix.length(); i--) {
+            if (!java.util.Objects.equals(suffix.path[i - diff], this.path[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean prefixMatch(ElemRef prefix) {
+        if (prefix.length() > this.length()) {
+            return false;
+        }
+        for (int i = 0; i < prefix.length(); i++) {
+            if (!java.util.Objects.equals(prefix.path[i], this.path[i])) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean exactMatch(ElemRef other) {
+        return Arrays.equals(this.path, other.path);
+    }
+
+    public ElemRef addPrefix(String prefix) {
+        String[] newPath = new String[this.length() + 1];
+        newPath[0] = prefix;
+        System.arraycopy(this.path, 0, newPath, 1, this.length());
+        return new ElemRef(newPath);
+    }
 }

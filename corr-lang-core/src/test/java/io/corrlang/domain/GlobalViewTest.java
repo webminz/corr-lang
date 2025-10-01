@@ -30,9 +30,11 @@ public class GlobalViewTest extends TestWithGraphLib {
                 .objectType("B").field("bb", "B").endObjectType()
                 .objectType("C").field("cb", "B").endObjectType()
                 .build();
+
         middle = new SchemaBuilder(Name.identifier("middle"), getUniverse())
                 .objectType("X").field("x", "Y").field("z", "Y").endObjectType()
                 .objectType("Z").field("z", "X").endObjectType().build();
+
         right = new SchemaBuilder(Name.identifier("right"), getUniverse())
                 .objectType("M").field("m", "N").endObjectType()
                 .objectType("N").field("n", "P").endObjectType()
@@ -44,6 +46,8 @@ public class GlobalViewTest extends TestWithGraphLib {
 
     @Test
     public void testGlobalViewSum() {
+
+
 
     }
 

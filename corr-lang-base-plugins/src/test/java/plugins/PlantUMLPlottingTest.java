@@ -6,7 +6,7 @@ import io.corrlang.domain.schemas.Schema;
 import io.corrlang.domain.schemas.SchemaBuilder;
 import io.corrlang.plugins.PlantUmlTechSpace;
 import io.corrlang.techspaces.TechSpaceRegistry;
-import io.corrlang.techspaces.WriteSchemaCapabilities;
+import io.corrlang.techspaces.SerializeSchemaCapability;
 import io.corrlang.testfixtures.ExampleSystems;
 import no.hvl.past.names.Name;
 import org.junit.jupiter.api.BeforeAll;
@@ -17,7 +17,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 
-import static io.corrlang.domain.QualifiedName.qname;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -41,7 +41,7 @@ public class PlantUMLPlottingTest {
     public void testPersonExample() throws Exception {
         DependencyInjectionContainer di = DependencyInjectionContainer.create();
         TechSpaceRegistry reg = di.getBean(TechSpaceRegistry.class);
-        WriteSchemaCapabilities schemaWriters = reg.schemaWriter(PlantUmlTechSpace.ID);
+        SerializeSchemaCapability schemaWriters = reg.schemaWriter(PlantUmlTechSpace.ID);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         SchemaBuilder builder = new SchemaBuilder(Name.identifier("Persons"), di.getUniverse());
         ExampleSystems.buildPersonsJobsAndCommunication(builder);
@@ -103,7 +103,7 @@ PostalAddress -up-|> CommunicationChannel
     public void testSalesInvoicesHR() throws Exception {
         DependencyInjectionContainer di = DependencyInjectionContainer.create();
         TechSpaceRegistry reg = di.getBean(TechSpaceRegistry.class);
-        WriteSchemaCapabilities schemaWriters = reg.schemaWriter(PlantUmlTechSpace.ID);
+        SerializeSchemaCapability schemaWriters = reg.schemaWriter(PlantUmlTechSpace.ID);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         SchemaBuilder builder = new SchemaBuilder(Name.identifier("Invoices"), di.getUniverse());
         Schema s = ExampleSystems.buildSalesSystemSchema(builder);

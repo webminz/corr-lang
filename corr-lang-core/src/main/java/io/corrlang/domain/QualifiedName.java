@@ -6,20 +6,22 @@ import java.util.Objects;
 
 public class QualifiedName {
 
-    private final Name system;
+    private final int endpoint;
     private final Name element;
 
-    public QualifiedName(Name system, Name element) {
-        this.system = system;
+    public QualifiedName(int system, Name element) {
+        this.endpoint = system;
         this.element = element;
     }
 
-    public Name getSystem() {
-        return system;
-    }
 
     public Name getElement() {
         return element;
+    }
+
+
+    public int getEndpoint() {
+        return endpoint;
     }
 
     @Override
@@ -27,29 +29,24 @@ public class QualifiedName {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         QualifiedName that = (QualifiedName) o;
-        return system.equals(that.system) && element.equals(that.element);
+        return endpoint == that.endpoint && Objects.equals(element, that.element);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(system, element);
+        return Objects.hash(endpoint, element);
     }
 
     @Override
     public String toString() {
-        return system.printRaw() + "." + element.printRaw();
+        return endpoint + "::" + element.toString();
     }
 
 
-    public static QualifiedName qname(Name systemURI, Name element) {
-        return new QualifiedName(systemURI, element);
-    }
-
-    public static QualifiedName qname(String systemURI, Name element) {
-        return new QualifiedName(Name.identifier(systemURI), element);
-    }
 
     public static QualifiedName qname(Endpoint system, Name element) {
-        return new QualifiedName(system.asId(), element);
+        return new QualifiedName(system.getOrder(), element);
     }
+
+
 }

@@ -33,8 +33,6 @@ import java.util.stream.Stream;
  */
 public class Schema {
 
-
-
     // TODO: the cache loader need to reworked
 
     public static class NotFoundException extends RuntimeException {
@@ -148,26 +146,27 @@ public class Schema {
                 formalisation
                         .diagramsOn(Triple.node(name))
                         .map(Diagram::label)
-                        .forEach(formula -> {
-                            if (formula instanceof ActionMarker) {
-                                messages.add(name);
-                            } else if (formula instanceof ActionGroupMarker) {
-                                messageGroups.add(name);
-                            } else if (formula instanceof StringDT) {
-                                baseTypes.put(name, DataTypeDescription.STRING);
-                            } else if (formula instanceof FloatDT) {
-                                baseTypes.put(name, DataTypeDescription.FLOATING_POINT_NUMBER);
-                            } else if (formula instanceof IntDT) {
-                                baseTypes.put(name, DataTypeDescription.INTEGRAL_NUMBER);
-                            } else if (formula instanceof BoolDT) {
-                                baseTypes.put(name, DataTypeDescription.BOOLEAN);
-                            } else if (formula instanceof EnumValue) {
-                                baseTypes.put(name, DataTypeDescription.ENUMERATED);
-                            } else if (formula instanceof DataTypePredicate) {
-                                baseTypes.put(name, DataTypeDescription.CUSTOM);
-                            }
-                        });
-
+                        .forEach(
+                                formula -> {
+                                    switch (formula) {
+                                        case NodeMarker nm -> {
+                                            switch (nm.getType()) {
+                                                case ACTION -> messages.add(name);
+                                                case ACTION_GROUP -> messageGroups.add(name);
+                                            }
+                                        }
+                                        case StringDT ignored -> baseTypes.put(name, DataTypeDescription.STRING);
+                                        case FloatDT ignored ->
+                                                baseTypes.put(name, DataTypeDescription.FLOATING_POINT_NUMBER);
+                                        case IntDT ignored -> baseTypes.put(name, DataTypeDescription.INTEGRAL_NUMBER);
+                                        case BoolDT ignored -> baseTypes.put(name, DataTypeDescription.BOOLEAN);
+                                        case EnumValue ignored -> baseTypes.put(name, DataTypeDescription.ENUMERATED);
+                                        case DataTypePredicate ignored ->
+                                                baseTypes.put(name, DataTypeDescription.CUSTOM);
+                                        default -> { }
+                                    }
+                                }
+                        );
             });
 
             keyTypesCachedIndexed = true;
@@ -212,8 +211,12 @@ public class Schema {
                 } else if (messages.contains(triple.getSource())) {
                     if (formalisation
                             .diagramsOn(triple)
-                            .anyMatch(diagram ->
-                                    diagram.label() instanceof ActionOutputMarker)) {
+                            .anyMatch(diagram -> {
+                                        if (diagram.label() instanceof EdgeMarker em) {
+                                            return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_OUTPUT);
+                                        }
+                                        return false;
+                                    })) {
                         return SchemaElementType.MSG_OUT;
                     } else {
                         return SchemaElementType.MSG_IN;
@@ -351,11 +354,21 @@ public class Schema {
     }
 
     private boolean isAction(Name node) {
-        return formalisation.diagramsOn(Triple.node(node)).anyMatch(diag -> diag.label() instanceof ActionMarker);
+        return formalisation.diagramsOn(Triple.node(node)).anyMatch(diag -> {
+            if (diag.label() instanceof NodeMarker nm) {
+                return nm.getType().equals(NodeMarker.NodeMarkerType.ACTION);
+            }
+            return false;
+        });
     }
 
     private boolean isActionGroup(Name node) {
-        return formalisation.diagramsOn(Triple.node(node)).anyMatch(diag -> diag.label() instanceof ActionGroupMarker);
+        return formalisation.diagramsOn(Triple.node(node)).anyMatch(diag -> {
+            if (diag.label() instanceof NodeMarker nm) {
+                return nm.getType().equals(NodeMarker.NodeMarkerType.ACTION_GROUP);
+            }
+            return false;
+        });
     }
 
     public Stream<Triple> links() {
@@ -363,15 +376,30 @@ public class Schema {
     }
 
     private boolean isActionArgument(Triple e) {
-        return formalisation.diagramsOn(e).anyMatch(diag -> diag.label() instanceof ActionInputMarker);
+        return formalisation.diagramsOn(e).anyMatch(diag -> {
+            if (diag.label() instanceof EdgeMarker em) {
+                return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_INPUT);
+            }
+            return false;
+        });
     }
 
     private boolean isActionResult(Triple e) {
-        return formalisation.diagramsOn(e).anyMatch(diag -> diag.label() instanceof ActionOutputMarker);
+        return formalisation.diagramsOn(e).anyMatch(diag -> {
+            if (diag.label() instanceof EdgeMarker em) {
+                return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_OUTPUT);
+            }
+            return false;
+        });
     }
 
     private boolean isActionContainment(Triple e) {
-        return formalisation.diagramsOn(e).anyMatch(diag -> diag.label() instanceof ActionGroupChildMarker);
+        return formalisation.diagramsOn(e).anyMatch(diag -> {
+            if (diag.label() instanceof EdgeMarker em) {
+                return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_GROUP_MEMBER);
+            }
+            return false;
+        });
     }
 
 

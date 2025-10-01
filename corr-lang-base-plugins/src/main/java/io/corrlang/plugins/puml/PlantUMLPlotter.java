@@ -1,11 +1,12 @@
 package io.corrlang.plugins.puml;
 
 
-import io.corrlang.domain.ComprSys;
-import io.corrlang.domain.MessageArgument;
-import io.corrlang.domain.MessageType;
+import io.corrlang.domain.Correspondence;
 import io.corrlang.domain.Endpoint;
+import io.corrlang.domain.diagrams.EdgeMarker;
+import io.corrlang.domain.diagrams.NodeMarker;
 import io.corrlang.domain.exceptions.CorrLangException;
+import io.corrlang.techspaces.SerializeSchemaCapability;
 import no.hvl.past.graph.GraphTheory;
 import no.hvl.past.graph.Universe;
 import no.hvl.past.graph.elements.Triple;
@@ -24,25 +25,39 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class PlantUMLPlotter {
+public class PlantUMLPlotter implements SerializeSchemaCapability {
 
-    private final boolean printDiagrams;
-    private final boolean drawServices;
+    private boolean printDiagrams;
+    private boolean drawServices;
+    private String pumlExecutable;
 
-    private final String pumlExecutable;
+    private boolean invokePuml;
     private final Logger logger;
 
 
-    public PlantUMLPlotter(
-            boolean printDiagrams,
-            boolean drawServices,
-            String pumlExecutable) {
-        this.printDiagrams = printDiagrams;
-        this.drawServices = drawServices;
-        this.pumlExecutable = pumlExecutable;
+    public PlantUMLPlotter() {
+        this.printDiagrams = false;
+        this.drawServices = true;
+        this.pumlExecutable = null;
+        this.invokePuml = false;
         this.logger = LoggerFactory.getLogger(getClass());
     }
 
+    public void setPrintDiagrams(boolean printDiagrams) {
+        this.printDiagrams = printDiagrams;
+    }
+
+    public void setDrawServices(boolean drawServices) {
+        this.drawServices = drawServices;
+    }
+
+    public void setPumlExecutable(String pumlExecutable) {
+        this.pumlExecutable = pumlExecutable;
+    }
+
+    public void setInvokePuml(boolean invokePuml) {
+        this.invokePuml = invokePuml;
+    }
 
     public void serializeEndpoint(Endpoint system, OutputStream outputStream) throws IOException {
         OutputStreamWriter writer = new OutputStreamWriter(outputStream);
@@ -79,41 +94,13 @@ public class PlantUMLPlotter {
         FilePlotElement file = new FilePlotElement();
 
         system.getSchema().types().forEach(node -> {
-//            if (system instanceof ComprSys) {
-//                if (node.firstPart().equals(system.schema().getName())) {
-//                    ComprSys csys = (ComprSys) system;
-//                    if (!csys.isMerged(node.secondPart())) {
-//                        plotCommWitn(csys, file, node);
-//                    } else {
-//                        plotNode(system,file,node);
-//                    }
-//                } else {
-//                    plotNode(system,file,node);
-//                }
-//            } else {
                 plotNode(system, file, node);
-//            }
         });
         Set<Triple> covered = new HashSet<>();
 
 
         system.getSchema().links().forEach(t -> {
-//            if (system instanceof ComprSys) {
-//                ComprSys csys = (ComprSys) system;
-//                if (t.getLabel() instanceof BinaryCombinator) {
-//                    plotProjection(csys, file, file, covered, t);
-//                } else if (t.getLabel().firstPart().equals(system.schema().getName())) {
-//                    if (csys.isMerged(t.getLabel())) {
-//                        plotCommLink(csys, file, covered, t);
-//                    } else {
-//                        plotLink(system,file,covered,t);
-//                    }
-//                } else {
-//                    plotLink(system, file, covered, t);
-//                }
-//            } else {
                 plotLink(system, file, covered, t);
-//            }
         });
 
         system.getSchema().directSuperTypes().forEach(t -> {
@@ -141,7 +128,7 @@ public class PlantUMLPlotter {
 
         if (printDiagrams) {
             system.getSchema().sketch().diagrams()
-                    .filter(d -> !(d instanceof MessageType) && !(d instanceof MessageArgument) &&
+                    .filter(d -> !(d instanceof NodeMarker) && !(d instanceof EdgeMarker) &&
                             !DataTypePredicate.getInstance().diagramIsOfType(d) &&
                             !TargetMultiplicity.class.isAssignableFrom(d.label().getClass()) &&
                             !SourceMultiplicity.class.isAssignableFrom(d.label().getClass()) &&
@@ -161,17 +148,6 @@ public class PlantUMLPlotter {
 
     }
 
-    private void plotCommLink(ComprSys csys, FilePlotElement metamodel, Set<Triple> covered, Triple t) {
-        LinkPlotElement linkPlotElement = metamodel.addNamedEdge(csys.displayName(t.getSource()), csys.displayName(t.getLabel()), csys.displayName(t.getTarget()));
-        linkPlotElement.setSpecialStyling("#blue;line.dashed");
-
-    }
-
-
-
-    private void plotCommWitn(ComprSys system, FilePlotElement file, Name node) {
-        file.addTraceLink(system.displayName(node));
-    }
 
     private void plotDiagram(Endpoint system, FilePlotElement metamodel, no.hvl.past.graph.Diagram d) {
         String content = "";
@@ -224,10 +200,6 @@ public class PlantUMLPlotter {
     private String mkReference(Endpoint endpoint, Name name) {
         String result = "";
         Name current = name;
-//        if (endpoint instanceof ComprSys && name.hasPrefix(endpoint.schema().getName())) {
-//            result += endpoint.getSchema().getFormalRepresentation().getName().printRaw() + "::overlaps::";
-//            current = name.secondPart();
-//        }
         while (current instanceof Prefix) {
             result += current.firstPart().printRaw();
             result += "::";
@@ -262,10 +234,6 @@ public class PlantUMLPlotter {
             } else {
                 Multiplicity targetMultiplicity = system.getSchema().multiplicity(t.getLabel());
                 linkPlotElement.setTrgLabel(makeMult(targetMultiplicity));
-//                Pair<Integer, Integer> sourceMultiplicity = system.getSourceMultiplicity(t);
-//                if (sourceMultiplicity.getLeft() != 0 || sourceMultiplicity.getRight() != 1) {
-//                    linkPlotElement.setSrcLabel(makeMult(sourceMultiplicity));
-//                }
                 if (isComp) {
                     linkPlotElement.setType(LinkPlotElement.LinkType.COMPOSITION);
                 } else if (system.getSchema().isAggregation(t)) {
@@ -329,4 +297,13 @@ public class PlantUMLPlotter {
         return "" + (targetMultiplicity.getLowerBound() < 0 ? "*" : targetMultiplicity.getLowerBound()) + ".." + (targetMultiplicity.getUpperBound() < 0 ? "*" : targetMultiplicity.getLowerBound()) + "";
     }
 
+    @Override
+    public Optional<String> defaultFileEnding() {
+        return Optional.of("puml");
+    }
+
+    @Override
+    public SchemaWriter<OutputStream> serializeSchema() {
+        return this::plot;
+    }
 }

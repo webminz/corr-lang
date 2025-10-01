@@ -2,9 +2,21 @@ syntax = "proto2";
 
 option java_package = "io.corrlang.protocol";
 
-service CorrLangMetaService {
-  rpc InspectSchema (InspectEndpointSchemaRequest) returns (stream SchemaElement);
+service CorrLangService {
   rpc RegisterTechSpace (RegisterTechSpaceRequest) returns (TechSpaceRegistered);
+
+  rpc ParseSchema (ParseEndpointSchemaRequest) returns (stream SchemaElement);
+  rpc SerializeSchema (stream SchemaElement) returns (BinaryData);
+
+  rpc ParseData (BinaryData) returns (stream TreeData);
+  rpc SerializeData (stream TreeData) returns (BinaryData);
+
+}
+
+
+message BinaryData {
+  required int32 byteLength = 1;
+  required bytes content = 2;
 }
 
 message RegisterTechSpaceRequest {
@@ -17,11 +29,12 @@ message RegisterTechSpaceRequest {
 enum TechSpaceCapabilities {
   PARSE_SCHEMA = 1;
   PARSE_SCHEMA_FROM_URL = 2;
-  WRITE_SCHEMA = 3;
-  HANDLE_TCP = 4;
-  READ_DATA = 5;
-  WRITE_DATA = 6;
-  PUSH_DATA = 7;
+  PARSE_DATA = 3;
+  PARSE_DATA_FROM_URL = 4;
+  PARSE_COMMAND = 5;
+  SERIALIZE_SCHEMA = 6;
+  SERIALIZE_DATA = 7;
+  SERIALIZE_COMMAND = 8;
 }
 
 message TechSpaceRegistered {
@@ -30,7 +43,7 @@ message TechSpaceRegistered {
   optional string systemServiceDataDir = 3;
 }
 
-message InspectEndpointSchemaRequest {
+message ParseEndpointSchemaRequest {
   required string techSpaceName = 1;
   oneof location {
     string localFileSystemLocation = 2;
@@ -107,4 +120,64 @@ message ReferenceTypeInformation {
   repeated string inverseName = 5;
   optional Multiplicity inverseMultiplicity = 6;
 }
+
+message TreeData {
+  oneof treeElementKind {
+    BeginRoot beginRoot = 1;
+    BeginBranch beginBranch = 2;
+    Leaf leaf = 3;
+    EndBranch endBranch = 4;
+    EndRoot endRoot = 5;
+  }
+}
+
+message BeginRoot {
+  required string rootType = 1;
+}
+
+message EndRoot {
+}
+
+message BeginBranch {
+  required string branchName = 1;
+  required string childrenType = 2;
+  optional Multiplicity multiplicity = 3;
+  optional bool isOrdered = 4;
+}
+
+message EndBranch {
+  required string branchName = 1;
+}
+
+message Leaf {
+  required string typeName = 1;
+  oneof value {
+      StringValue stringValue = 2;
+      IntValue intValue = 3;
+      FloatValue floatValue = 4;
+      BoolValue boolValue = 5;
+      CustomValue customValue = 6;
+  }
+}
+
+message StringValue {
+  required string value = 1;
+}
+
+message IntValue {
+  required int64 value = 1;
+}
+
+message FloatValue {
+  required double value = 1;
+}
+
+message BoolValue {
+  required bool value = 1;
+}
+
+message CustomValue {
+  required BinaryData value = 1;
+}
+
 

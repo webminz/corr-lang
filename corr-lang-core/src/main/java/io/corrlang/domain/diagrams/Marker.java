@@ -22,5 +22,14 @@ public abstract class Marker implements GraphTheory {
         return true;
     }
 
-    public abstract void accept(MarkerVisitor visitor);
+
+    @Override
+    public boolean isPredicate() {
+        return true;
+    }
+
+    @Override
+    public boolean isOperation() {
+        return false;
+    }
 }

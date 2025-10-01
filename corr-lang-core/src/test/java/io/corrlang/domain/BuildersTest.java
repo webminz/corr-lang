@@ -166,7 +166,10 @@ public class BuildersTest extends TestWithGraphLib {
                                 Name.identifier("Registry"),
                                 Name.identifier("partners").prefixWith(Name.identifier("Registry")),
                                 Name.identifier("Person")))
-                .filter(d -> d.label() instanceof ContainmentMarker)
+                .filter(d -> { if (d.label() instanceof EdgeMarker em) {
+                    return em.getType().equals(EdgeMarker.EdgeMarkerType.CONTAINMENT);
+                }
+                    return false; })
                 .count());
 
         Optional<Diagram> diagram = form.diagramsOn(
@@ -231,7 +234,10 @@ public class BuildersTest extends TestWithGraphLib {
 
         assertEquals(1, sketch.diagramsOn(
                         Triple.node(Name.identifier("contracts").prefixWith(Name.identifier("company"))))
-                .filter(d -> d.label() instanceof ActionGroupMarker)
+                .filter(d -> {  if (d.label() instanceof NodeMarker nm) {
+                    return nm.getType().equals(NodeMarker.NodeMarkerType.ACTION_GROUP);
+                }
+                return false;})
                 .count());
 
         assertEquals(1, sketch.diagramsOn(
@@ -239,7 +245,10 @@ public class BuildersTest extends TestWithGraphLib {
                                 Name.identifier("GET").prefixWith(Name.identifier("contracts").prefixWith(Name.identifier("company")))
                         )
                 )
-                .filter(d -> d.label() instanceof ActionMarker)
+                .filter(d -> {  if (d.label() instanceof NodeMarker nm) {
+            return nm.getType().equals(NodeMarker.NodeMarkerType.ACTION_GROUP);
+        }
+            return false;})
                 .count());
 
 
@@ -248,7 +257,10 @@ public class BuildersTest extends TestWithGraphLib {
                                 Name.identifier("POST").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company"))),
                                 Name.identifier("dateOfEmployment").index(2).prefixWith(Name.identifier("POST").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company")))),
                                 Name.identifier("DateTime")))
-                .filter(d -> d.label() instanceof ActionInputMarker)
+                .filter(d -> {  if (d.label() instanceof EdgeMarker em) {
+                    return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_INPUT);
+                }
+                    return false;})
                 .count());
 
         assertEquals(1, sketch.diagramsOn(
@@ -256,7 +268,10 @@ public class BuildersTest extends TestWithGraphLib {
                                 Name.identifier("GET").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company"))),
                                 SpecialNames.RESULT_SUCCESS.prefixWith(Name.identifier("GET").prefixWith(Name.identifier("people").prefixWith(Name.identifier("company")))),
                                 Name.identifier("Employee")))
-                .filter(d -> d.label() instanceof ActionOutputMarker)
+                .filter(d -> {  if (d.label() instanceof EdgeMarker em) {
+                    return em.getType().equals(EdgeMarker.EdgeMarkerType.ACTION_INPUT);
+                }
+                    return false;})
                 .count());
 
     }

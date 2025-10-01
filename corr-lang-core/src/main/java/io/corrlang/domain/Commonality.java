@@ -2,66 +2,30 @@ package io.corrlang.domain;
 
 import no.hvl.past.names.Name;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import javax.annotation.Nullable;
+import java.util.*;
 
-public class Commonality {
+public sealed interface Commonality permits Commonality.Relates, Commonality.Identifies, Commonality.Synchronizes {
 
-    private final Name type;
-    private final Name id;
-    private final Set<QualifiedName> projections;
+    record Relates(int order, List<QualifiedName> projections, Optional<Commonality> parent, Optional<String> relationName) implements Commonality {}
 
-    // TODO commonalities must also be able express links
+    record Identifies(int order, List<QualifiedName> projections, String commonName,  Optional<Commonality> parent) implements Commonality {}
 
-    Commonality(Name type, Name id, Set<QualifiedName> projections) {
-        this.type = type;
-        this.id = id;
-        this.projections = projections;
+    record Synchronizes(int order, List<QualifiedName> projections, List<Integer> projectionDependency,  Optional<Commonality> parent, Optional<String> relationName) implements Commonality {}
+
+
+    List<QualifiedName> projections();
+
+    Optional<Commonality> parent();
+
+    default boolean contains(QualifiedName name) {
+        return projections().contains(name);
     }
 
-    public Name getType() {
-        return type;
-    }
-
-    public Name getId() {
-        return id;
-    }
-
-    public boolean contains(Name system, Name element) {
-        return this.projections.contains(new QualifiedName(system, element));
-    }
-
-    public Set<QualifiedName> getProjections() {
-        return projections;
-    }
-
-    public Optional<Name> projectionOn(Name system) {
-        return projections.stream().filter(qualifiedName -> qualifiedName.getSystem().equals(system)).findFirst().map(QualifiedName::getElement);
-    }
-
-    public Commonality add(Name system, Name element) {
-        Set<QualifiedName> related = new HashSet<>(projections);
-        related.add(new QualifiedName(system, element));
-        return new Commonality(type, id, related);
+    default Optional<Name> projectOn(Endpoint endpoint) {
+        return projections().stream().filter(qname -> qname.getEndpoint() == endpoint.getOrder()).map(QualifiedName::getElement).findFirst();
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Commonality that = (Commonality) o;
-        return type.equals(that.type) && id.equals(that.id) && projections.equals(that.projections);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(type, id, projections);
-    }
-
-    public static Commonality create(Name type, Name commId) {
-        return new Commonality(type, commId, new HashSet<>());
-    }
 }

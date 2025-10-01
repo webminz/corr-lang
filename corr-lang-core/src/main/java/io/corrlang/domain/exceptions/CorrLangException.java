@@ -26,11 +26,11 @@ public class CorrLangException extends RuntimeException {
     }
 
     public static CorrLangException io(IOException nested) {
-        return new CorrLangException(null, nested, FailureTypes.NESTED_IO_EXCEPTION);
+        return new CorrLangException(null, nested, new FailureTypes.NestedIOException(nested));
     }
 
     public static CorrLangException missingTechSpaceCapability(String techSpace, Class<? extends TechSpaceCapability> capability) {
-        return new CorrLangException("%s is missing '%s'".formatted(techSpace, capability.getName()), null, FailureTypes.TECH_SPACE_MISSING_CAPABILITY);
+        return new CorrLangException("%s is missing '%s'".formatted(techSpace, capability.getName()), null, new FailureTypes.TechSpaceMissingCapability(techSpace));
     }
 
 }

@@ -589,46 +589,49 @@ public class ExampleSystems {
     }
 
 
-    public Schema buildPostsSchema(SchemaBuilder builder) {
-        builder.stringValueType("String");
-        builder.stringValueType("ID");
-        builder.boolValueType("Boolean");
-        builder.intValueType("Int");
-        builder.floatValueType("Float");
-        builder.objectType("Post")
+    public static Schema buildPostsSchema(SchemaBuilder builder) {
+        builder
+                .stringValueType("String")
+                .stringValueType("ID")
+                .boolValueType("Boolean")
+                .intValueType("Int")
+                .floatValueType("Float")
+        .objectType("Post")
                 .buildField("id", "ID").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("title", "String").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("content", "String").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("author", "User").multiplicity(Multiplicity.of(true, false)).endField()
-                .endObjectType();
-        builder.objectType("User")
+                .endObjectType()
+        .objectType("User")
                 .buildField("id", "ID").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("name", "String").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("email", "String").multiplicity(Multiplicity.of(true, false)).endField()
                 .buildField("posts", "Post").multiplicity(Multiplicity.of(false, true)).listSemantics().endField()
-                .endObjectType();
-        builder.actionGroup("Query")
+                .endObjectType()
+        .actionGroup("Query")
                 .action("allPosts")
-                .buildReturnArg("Post").multiplicity(Multiplicity.of(true, true)).listSemantics().endArgument()
+                    .buildReturnArg("Post").multiplicity(Multiplicity.of(true, true)).listSemantics().endArgument()
                 .endActionAndBackToGroup()
+
                 .action("post")
-                .buildInputArg("id", "ID").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildReturnArg("Post").multiplicity(Multiplicity.of(false, false)).endArgument()
+                    .buildInputArg("id", "ID").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildReturnArg("Post").multiplicity(Multiplicity.of(false, false)).endArgument()
+
                 .endActionAndBackToGroup()
-                .endCurrentGroup();
-        builder.actionGroup("Mutation")
+                .end()
+        .actionGroup("Mutation")
                 .action("createPost")
-                .buildInputArg("title", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildInputArg("content", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildInputArg("authorId", "ID").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildReturnArg("Post").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("title", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("content", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("authorId", "ID").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildReturnArg("Post").multiplicity(Multiplicity.of(true, false)).endArgument()
                 .endActionAndBackToGroup()
                 .action("createUser")
-                .buildInputArg("name", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildInputArg("email", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
-                .buildReturnArg("User").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("name", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildInputArg("email", "String").multiplicity(Multiplicity.of(true, false)).endArgument()
+                    .buildReturnArg("User").multiplicity(Multiplicity.of(true, false)).endArgument()
                 .endActionAndBackToGroup()
-                .endCurrentGroup();
+                .end();
 
         return builder.build();
     }

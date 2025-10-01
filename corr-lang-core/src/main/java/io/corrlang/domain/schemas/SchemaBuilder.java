@@ -513,7 +513,7 @@ public class SchemaBuilder {
 
         // containments
         for (Triple contnmt : containmentEdges) {
-            graphBuilders.startDiagram(ContainmentMarker.getInstance());
+            graphBuilders.startDiagram(new EdgeMarker(EdgeMarker.EdgeMarkerType.CONTAINMENT));
             graphBuilders.map(Universe.ARROW_SRC_NAME, contnmt.getSource());
             graphBuilders.map(Universe.ARROW_LBL_NAME, contnmt.getLabel());
             graphBuilders.map(Universe.ARROW_TRG_NAME, contnmt.getTarget());
@@ -529,14 +529,14 @@ public class SchemaBuilder {
 
         // Action Types
         for (Name action : actions) {
-            graphBuilders.startDiagram(ActionMarker.getInstance());
+            graphBuilders.startDiagram(new NodeMarker(NodeMarker.NodeMarkerType.ACTION));
             graphBuilders.map(Universe.ONE_NODE_THE_NODE, action);
             graphBuilders.endDiagram(Name.anonymousIdentifier());
         }
 
         // Action inputs
         for (Triple actionInput : actionInputs) {
-            graphBuilders.startDiagram(ActionInputMarker.getInstance());
+            graphBuilders.startDiagram(new EdgeMarker(EdgeMarker.EdgeMarkerType.ACTION_INPUT));
             graphBuilders.map(Universe.ARROW_SRC_NAME, actionInput.getSource());
             graphBuilders.map(Universe.ARROW_LBL_NAME, actionInput.getLabel());
             graphBuilders.map(Universe.ARROW_TRG_NAME, actionInput.getTarget());
@@ -545,7 +545,7 @@ public class SchemaBuilder {
 
         // Action outputs
         for (Triple actionOutput : actionOutputs) {
-            graphBuilders.startDiagram(ActionOutputMarker.getInstance());
+            graphBuilders.startDiagram(new EdgeMarker(EdgeMarker.EdgeMarkerType.ACTION_OUTPUT));
             graphBuilders.map(Universe.ARROW_SRC_NAME, actionOutput.getSource());
             graphBuilders.map(Universe.ARROW_LBL_NAME, actionOutput.getLabel());
             graphBuilders.map(Universe.ARROW_TRG_NAME, actionOutput.getTarget());
@@ -554,14 +554,14 @@ public class SchemaBuilder {
 
         // Action groups
         for (Name actionGroup : actionGroups) {
-            graphBuilders.startDiagram(ActionGroupMarker.getInstance());
+            graphBuilders.startDiagram(new NodeMarker(NodeMarker.NodeMarkerType.ACTION_GROUP));
             graphBuilders.map(Universe.ONE_NODE_THE_NODE, actionGroup);
             graphBuilders.endDiagram(Name.anonymousIdentifier());
         }
 
         // Action group memberships
         for (Triple agMember : actionGroupMemberships) {
-            graphBuilders.startDiagram(ActionGroupChildMarker.getInstance());
+            graphBuilders.startDiagram(new EdgeMarker(EdgeMarker.EdgeMarkerType.ACTION_GROUP_MEMBER));
             graphBuilders.map(Universe.ARROW_SRC_NAME, agMember.getSource());
             graphBuilders.map(Universe.ARROW_LBL_NAME, agMember.getLabel());
             graphBuilders.map(Universe.ARROW_TRG_NAME, agMember.getTarget());
